@@ -78,7 +78,8 @@ export default {
     provider: 'Provider',
     manageProvider: 'Manage Provider',
     stadium: 'Stadium',
-    manageStadium: 'Manage Stadium'
+    manageStadium: 'Manage Stadium',
+    user: 'User'
   },
   tour: {
     add: 'Add',
@@ -92,6 +93,39 @@ export default {
     action: 'Actions',
     stepOneName: 'General Data',
     stepTwoName: 'Detail Days'
+  },
+  match: {},
+  hotel: {
+    nameEnHotel: 'Name En',
+    nameEsHotel: 'Name Es',
+    categoryHotel: 'Category',
+    cityHotel: 'City',
+    providerHotel: 'Provider',
+    status: 'Status'
+  },
+  provider: {
+    nameProvider: 'Name',
+    taxIDProvider: 'Tax ID',
+    phoneProvider: 'Phone',
+    emailProvier: 'Email',
+    statusProvier: 'Status'
+  },
+  city: {
+    nameEnCity: 'Name En',
+    nameEsCity: 'Name Es',
+    latitudeCity: 'Latitude',
+    longitudeCity: 'Longitude'
+  },
+  stadium: {
+    nameStadium: 'Name',
+    cityStadium: 'City',
+    latitudeStadium: 'Latitude',
+    longitudeStadium: 'Longitude'
+  },
+  user:{
+    nameUser: 'Usuario',
+    rolUser: '',
+    permission: ''
   },
   navbar: {
     dashboard: 'Dashboard',
@@ -161,7 +195,8 @@ export default {
     draft: 'Draft',
     delete: 'Delete',
     cancel: 'Cancel',
-    confirm: 'Confirm'
+    confirm: 'Confirm',
+    next: 'Next'
   },
   example: {
     warning: 'Creating and editing pages cannot be cached by keep-alive because keep-alive include does not currently support caching based on routes, so it is currently cached based on component name. If you want to achieve a similar caching effect, you can use a browser caching scheme such as localStorage. Or do not use keep-alive include to cache all pages directly. See details'

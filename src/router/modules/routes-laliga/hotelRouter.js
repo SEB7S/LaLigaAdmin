@@ -13,19 +13,19 @@ const hotelRouter = {
   },
   children: [
     {
-      path: 'hotel',
+      path: 'manageCategory',
       component: () => import('@/components-laLiga/hotel/categoryHotel'),
       name: 'Hotel Category',
       meta: { title: 'hotelCategory' }
     },
     {
-      path: 'markdown',
-      component: () => import('@/views/components-demo/split-pane'),
+      path: 'manageHotel',
+      component: () => import('@/components-laLiga/hotel/configHotel'),
       name: 'Manage Hotel',
       meta: { title: 'manageHotel' }
     },
     {
-      path: 'json-editor',
+      path: 'manageRoom',
       component: () => import('@/views/components-demo/split-pane'),
       name: 'Manage Room',
       meta: { title: 'manageRoom' }

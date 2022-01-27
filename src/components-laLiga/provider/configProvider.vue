@@ -1,12 +1,13 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!--       <el-input
-        placeholder="Nombre En"
+            <el-input
+        placeholder="Search"
         style="width: 200px"
         class="filter-item"
+        v-model="search"
         @keyup.enter.native="handleFilter"
-      />
+      /><!-- 
       <el-button
         v-waves
         class="filter-item"
@@ -23,7 +24,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        Add
+        {{$t('table.add')}}
       </el-button>
       <el-button
         v-waves
@@ -33,21 +34,13 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        Export
+        {{$t('table.export')}}
       </el-button>
-      <el-checkbox
-        v-model="showReviewer"
-        class="filter-item"
-        style="margin-left: 15px"
-        @change="tableKey = tableKey + 1"
-      >
-        reviewer
-      </el-checkbox>
     </div>
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list"
+      :data="provider"
       border
       fit
       highlight-current-row
@@ -66,27 +59,27 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="100px" align="center">
+      <el-table-column :label="$t('provider.nameProvider')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Tax ID" min-width="100px" align="center">
+      <el-table-column :label="$t('provider.taxIDProvider')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.document }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Phone" min-width="100px" align="center">
+      <el-table-column :label="$t('provider.phoneProvider')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Email" min-width="100px" align="center">
+      <el-table-column :label="$t('provider.emailProvier')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Status" min-width="100px" align="center">
+      <el-table-column :label="$t('provider.statusProvier')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <el-switch
             v-model="row.status"
@@ -97,14 +90,14 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Actions"
+        :label="$t('table.actions')"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+            {{$t('table.edit') }}
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -112,7 +105,7 @@
             type="danger"
             @click="confirmDelete(row)"
           >
-            Delete
+            {{$t('table.delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -133,26 +126,26 @@
         label-width="120px"
         style="width: 50%; margin-left: 50px"
       >
-        <el-form-item label="Name">
+        <el-form-item :label="$t('provider.nameProvider')">
           <el-input v-model="formProvider.name" />
         </el-form-item>
-        <el-form-item label="Tax ID">
+        <el-form-item :label="$t('provider.taxIDProvider')">
           <el-input v-model="formProvider.document" />
         </el-form-item>
-        <el-form-item label="Phone">
+        <el-form-item :label="$t('provider.phoneProvider')">
           <el-input v-model="formProvider.phone" type="tel" />
         </el-form-item>
-        <el-form-item label="Email">
+        <el-form-item :label="$t('provider.emailProvier')">
           <el-input v-model="formProvider.email" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> {{$t('table.cancel')}} </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? postProvider() : updateData()"
         >
-          Confirm
+          {{$t('table.confirm')}}
         </el-button>
       </div>
     </el-dialog>
@@ -280,7 +273,8 @@ export default {
       },
       providerUpdate: [],
       /* EndPoint */
-      url: this.$store.getters.url
+      url: this.$store.getters.url,
+      search: ''
     }
   },
   created() {
@@ -526,7 +520,27 @@ export default {
         }
       })
     }
-  }
+  },
+    computed: {
+    provider() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return item.name
+            .toLowerCase()
+            .includes(this.search.toLowerCase()) ||
+            item.document
+            .toLowerCase()
+            .includes(this.search.toLowerCase()) ||
+            item.phone
+            .toLowerCase()
+            .includes(this.search.toLowerCase()) ||
+            item.email
+            .toLowerCase()
+            .includes(this.search.toLowerCase());
+        });
+      }
+    },
+  },
 }
 </script>
 <style lang="scss" >

@@ -1,19 +1,17 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-           <el-input
-        placeholder="Search"
+      <!--       <el-input
+        placeholder="Nombre En"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
-      /><!--  
+      />
       <el-button
         v-waves
         class="filter-item"
         type="primary"
         icon="el-icon-search"
-        v-model="search"
         @click="handleFilter"
       >
         Search
@@ -25,7 +23,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        {{$t('table.add')}}
+        Add
       </el-button>
       <el-button
         v-waves
@@ -35,14 +33,22 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        {{$t('table.export')}}
+        Export
       </el-button>
+      <el-checkbox
+        v-model="showReviewer"
+        class="filter-item"
+        style="margin-left: 15px"
+        @change="tableKey = tableKey + 1"
+      >
+        reviewer
+      </el-checkbox>
     </div>
 
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="stadium"
+      :data="list"
       border
       fit
       highlight-current-row
@@ -61,35 +67,35 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.nameStadium')" min-width="100px" align="center">
+      <el-table-column label="Nmae" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.cityStadium')" min-width="100px" align="center">
+      <el-table-column label="City" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.cityName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.latitudeStadium')" min-width="100px" align="center">
+      <el-table-column label="Latitude" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.latitude }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.longitudeStadium')" min-width="100px" align="center">
+      <el-table-column label="Longitude" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.longitude }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('table.actions')"
+        label="Actions"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{$t('table.edit')}}
+            Edit
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -97,7 +103,7 @@
             type="danger"
             @click="confirmDelete(row)"
           >
-            {{$t('table.delete')}}
+            Delete
           </el-button>
         </template>
       </el-table-column>
@@ -120,16 +126,16 @@
         label-width="120px"
         style="width: 800px; margin-left: 50px"
       >
-        <el-form-item :label="$t('stadium.nameStadium')">
+        <el-form-item label="Name">
           <el-input v-model="formStadium.name" />
         </el-form-item>
-        <el-form-item :label="$t('stadium.latitudeStadium')">
+        <el-form-item label="Latitude">
           <el-input v-model="formStadium.latitude" />
         </el-form-item>
-        <el-form-item :label="$t('stadium.longitudeStadium')">
+        <el-form-item label="Longitude">
           <el-input v-model="formStadium.longitude" />
         </el-form-item>
-        <el-form-item :label="$t('stadium.cityStadium')">
+        <el-form-item label="City">
           <el-autocomplete
             v-model="formStadium.city_name"
             popper-class="my-autocomplete"
@@ -150,12 +156,12 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> {{$t('table.cancel')}} </el-button>
+        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? postStadium() : updateData()"
         >
-          {{$t('table.confirm')}}
+          Confirm
         </el-button>
       </div>
     </el-dialog>
@@ -204,7 +210,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'ConfigStadium',
+  name: 'ConfigUser',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -289,7 +295,6 @@ export default {
         city_name: ''
       },
       stadiumUpdate: [],
-      search: '',
       /* EndPoint */
       url: this.$store.getters.url
     }
@@ -539,27 +544,7 @@ export default {
     handleIconClick(ev) {
       console.log(ev)
     }
-  },
-    computed: {
-    stadium() {
-      if (this.list) {
-        return this.list.filter((item) => {
-          return item.name
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.cityName
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.latitude
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.longitude
-            .toLowerCase()
-            .includes(this.search.toLowerCase());
-        });
-      }
-    },
-  },
+  }
 }
 </script>
 <style lang="scss">

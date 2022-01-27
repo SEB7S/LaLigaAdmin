@@ -23,7 +23,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        {{ $t('tour.add') }}
+        {{ $t("table.add") }}
       </el-button>
       <el-button
         v-waves
@@ -33,7 +33,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        {{ $t('tour.export') }}
+        {{ $t("table.export") }}
       </el-button>
     </div>
     <el-table
@@ -58,22 +58,38 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('tour.nameTour')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('tour.nameTour')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('tour.nameProvider')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('tour.nameProvider')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.providerName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('tour.durationTour')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('tour.durationTour')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.duration_in_days }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('tour.status')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('tour.status')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <el-switch
             v-model="row.status"
@@ -84,14 +100,14 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('tour.action')"
+        :label="$t('table.actions')"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{ $t('tour.edit') }}
+            {{ $t("table.edit") }}
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -99,7 +115,7 @@
             type="danger"
             @click="confirmDelete(row)"
           >
-            {{ $t('tour.delete') }}
+            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -135,27 +151,25 @@
                 v-model="formTour.duration_in_days"
                 :min="1"
                 :max="35"
-                @change="handleChange"
               />
             </el-form-item>
             <el-form-item :label="$t('tour.nameProvider')">
-              <el-autocomplete
-                v-model="formTour.providerName"
-                popper-class="my-autocomplete"
-                :fetch-suggestions="getProviders"
-                placeholder="Please input"
-                style="width: 100%"
-                @select="handleSelect"
-              >
-                <i
-                  slot="suffix"
-                  class="el-icon-edit el-input__icon"
-                  @click="handleIconClick"
-                />
-                <template slot-scope="{ item }">
-                  <div class="value">{{ item.name }}</div>
-                </template>
-              </el-autocomplete>
+                <el-autocomplete
+                          v-model="formTour.providerName"
+                          popper-class="my-autocomplete"
+                          :fetch-suggestions="getProviders"
+                          placeholder="Please input"
+                          style="width: 100%"
+                          @select="handleSelect"
+                        >
+                          <i
+                            slot="suffix"
+                            class="el-icon-edit el-input__icon"
+                          />
+                          <template slot-scope="{ item }">
+                            <div class="value">{{ item.name }}</div>
+                          </template>
+                </el-autocomplete>              
             </el-form-item>
             <el-form-item label="Hotel Category">
               <el-select v-model="formTour.hotel_category" placeholder="Select">
@@ -186,11 +200,8 @@
               />
             </el-form-item>
           </el-form>
-          <el-collapse v-model="activeNames" accordion @change="handleChange">
-            <div
-              v-for="(formDay, counter) in formDayDetail"
-              :key="counter"
-            >
+          <el-collapse v-model="activeNames" accordion>
+            <div v-for="(formDay, counter) in formDayDetail" :key="counter">
               <div class="grid-content">
                 <el-collapse-item :title="formDay.dayName" :name="counter">
                   <el-form
@@ -214,7 +225,6 @@
                           <i
                             slot="suffix"
                             class="el-icon-edit el-input__icon"
-                            @click="handleIconClick"
                           />
                           <template slot-scope="{ item }">
                             <div class="value">{{ item.nameEnglish }}</div>
@@ -232,7 +242,7 @@
                           <i class="el-icon-plus" />
                         </el-upload>
                         <el-dialog :visible.sync="dialogVisible">
-                          <img width="100%" :src="dialogImageUrl" alt="">
+                          <img width="100%" :src="dialogImageUrl" alt="" />
                         </el-dialog>
                       </el-form-item>
                       <el-form-item label="Description">
@@ -258,7 +268,8 @@
                           type="textarea"
                           placeholder="Please input"
                         />
-                      </el-form-item></div></el-form>
+                      </el-form-item></div
+                  ></el-form>
                 </el-collapse-item>
               </div>
             </div>
@@ -272,7 +283,7 @@
           type="primary"
           @click="dialogStatus === 'create' ? postTour() : updateData()"
         >
-          {{ active != 3 ? "Next" : "Confirm" }}
+          {{ active != 1 ? $t('table.next') : $t('table.confirm') }}
         </el-button>
       </div>
     </el-dialog>
@@ -289,7 +300,7 @@
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">
-          Confirm
+           {{$t('table.confirm')}}
         </el-button>
       </span>
     </el-dialog>
@@ -298,9 +309,7 @@
 <script>
 import {
   fetchList,
-  fetchPv,
-  createArticle,
-  updateArticle
+  fetchPv
 } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -531,8 +540,7 @@ export default {
       this.active = 0
     },
     postTour() {
-      this.next()
-      if (this.active == 6) {
+      if (this.active === 0) {
         this.$refs['dataForm'].validate((valid) => {
           var tour = {
             name: this.formTour.name,
@@ -564,6 +572,7 @@ export default {
         })
         .catch((error) => {
           this.status = 'error'
+          console.log(error.response)
         })
     },
     handleDelete(row) {
@@ -657,6 +666,7 @@ export default {
         })
         .catch((error) => {
           this.status = 'error'
+          console.error(error.response)
         })
     },
     createFilter(queryString) {
@@ -665,162 +675,133 @@ export default {
       }
     },
     handleSelect(item) {
-      console.log(item)
-      this.formTour.providerName = item.name
-      this.formTour.idProvider = item.id
+    this.formTour.providerName = item.name
+    this.formTour.idProvider = item.id
     },
-    handleIconClick(ev) {
-      console.log(ev)
-    },
-    changeStatus(data, status) {
-      console.log(status)
-      var tour = {
-        id: data.id,
-        name: data.name,
-        duration_in_days: data.duration_in_days,
-        status: status,
-        idProvider: data.idProvider
-      }
-      axios
-        .put(this.url + 'Tour', tour)
-        .then((response) => {
-          this.dialogFormVisible = false
-          this.$notify({
-            title: 'Success',
-            message: 'Status changed Successfully',
-            type: 'success',
-            duration: 2000
-          })
-
-          this.getProvider()
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    next() {
-      if (this.active++ > 2) this.active = 0
-    },
-    /** Images */
-    handleRemove(file, fileList) {
-      console.log(file, fileList)
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
-    },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG) {
-        this.$message.error('La imagen debe estar en formato JPG!')
-      }
-      if (!isLt2M) {
-        this.$message.error('La imagen excede los 2MB!')
-      }
-      return isJPG && isLt2M
-    },
-    handleChange(val) {
-      console.log(val)
-    },
-    /** City */
-    getCities(queryString, cb) {
-      axios
-        .get(this.url + 'City')
-        .then((response) => {
-          console.log(response.data)
-          var links = response.data
-          var results = queryString
-            ? links.filter(this.createFilterCity(queryString))
-            : links
-          cb(results)
-        })
-        .catch((error) => {
-          this.status = 'error'
-        })
-    },
-    createFilterCity(queryString) {
-      return (link) => {
-        return (
-          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
-        )
-      }
-    },
-    handleSelectCity(item) {
-      console.log(item, this.arrayPosition)
-      this.formDayDetail[this.arrayPosition].city_name = item.nameEnglish
-      this.formDayDetail[this.arrayPosition].cityId = item.id
-    },
-    handleIconClick(ev) {
-      console.log(ev)
-    },
-    calculateDays(item) {
-      const months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ]
-
-      const dateFormat =
-        this.start_date.getDate() +
-        '/' +
-        (this.start_date.getMonth() + 1) +
-        '/' +
-        this.start_date.getFullYear()
-
-      for (
-        let index = 0;
-        index < parseInt(this.formTour.duration_in_days);
-        index++
-      ) {
-        console.log(dateFormat)
-        var day = {
-          dayName:
-            'Day ' + (index + 1) + ' - ' + this.addDate(index, dateFormat),
-          city_name: '',
-          cityId: 0,
-          description_language: 'English',
-          description_english: '',
-          description_spanish: ''
-        }
-        this.formDayDetail.push(day)
-      }
-    },
-    addDate(d, fecha) {
-      {
-        var Fecha = new Date()
-        var sFecha =
-          fecha ||
-          Fecha.getDate() +
-            '/' +
-            (Fecha.getMonth() + 1) +
-            '/' +
-            Fecha.getFullYear()
-        var sep = sFecha.indexOf('/') != -1 ? '/' : '-'
-        var aFecha = sFecha.split(sep)
-        var fecha = aFecha[2] + '/' + aFecha[1] + '/' + aFecha[0]
-        fecha = new Date(fecha)
-        fecha.setDate(fecha.getDate() + parseInt(d))
-        var anno = fecha.getFullYear()
-        var mes = fecha.getMonth() + 1
-        var dia = fecha.getDate()
-        mes = mes < 10 ? '0' + mes : mes
-        dia = dia < 10 ? '0' + dia : dia
-        var fechaFinal = dia + sep + mes + sep + anno
-        return fechaFinal
-      }
+  handleSelectCity(item) {
+    console.log(item, this.arrayPosition)
+    this.formDayDetail[this.arrayPosition].city_name = item.nameEnglish
+    this.formDayDetail[this.arrayPosition].cityId = item.id
+  },
+  handleIconClick(ev) {
+    console.log(ev)
+  },
+  changeStatus(data, status) {
+    console.log(status)
+    var tour = {
+      id: data.id,
+      name: data.name,
+      duration_in_days: data.duration_in_days,
+      status: status,
+      idProvider: data.idProvider
     }
+    axios
+      .put(this.url + 'Tour', tour)
+      .then((response) => {
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'Success',
+          message: 'Status changed Successfully',
+          type: 'success',
+          duration: 2000
+        })
+        this.getProvider()
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  },
+  next() {
+    if (this.active++ > 2) this.active = 0
+  },
+  /** Images */
+  handleRemove(file, fileList) {
+    console.log(file, fileList)
+  },
+  handlePictureCardPreview(file) {
+    this.dialogImageUrl = file.url
+    this.dialogVisible = true
+  },
+  beforeAvatarUpload(file) {
+    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+    const isLt2M = file.size / 1024 / 1024 < 2
+    if (!isJPG) {
+      this.$message.error('La imagen debe estar en formato JPG!')
+    }
+    if (!isLt2M) {
+      this.$message.error('La imagen excede los 2MB!')
+    }
+    return isJPG && isLt2M
+  },
+  handleChange(val) {
+    console.log(val)
+  },
+  /** City */
+  getCities(queryString, cb) {
+    axios
+      .get(this.url + 'City')
+      .then((response) => {
+        console.log(response.data)
+        var links = response.data
+        var results = queryString
+          ? links.filter(this.createFilterCity(queryString))
+          : links
+        cb(results)
+      })
+      .catch((error) => {
+        this.status = 'error'
+        console.error(error.response)
+      })
+  },
+  createFilterCity(queryString) {
+    return (link) => {
+      return (
+        link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+        0
+      )
+    }
+  },
+  calculateDays(item) {
+    const dateFormat =
+    this.start_date.getDate() +
+    '/' +
+    (this.start_date.getMonth() + 1) +
+    '/' +
+    this.start_date.getFullYear()
+    for (
+      let index = 0;
+      index < parseInt(this.formTour.duration_in_days);
+      index++
+    ) {
+      console.log(dateFormat)
+      var day = {
+        dayName:
+        'Day ' + (index + 1) + ' - ' + this.addDate(index, dateFormat),
+        city_name: '',
+        cityId: 0,
+        description_language: 'English',
+        description_english: '',
+        description_spanish: ''
+      }
+      this.formDayDetail.push(day)
+    }
+  },
+  addDate(d, fecha) {
+ var Fecha = new Date();
+ var sFecha = fecha || (Fecha.getDate() + "/" + (Fecha.getMonth() +1) + "/" + Fecha.getFullYear());
+ var sep = sFecha.indexOf('/') != -1 ? '/' : '-';
+ var aFecha = sFecha.split(sep);
+ var fecha = aFecha[2]+'/'+aFecha[1]+'/'+aFecha[0];
+ fecha= new Date(fecha);
+ fecha.setDate(fecha.getDate()+parseInt(d));
+ var anno=fecha.getFullYear();
+ var mes= fecha.getMonth()+1;
+ var dia= fecha.getDate();
+ mes = (mes < 10) ? ("0" + mes) : mes;
+ dia = (dia < 10) ? ("0" + dia) : dia;
+ var fechaFinal = dia+sep+mes+sep+anno;
+ return (fechaFinal);
+  }
   }
 }
 </script>

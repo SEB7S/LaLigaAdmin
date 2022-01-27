@@ -15,7 +15,12 @@
         <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
-
+        <el-tooltip content="Users" effect="dark" placement="bottom">
+          <router-link to="/user">
+           <svg-icon icon-class="peoples" class="right-menu-item" style="font-size:34px !important" />
+          </router-link>
+         
+        </el-tooltip>
         <lang-select class="right-menu-item hover-effect" />
 
       </template>

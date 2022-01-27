@@ -77,7 +77,7 @@ export const constantRoutes = [
     path: '/401',
     component: () => import('@/views/error-page/401'),
     hidden: true
-  }
+  },
 
   /**   {
     path: '/',
@@ -145,6 +145,19 @@ export const asyncRoutes = [
   cityRouter,
   stadiumRouter,
 
+  {
+    path: '/user',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/user',
+        component: () => import('@/components-laLiga/user/configUser'),
+        name: 'User',
+        meta: { title: 'user', icon: 'icon', noCache: true }
+      }
+    ]
+  },
   /**     {
     path: '/permission',
     component: Layout,

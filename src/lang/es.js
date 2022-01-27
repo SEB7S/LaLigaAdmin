@@ -78,20 +78,49 @@ export default {
     provider: 'Proveedor',
     manageProvider: 'Gestionar Proveedor',
     stadium: 'Estadio',
-    manageStadium: 'Gestionar Estadio'
+    manageStadium: 'Gestionar Estadio',
+    user: 'Usuario'
   },
   tour: {
-    add: 'Agregar',
-    export: 'Exportar',
-    edit: 'Editar',
-    delete: 'Eliminar',
     nameTour: 'Nombre',
     nameProvider: 'Proveedor',
     durationTour: 'Duración (Días)',
     status: 'Estado',
-    action: 'Acciones',
     stepOneName: 'Datos Generales',
     stepTwoName: 'Detalle de Días'
+  },
+  match: {},
+  hotel: {
+    nameEnHotel: 'Nombre En',
+    nameEsHotel: 'Nombre Es',
+    categoryHotel: 'Categoría',
+    cityHotel: 'Ciudad',
+    providerHotel: 'Proveedor',
+    status: 'Estado'
+  },
+  provider: {
+    nameProvider: 'Nombre',
+    taxIDProvider: 'Tax ID',
+    phoneProvider: 'Teléfono',
+    emailProvier: 'Correo Electrónico',
+    statusProvier: 'Estado'
+  },
+  city: {
+    nameEnCity: 'Nombre En',
+    nameEsCity: 'Nombre Es',
+    latitudeCity: 'Latitud',
+    longitudeCity: 'Longitud'
+  },
+  stadium: {
+    nameStadium: 'Nombre',
+    cityStadium: 'Ciudad',
+    latitudeStadium: 'Latitud',
+    longitudeStadium: 'Longitud'
+  },
+  user:{
+    nameUser: 'Usuario',
+    rolUser: '',
+    permission: ''
   },
   navbar: {
     logOut: 'Salir',
@@ -161,7 +190,8 @@ export default {
     draft: 'Draft',
     delete: 'Eliminar',
     cancel: 'Cancelar',
-    confirm: 'Confirmar'
+    confirm: 'Confirmar',
+    next: 'Siguiente'
   },
   example: {
     warning: 'Creating and editing pages cannot be cached by keep-alive because keep-alive include does not currently support caching based on routes, so it is currently cached based on component name. If you want to achieve a similar caching effect, you can use a browser caching scheme such as localStorage. Or do not use keep-alive include to cache all pages directly. See details'
