@@ -77,7 +77,7 @@ export const constantRoutes = [
     path: '/401',
     component: () => import('@/views/error-page/401'),
     hidden: true
-  },
+  }
 
   /**   {
     path: '/',
@@ -92,7 +92,7 @@ export const constantRoutes = [
       }
     ]
   }, */
-/**   {
+  /**   {
     path: '/documentation',
     component: Layout,
     children: [
@@ -144,7 +144,6 @@ export const asyncRoutes = [
   providerRouter,
   cityRouter,
   stadiumRouter,
-
   {
     path: '/user',
     component: Layout,

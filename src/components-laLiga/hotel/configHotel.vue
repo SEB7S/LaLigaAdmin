@@ -41,6 +41,7 @@
       :key="tableKey"
       v-loading="listLoading"
       :data="hotel"
+      size="mini"
       border
       fit
       highlight-current-row
@@ -83,7 +84,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.category }}</span>
+          <span>{{ row.categoryName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -125,16 +126,20 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{ $t("table.edit") }}
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleUpdate(row)"
+            icon="el-icon-edit"
+          >
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="confirmDelete(row)"
+            icon="el-icon-delete"
           >
-            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -147,58 +152,169 @@
       @pagination="getList"
     />
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="left"
-        label-width="120px"
-        style="width: 800px; margin-left: 50px"
-      >
-        <el-form-item :label="$t('hotel.nameEnHotel')">
-          <el-input v-model="formHotel.nameEnglish" />
-        </el-form-item>
-        <el-form-item :label="$t('hotel.nameEsHotel')">
-          <el-input v-model="formHotel.nameSpanish" />
-        </el-form-item>
-        <el-form-item :label="$t('hotel.categoryHotel')">
-          <el-input v-model="formHotel.category" />
-        </el-form-item>
-        <el-form-item :label="$t('hotel.cityHotel')">
-          <el-autocomplete
-            v-model="formHotel.city_name"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getCities"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
-          >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.nameEnglish }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-        <el-form-item :label="$t('hotel.providerHotel')">
-          <el-autocomplete
-            v-model="formHotel.providerName"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getProviders"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelectProvider"
-          >
-            <i slot="suffix" class="el-icon-edit el-input__icon" />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.name }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-      </el-form>
+      <el-steps :active="active" align-center finish-status="success">
+        <el-step title="General Data"></el-step>
+        <el-step title="Image / Description"></el-step>
+        <el-step title="Room Type"></el-step>
+      </el-steps>
+      <div v-if="active == 0">
+        <el-form
+          ref="formHotel"
+          :model="formHotel"
+          :rules="rules"
+          label-position="top"
+          label-width="120px"
+          style="margin: 30px"
+        >
+          <el-form-item :label="$t('hotel.nameEnHotel')" prop="nameEnglish">
+            <el-input v-model="formHotel.nameEnglish" />
+          </el-form-item>
+          <el-form-item :label="$t('hotel.nameEsHotel')" prop="nameSpanish">
+            <el-input v-model="formHotel.nameSpanish" />
+          </el-form-item>
+          <el-form-item :label="$t('hotel.providerHotel')" prop="providerName">
+            <el-autocomplete
+              v-model="formHotel.providerName"
+              popper-class="my-autocomplete"
+              :fetch-suggestions="getProviders"
+              placeholder="Please input"
+              style="width: 100%"
+              @select="handleSelectProvider"
+            >
+              <i slot="suffix" class="el-icon-edit el-input__icon" />
+              <template slot-scope="{ item }">
+                <div class="value">{{ item.name }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+          <el-form-item :label="$t('hotel.categoryHotel')" prop="categoryName">
+            <el-autocomplete
+              v-model="formHotel.categoryName"
+              popper-class="my-autocomplete"
+              :fetch-suggestions="getCategories"
+              placeholder="Please input"
+              style="width: 100%"
+              @select="handleSelectCategory"
+            >
+              <i
+                slot="suffix"
+                class="el-icon-edit el-input__icon"
+                @click="handleIconClick"
+              />
+              <template slot-scope="{ item }">
+                <div class="value">{{ item.categoryName }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+          <el-form-item :label="$t('hotel.cityHotel')" prop="city_name">
+            <el-autocomplete
+              v-model="formHotel.city_name"
+              popper-class="my-autocomplete"
+              :fetch-suggestions="getCities"
+              placeholder="Please input"
+              style="width: 100%"
+              @select="handleSelect"
+            >
+              <i
+                slot="suffix"
+                class="el-icon-edit el-input__icon"
+                @click="handleIconClick"
+              />
+              <template slot-scope="{ item }">
+                <div class="value">{{ item.nameEnglish }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div v-if="active == 1">
+        <el-form
+          ref="formHotel"
+          label-position="top"
+          label-width="120px"
+          style="margin: 30px"
+        >
+          <el-form-item :label="$t('hotel.image')">
+            <el-upload
+              :action="url + 'HotelMediaImage/SendHotelImage'"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              name="UploadImage"
+              :data="formImageHotel"
+            >
+              <i class="el-icon-plus"></i>
+            </el-upload>
+          </el-form-item>
+          <el-form-item :label="$t('hotel.description')">
+            <el-input
+              type="textarea"
+              :rows="2"
+              placeholder="Please input"
+              v-model="description"
+              maxlength="150"
+              show-word-limit
+            >
+            </el-input>
+          </el-form-item>
+        </el-form>
+
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="" />
+        </el-dialog>
+      </div>
+      <div v-if="active == 2">
+        <el-form
+          ref="formRoomType"
+          :rules="rules"
+          style="margin-top: 30px; display: flex; justify-content: center"
+          label-position="top"
+        >
+          <div>
+            <el-row
+              :gutter="20"
+              v-for="(room, counter) in formRoomType"
+              v-bind:key="counter"
+            >
+              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
+                ><div class="grid-content">
+                  <el-form-item>
+                    <el-input
+                      v-model="room.nameEnglish"
+                      placeholder="Name En"
+                    />
+                  </el-form-item></div
+              ></el-col>
+              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
+                ><div class="grid-content">
+                  <el-form-item>
+                    <el-input
+                      v-model="room.nameEspanish"
+                      placeholder="Name Es"
+                    />
+                  </el-form-item></div
+              ></el-col>
+              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
+                ><div class="grid-content">
+                  <el-form-item>
+                    <el-input v-model="room.maxPax" placeholder="Max Pax" />
+                  </el-form-item></div
+              ></el-col>
+              <el-col :span="6" :xs="24" :sm="24" :md="3" :lg="3" :xl="3"
+                ><div class="grid-content bg-purple">
+                  <el-form-item>
+                    <el-button
+                      type="danger"
+                      @click="deleteRoom(counter)"
+                      icon="el-icon-delete"
+                    ></el-button>
+                  </el-form-item></div
+              ></el-col>
+            </el-row>
+          </div>
+        </el-form>
+        <el-button type="primary" @click="addRoom">+</el-button>
+      </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
@@ -211,7 +327,6 @@
         </el-button>
       </div>
     </el-dialog>
-
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table
         :data="pvData"
@@ -242,6 +357,7 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
+import { forEach } from "jszip/lib/object";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -275,7 +391,7 @@ export default {
   data() {
     return {
       tableKey: 0,
-      list: null,
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -311,22 +427,6 @@ export default {
       },
       dialogPvVisible: false,
       pvData: [],
-      rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" },
-        ],
-        timestamp: [
-          {
-            type: "date",
-            required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
-        ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
-        ],
-      },
       downloadLoading: false,
       /** FormCity  */
       city_name: "",
@@ -336,7 +436,8 @@ export default {
       formHotel: {
         nameEnglish: "",
         nameSpanish: "",
-        category: "",
+        categoryName: "",
+        categoryId: "",
         cityId: "",
         city_name: "",
         providerId: "",
@@ -346,7 +447,97 @@ export default {
       hotelUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
+      urlImgage: this.$store.getters.urlImgage,
+      description: "",
       search: "",
+      rules: {
+        nameEnglish: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "change",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+
+        nameSpanish: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "change",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+        providerName: [
+          {
+            required: true,
+            message: "Please input provider",
+            trigger: "change",
+          },
+        ],
+        categoryName: [
+          {
+            required: true,
+            message: "Please input category",
+            trigger: "change",
+          },
+        ],
+        city_name: [
+          {
+            required: true,
+            message: "Please input city",
+            trigger: "change",
+          },
+        ],
+        name_en: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "change",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+        name_es: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "change",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+      },
+      formImageHotel: {
+        MediaContentType: 0,
+        idHotel: null,
+      },
+      formRoomType: [
+        {
+          id: "",
+          nameEspanish: "",
+          nameEnglish: "",
+          maxPax: 0,
+        },
+      ],
+      active: 0,
+      /* Images */
+      dialogImageUrl: "",
+      dialogVisible: false,
     };
   },
   created() {
@@ -391,30 +582,34 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
+      this.formHotel = {
+        nameEnglish: "",
+        nameSpanish: "",
+        categoryName: "",
+        categoryId: "",
+        cityId: "",
+        city_name: "",
+        providerId: "",
+        providerName: "",
+        statusActive: true,
       };
+      this.city_name = "";
     },
     handleUpdate(row) {
       console.log(row);
+      this.active = 0;
       this.hotelUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.formHotel.nameEnglish = row.nameEnglish;
       this.formHotel.nameSpanish = row.nameSpanish;
-      this.formHotel.category = row.category;
+      this.formHotel.categoryName = row.categoryName;
       this.formHotel.city_name = row.cityName;
       this.formHotel.providerName = row.providerName;
       this.formHotel.statusActive = row.statusActive;
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formHotel"].validate((valid) => {
         if (valid) {
           var hotel = {
             id: this.hotelUpdate.id,
@@ -484,22 +679,56 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.city_name = "";
     },
     postHotel() {
-      this.$refs["dataForm"].validate((valid) => {
-        var hotel = {
-          nameEnglish: this.formHotel.nameEnglish,
-          nameSpanish: this.formHotel.nameSpanish,
-          category: this.formHotel.category,
-          cityId: this.formHotel.cityId,
-          providerId: this.formHotel.providerId,
-          statusActive: this.formHotel.statusActive,
-        };
-        if (valid) {
+      if (this.active == 0) {
+        this.$refs["formHotel"].validate((valid) => {
+          var hotel = {
+            nameEnglish: this.formHotel.nameEnglish,
+            nameSpanish: this.formHotel.nameSpanish,
+            categoryId: this.formHotel.categoryId,
+            cityId: this.formHotel.cityId,
+            providerId: this.formHotel.providerId,
+            statusActive: this.formHotel.statusActive,
+          };
+          if (valid) {
+            axios
+              .post(this.url + "Hotel", hotel)
+              .then((response) => {
+                this.formImageHotel.idHotel = response.data.id;
+                console.log(response);
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Hotel Agregado con éxito",
+                  type: "success",
+                  duration: 2000,
+                });
+                this.getHotel();
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+          }
+        });
+      }
+      if (this.active == 1) {
+        next();
+      }
+      if (this.active == 2) {
+        this.formRoomType.forEach((element) => {
+          var roomType = {
+            nameEnglish: element.nameEnglish,
+            nameEspanish: element.nameEspanish,
+            maxPax: parseInt(element.maxPax),
+            /* hotelId: this.formImageHotel.idHotel, */
+            hotelId: 12,
+          };
           axios
-            .post(this.url + "Hotel", hotel)
+            .post(this.url + "RoomType", roomType)
             .then((response) => {
+              console.log(response);
+              element.id = response.data.id;
               this.dialogFormVisible = false;
               this.$notify({
                 title: "Success",
@@ -507,13 +736,13 @@ export default {
                 type: "success",
                 duration: 2000,
               });
-              this.getHotel();
             })
             .catch((error) => {
               console.error(error.response);
             });
-        }
-      });
+          console.log(this.formRoomType);
+        });
+      }
     },
     getHotel() {
       this.listLoading = true;
@@ -586,7 +815,7 @@ export default {
     createFilter(queryString) {
       return (link) => {
         return (
-          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          link.categoryName.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
         );
       };
@@ -595,6 +824,34 @@ export default {
       console.log(item);
       this.formHotel.city_name = item.nameEnglish;
       this.formHotel.cityId = item.id;
+    },
+    getCategories(queryString, cb) {
+      axios
+        .get(this.url + "HotelCategories")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterCategory(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    createFilterCategory(queryString) {
+      return (link) => {
+        return (
+          link.categoryName.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    handleSelectCategory(item) {
+      console.log(item);
+      this.formHotel.categoryName = item.categoryName;
+      this.formHotel.categoryId = item.id;
     },
     handleIconClick(ev) {
       console.log(ev);
@@ -625,52 +882,93 @@ export default {
       this.formHotel.providerId = item.id;
     },
     changeStatus(data, status) {
-      console.log(status);
-      var hotel = {
-        id: data.id,
-        nameEnglish: data.nameEnglish,
-        nameSpanish: data.nameSpanish,
-        providerId: data.providerId,
-        category: data.category,
-        statusActive: status,
-        cityId: data.cityId,
-      };
-      axios
-        .put(this.url + "Hotel", hotel)
-        .then((response) => {
-          this.dialogFormVisible = false;
-          this.$notify({
-            title: "Success",
-            message: "Status changed Successfully",
+      this.$confirm(
+        "This will permanently changed the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
             type: "success",
-            duration: 2000,
+            message: "Status Changed",
+          });
+          var hotel = {
+            id: data.id,
+            nameEnglish: data.nameEnglish,
+            nameSpanish: data.nameSpanish,
+            providerId: data.providerId,
+            category: data.category,
+            statusActive: status,
+            cityId: data.cityId,
+          };
+          axios
+            .put(this.url + "Hotel", hotel)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Status changed Successfully",
+                type: "success",
+                duration: 2000,
+              });
+              this.getHotel();
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Status canceled",
           });
           this.getHotel();
-        })
-        .catch((error) => {
-          console.error(error);
         });
+    },
+    next() {
+      if (this.active++ > 2) this.active = 0;
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      console.log(file);
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    addRoom() {
+      this.formRoomType.push({
+        id: "",
+        nameEspanish: "",
+        nameEnglish: "",
+        maxPax: 0,
+      });
+    },
+    deleteRoom(counter) {
+      this.formRoomType.splice(counter, 1);
     },
   },
   computed: {
     hotel() {
-      if (this.list) {
+      if (this.list.length > 0) {
         return this.list.filter((item) => {
-          return item.nameEnglish
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
+          return (
+            item.nameEnglish
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
             item.nameSpanish
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.cityName
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.cityName.toLowerCase().includes(this.search.toLowerCase()) ||
             item.providerName
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) || 
-            item.category
-            .toLowerCase()
-            .includes(this.search.toLowerCase());
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.categoryName.toLowerCase().includes(this.search.toLowerCase())
+          );
         });
       }
     },
@@ -678,3 +976,9 @@ export default {
 };
 </script>
 <style lang="scss">
+@media (max-width: 600px) {
+  .el-dialog {
+    width: 100% !important;
+  }
+}
+</style>

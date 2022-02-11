@@ -3,7 +3,7 @@
 import Layout from '@/layout'
 
 const hotelRouter = {
-  path: '/',
+  path: '/hotel',
   component: Layout,
   redirect: 'hotel',
   name: 'ComponentDemo',

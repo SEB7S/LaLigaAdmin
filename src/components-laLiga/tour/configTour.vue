@@ -140,7 +140,7 @@
             ref="dataForm"
             :rules="rules"
             :model="temp"
-            label-position="left"
+            label-position="top"
             label-width="120px"
           >
             <el-form-item :label="$t('tour.nameTour')">
@@ -154,22 +154,19 @@
               />
             </el-form-item>
             <el-form-item :label="$t('tour.nameProvider')">
-                <el-autocomplete
-                          v-model="formTour.providerName"
-                          popper-class="my-autocomplete"
-                          :fetch-suggestions="getProviders"
-                          placeholder="Please input"
-                          style="width: 100%"
-                          @select="handleSelect"
-                        >
-                          <i
-                            slot="suffix"
-                            class="el-icon-edit el-input__icon"
-                          />
-                          <template slot-scope="{ item }">
-                            <div class="value">{{ item.name }}</div>
-                          </template>
-                </el-autocomplete>              
+              <el-autocomplete
+                v-model="formTour.providerName"
+                popper-class="my-autocomplete"
+                :fetch-suggestions="getProviders"
+                placeholder="Please input"
+                style="width: 100%"
+                @select="handleSelect"
+              >
+                <i slot="suffix" class="el-icon-edit el-input__icon" />
+                <template slot-scope="{ item }">
+                  <div class="value">{{ item.name }}</div>
+                </template>
+              </el-autocomplete>
             </el-form-item>
             <el-form-item label="Hotel Category">
               <el-select v-model="formTour.hotel_category" placeholder="Select">
@@ -188,7 +185,7 @@
             ref="dataForm"
             :rules="rules"
             :model="temp"
-            label-position="left"
+            label-position="top"
             label-width="120px"
           >
             <el-form-item label="Start Day">
@@ -208,7 +205,7 @@
                     ref="dataForm"
                     :rules="rules"
                     :model="temp"
-                    label-position="left"
+                    label-position="top"
                     label-width="120px"
                   >
                     <div>
@@ -233,11 +230,12 @@
                       </el-form-item>
                       <el-form-item label="Image">
                         <el-upload
-                          action="https://jsonplaceholder.typicode.com/posts/"
+                          :action="url + 'TourMediaContent/SendTourImage'"
                           list-type="picture-card"
                           :on-preview="handlePictureCardPreview"
                           :on-remove="handleRemove"
-                          :before-upload="beforeAvatarUpload"
+                          name="UploadImage"
+                          :data="formImageTour"
                         >
                           <i class="el-icon-plus" />
                         </el-upload>
@@ -283,7 +281,7 @@
           type="primary"
           @click="dialogStatus === 'create' ? postTour() : updateData()"
         >
-          {{ active != 1 ? $t('table.next') : $t('table.confirm') }}
+          {{ active != 1 ? $t("table.next") : $t("table.confirm") }}
         </el-button>
       </div>
     </el-dialog>
@@ -300,50 +298,47 @@
       </el-table>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogPvVisible = false">
-           {{$t('table.confirm')}}
+          {{ $t("table.confirm") }}
         </el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import {
-  fetchList,
-  fetchPv
-} from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
+import { fetchList, fetchPv } from "@/api/article";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'ConfigTour',
+  name: "ConfigTour",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   data() {
     return {
@@ -357,453 +352,468 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         type: [
-          { required: true, message: 'type is required', trigger: 'change' }
+          { required: true, message: "type is required", trigger: "change" },
         ],
         timestamp: [
           {
-            type: 'date',
+            type: "date",
             required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
-          }
+            message: "timestamp is required",
+            trigger: "change",
+          },
         ],
         title: [
-          { required: true, message: 'title is required', trigger: 'blur' }
-        ]
+          { required: true, message: "title is required", trigger: "blur" },
+        ],
       },
       downloadLoading: false,
       /** formDayDetail */
       formTour: {
-        name: '',
+        name: "",
         duration_in_days: 0,
         status: true,
-        idProvider: '',
-        providerName: '',
-        hotel_category: '',
+        idProvider: "",
+        providerName: "",
+        hotel_category: "",
         options: [
           {
-            value: 'Option1',
-            label: 'Option1'
+            value: "Option1",
+            label: "Option1",
           },
           {
-            value: 'Option2',
-            label: 'Option2'
+            value: "Option2",
+            label: "Option2",
           },
           {
-            value: 'Option3',
-            label: 'Option3'
+            value: "Option3",
+            label: "Option3",
           },
           {
-            value: 'Option4',
-            label: 'Option4'
+            value: "Option4",
+            label: "Option4",
           },
           {
-            value: 'Option5',
-            label: 'Option5'
-          }
-        ]
+            value: "Option5",
+            label: "Option5",
+          },
+        ],
       },
+      idTourCreated: 0,
       formDayDetail: [],
       arrayPosition: 0,
       tourUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
       active: 0,
-      dialogImageUrl: '',
+      dialogImageUrl: "",
       dialogVisible: false,
       activeNames: [0],
-      start_date: ''
-    }
+      start_date: "",
+      formImageTour: {
+        MediaContentType: 0,
+        idTour: 0,
+      },
+    };
   },
   created() {
     /*     this.getList(); */
-    this.getTour()
+    this.getTour();
   },
   methods: {
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getTour()
+      this.listQuery.page = 1;
+      this.getTour();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     resetTemp() {
       this.temp = {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
+        title: "",
+        status: "published",
+        type: "",
+      };
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'name', 'idProvider', 'duration_in_days']
-        const filterVal = ['id', 'name', 'idProvider', 'duration_in_days']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "idProvider", "duration_in_days"];
+        const filterVal = ["id", "name", "idProvider", "duration_in_days"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Tour' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "Tour" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.active = 0
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.active = 0;
     },
     postTour() {
-      if (this.active === 0) {
-        this.$refs['dataForm'].validate((valid) => {
+      if (this.active == 0) {
+        this.$refs["dataForm"].validate((valid) => {
           var tour = {
             name: this.formTour.name,
             duration_in_days: this.formTour.duration_in_days,
             status: this.formTour.status,
-            idProvider: this.formTour.idProvider
-          }
+            idProvider: this.formTour.idProvider,
+          };
           if (valid) {
             axios
-              .post(this.url + 'Tour', tour)
+              .post(this.url + "Tour", tour)
               .then((response) => {
-                this.next()
+                this.formImageTour.idTour = response.data.id
+                this.next();
+                this.idTourCreated = response.id;
               })
               .catch((error) => {
-                console.error(error.response)
-              })
+                console.error(error.response);
+              });
           }
-        })
+        });
+      } else {
       }
     },
     getTour() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'Tour')
+        .get(this.url + "Tour")
         .then((response) => {
-          console.log('sss', response.data)
-          this.list = response.data
-          this.listLoading = false
+          console.log("sss", response.data);
+          this.list = response.data;
+          this.listLoading = false;
         })
         .catch((error) => {
-          this.status = 'error'
-          console.log(error.response)
-        })
+          this.status = "error";
+          console.log(error.response);
+        });
     },
     handleDelete(row) {
       axios
-        .delete(this.url + 'Tour/' + row.id)
+        .delete(this.url + "Tour/" + row.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
-            type: 'success',
-            duration: 2000
-          })
-          this.getTour()
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getTour();
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        "This will permanently delete the file. Continue?",
+        "Warning",
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-            message: 'Delete completed'
-          })
-          this.handleDelete(row)
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: 'Delete canceled'
-          })
-        })
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
     handleUpdate(row) {
-      console.log(row)
-      this.tourUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formTour.name = row.name
-      this.formTour.duration_in_days = row.duration_in_days
-      this.formTour.status = row.status
-      this.formTour.idProvider = row.idProvider
+      console.log(row);
+      this.tourUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formTour.name = row.name;
+      this.formTour.duration_in_days = row.duration_in_days;
+      this.formTour.status = row.status;
+      this.formTour.idProvider = row.idProvider;
+      this.formTour.providerName = row.providerName;
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           var tour = {
             name: this.formTour.name,
             duration_in_days: this.formTour.duration_in_days,
             status: this.formTour.status,
-            idProvider: this.formTour.idProvider
-          }
+            idProvider: this.formTour.idProvider,
+          };
           axios
-            .put(this.url + 'Tour', tour)
+            .put(this.url + "Tour", tour)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: 'Success',
-                message: 'Update Successfully',
-                type: 'success',
-                duration: 2000
-              })
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
 
-              this.getTour()
+              this.getTour();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     getProviders(queryString, cb) {
       axios
-        .get(this.url + 'Provider')
+        .get(this.url + "Provider")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-          console.error(error.response)
-        })
+          this.status = "error";
+          console.error(error.response);
+        });
     },
     createFilter(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-      }
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
     },
     handleSelect(item) {
-    this.formTour.providerName = item.name
-    this.formTour.idProvider = item.id
+      this.formTour.providerName = item.name;
+      this.formTour.idProvider = item.id;
     },
-  handleSelectCity(item) {
-    console.log(item, this.arrayPosition)
-    this.formDayDetail[this.arrayPosition].city_name = item.nameEnglish
-    this.formDayDetail[this.arrayPosition].cityId = item.id
-  },
-  handleIconClick(ev) {
-    console.log(ev)
-  },
-  changeStatus(data, status) {
-    console.log(status)
-    var tour = {
-      id: data.id,
-      name: data.name,
-      duration_in_days: data.duration_in_days,
-      status: status,
-      idProvider: data.idProvider
-    }
-    axios
-      .put(this.url + 'Tour', tour)
-      .then((response) => {
-        this.dialogFormVisible = false
-        this.$notify({
-          title: 'Success',
-          message: 'Status changed Successfully',
-          type: 'success',
-          duration: 2000
+    handleSelectCity(item) {
+      console.log(item, this.arrayPosition);
+      this.formDayDetail[this.arrayPosition].city_name = item.nameEnglish;
+      this.formDayDetail[this.arrayPosition].cityId = item.id;
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
+    changeStatus(data, status) {
+      console.log(status);
+      var tour = {
+        id: data.id,
+        name: data.name,
+        duration_in_days: data.duration_in_days,
+        status: status,
+        idProvider: data.idProvider,
+      };
+      axios
+        .put(this.url + "Tour", tour)
+        .then((response) => {
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "Success",
+            message: "Status changed Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getProvider();
         })
-        this.getProvider()
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-  },
-  next() {
-    if (this.active++ > 2) this.active = 0
-  },
-  /** Images */
-  handleRemove(file, fileList) {
-    console.log(file, fileList)
-  },
-  handlePictureCardPreview(file) {
-    this.dialogImageUrl = file.url
-    this.dialogVisible = true
-  },
-  beforeAvatarUpload(file) {
-    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
-    const isLt2M = file.size / 1024 / 1024 < 2
-    if (!isJPG) {
-      this.$message.error('La imagen debe estar en formato JPG!')
-    }
-    if (!isLt2M) {
-      this.$message.error('La imagen excede los 2MB!')
-    }
-    return isJPG && isLt2M
-  },
-  handleChange(val) {
-    console.log(val)
-  },
-  /** City */
-  getCities(queryString, cb) {
-    axios
-      .get(this.url + 'City')
-      .then((response) => {
-        console.log(response.data)
-        var links = response.data
-        var results = queryString
-          ? links.filter(this.createFilterCity(queryString))
-          : links
-        cb(results)
-      })
-      .catch((error) => {
-        this.status = 'error'
-        console.error(error.response)
-      })
-  },
-  createFilterCity(queryString) {
-    return (link) => {
-      return (
-        link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
-        0
-      )
-    }
-  },
-  calculateDays(item) {
-    const dateFormat =
-    this.start_date.getDate() +
-    '/' +
-    (this.start_date.getMonth() + 1) +
-    '/' +
-    this.start_date.getFullYear()
-    for (
-      let index = 0;
-      index < parseInt(this.formTour.duration_in_days);
-      index++
-    ) {
-      console.log(dateFormat)
-      var day = {
-        dayName:
-        'Day ' + (index + 1) + ' - ' + this.addDate(index, dateFormat),
-        city_name: '',
-        cityId: 0,
-        description_language: 'English',
-        description_english: '',
-        description_spanish: ''
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    next() {
+      if (this.active++ > 2) this.active = 0;
+    },
+    /** Images */
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG) {
+        this.$message.error("La imagen debe estar en formato JPG!");
       }
-      this.formDayDetail.push(day)
-    }
+      if (!isLt2M) {
+        this.$message.error("La imagen excede los 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
+    handleChange(val) {
+      console.log(val);
+    },
+    /** City */
+    getCities(queryString, cb) {
+      axios
+        .get(this.url + "City")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterCity(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilterCity(queryString) {
+      return (link) => {
+        return (
+          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    calculateDays(item) {
+      const dateFormat =
+        this.start_date.getDate() +
+        "/" +
+        (this.start_date.getMonth() + 1) +
+        "/" +
+        this.start_date.getFullYear();
+      for (
+        let index = 0;
+        index < parseInt(this.formTour.duration_in_days);
+        index++
+      ) {
+        console.log(dateFormat);
+        var day = {
+          dayName:
+            "Day " + (index + 1) + " - " + this.addDate(index, dateFormat),
+          city_name: "",
+          cityId: 0,
+          description_language: "English",
+          description_english: "",
+          description_spanish: "",
+        };
+        this.formDayDetail.push(day);
+      }
+    },
+    addDate(d, fecha) {
+      var Fecha = new Date();
+      var sFecha =
+        fecha ||
+        Fecha.getDate() +
+          "/" +
+          (Fecha.getMonth() + 1) +
+          "/" +
+          Fecha.getFullYear();
+      var sep = sFecha.indexOf("/") !== -1 ? "/" : "-";
+      var aFecha = sFecha.split(sep);
+      var fecha = aFecha[2] + "/" + aFecha[1] + "/" + aFecha[0];
+      fecha = new Date(fecha);
+      fecha.setDate(fecha.getDate() + parseInt(d));
+      var anno = fecha.getFullYear();
+      var mes = fecha.getMonth() + 1;
+      var dia = fecha.getDate();
+      mes = mes < 10 ? "0" + mes : mes;
+      dia = dia < 10 ? "0" + dia : dia;
+      var fechaFinal = dia + sep + mes + sep + anno;
+      return fechaFinal;
+    },
   },
-  addDate(d, fecha) {
- var Fecha = new Date();
- var sFecha = fecha || (Fecha.getDate() + "/" + (Fecha.getMonth() +1) + "/" + Fecha.getFullYear());
- var sep = sFecha.indexOf('/') != -1 ? '/' : '-';
- var aFecha = sFecha.split(sep);
- var fecha = aFecha[2]+'/'+aFecha[1]+'/'+aFecha[0];
- fecha= new Date(fecha);
- fecha.setDate(fecha.getDate()+parseInt(d));
- var anno=fecha.getFullYear();
- var mes= fecha.getMonth()+1;
- var dia= fecha.getDate();
- mes = (mes < 10) ? ("0" + mes) : mes;
- dia = (dia < 10) ? ("0" + dia) : dia;
- var fechaFinal = dia+sep+mes+sep+anno;
- return (fechaFinal);
-  }
-  }
-}
+};
 </script>
 <style lang="scss">
 .el-form-item {
@@ -832,5 +842,11 @@ export default {
   position: absolute;
   border-color: inherit;
   background-color: #619b97;
+}
+
+@media (max-width: 600px) {
+  .el-dialog {
+    width: 100% !important;
+  }
 }
 </style>

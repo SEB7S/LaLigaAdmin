@@ -96,7 +96,11 @@ export default {
     categoryHotel: 'Categoría',
     cityHotel: 'Ciudad',
     providerHotel: 'Proveedor',
-    status: 'Estado'
+    status: 'Estado',
+    image: 'Imagen',
+    description: 'Descripción',
+    max_pax: 'Max Pax',
+    
   },
   provider: {
     nameProvider: 'Nombre',
@@ -131,7 +135,7 @@ export default {
     profile: 'Profile'
   },
   login: {
-    title: 'Formulario de acceso',
+    title: 'La Liga - Administrador',
     logIn: 'Acceso',
     username: 'Usuario',
     password: 'Contraseña',

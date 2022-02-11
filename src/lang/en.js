@@ -101,7 +101,10 @@ export default {
     categoryHotel: 'Category',
     cityHotel: 'City',
     providerHotel: 'Provider',
-    status: 'Status'
+    status: 'Status',
+    image: 'Image',
+    description: 'Description',
+    max_pax: 'Max Pax',
   },
   provider: {
     nameProvider: 'Name',
@@ -136,7 +139,7 @@ export default {
     size: 'Global Size'
   },
   login: {
-    title: 'Login Form',
+    title: 'La Liga - Admin',
     logIn: 'Login',
     username: 'Username',
     password: 'Password',

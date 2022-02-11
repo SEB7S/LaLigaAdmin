@@ -59,48 +59,12 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('hotel.nameEnHotel')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.nameEnglish }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('hotel.nameEsHotel')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.nameSpanish }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
         :label="$t('hotel.categoryHotel')"
         min-width="100px"
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.category }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('hotel.cityHotel')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.cityId }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('hotel.providerHotel')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.providerId }}</span>
+          <span>{{ row.categoryName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -136,52 +100,12 @@
         ref="dataForm"
         :rules="rules"
         :model="temp"
-        label-position="left"
+        label-position="top"
         label-width="120px"
-        style="width: 800px; margin-left: 50px"
+        style="margin-left: 50px"
       >
-        <el-form-item :label="$t('hotel.nameEnHotel')">
-          <el-input v-model="formhotel.nameEnglish" />
-        </el-form-item>
-        <el-form-item :label="$t('hotel.nameEsHotel')">
-          <el-input v-model="formhotel.nameSpanish" />
-        </el-form-item>
         <el-form-item :label="$t('hotel.categoryHotel')">
-          <el-input v-model="formhotel.category" />
-        </el-form-item>
-        <el-form-item :label="$t('hotel.cityHotel')">
-          <el-autocomplete
-            v-model="formhotel.city_name"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getCities"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
-          >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.nameEnglish }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-        <el-form-item :label="$t('hotel.providerHotel')">
-          <el-autocomplete
-            v-model="formhotel.providerName"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getProviders"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelectProvider"
-          >
-            <i slot="suffix" class="el-icon-edit el-input__icon" />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.name }}</div>
-            </template>
-          </el-autocomplete>
+          <el-input v-model="formCategory.categoryName" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -190,7 +114,7 @@
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? postHotel() : updateData()"
+          @click="dialogStatus === 'create' ? postCategory() : updateData()"
         >
           {{ $t("table.confirm") }}
         </el-button>
@@ -241,7 +165,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {});
 
 export default {
-  name: "ConfigStadium",
+  name: "categoryHotel",
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -318,14 +242,8 @@ export default {
       city_nameEs: "",
       cities: [],
       /** FormStadium */
-      formhotel: {
-        nameEnglish: "",
-        nameSpanish: "",
-        category: "",
-        cityId: "",
-        city_name: "",
-        providerId: "",
-        providerName: "",
+      formCategory: {
+        categoryName: "",
       },
       hotelUpdate: [],
       /* EndPoint */
@@ -333,7 +251,7 @@ export default {
     };
   },
   created() {
-    this.getHotel();
+    this.getCategory();
   },
   methods: {
     getList() {
@@ -350,7 +268,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1;
-      this.getHotel();
+      this.getCategory();
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -386,26 +304,20 @@ export default {
     },
     handleUpdate(row) {
       console.log(row);
-      this.stadiumUpdate = row;
+      this.hotelUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.formhotel.name = row.name;
-      this.formhotel.latitude = row.latitude;
-      this.formhotel.longitude = row.longitude;
-      this.formhotel.city_name = row.cityId;
+      this.formCategory.categoryName = row.categoryName;
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          var stadium = {
-            id: this.stadiumUpdate.id,
-            cityId: this.formhotel.cityId,
-            name: this.formhotel.name,
-            latitude: this.formhotel.latitude,
-            longitude: this.formhotel.longitude,
+          var category = {
+            id: this.hotelUpdate.id,
+            categoryName: this.formCategory.categoryName,
           };
           axios
-            .put(this.url + "Stadium", stadium)
+            .put(this.url + "HotelCategories", category)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -415,7 +327,7 @@ export default {
                 duration: 2000,
               });
 
-              this.getHotel();
+              this.getCategory();
             })
             .catch((error) => {
               console.error(error.response);
@@ -465,18 +377,14 @@ export default {
       this.dialogFormVisible = true;
       this.city_name = "";
     },
-    postHotel() {
+    postCategory() {
       this.$refs["dataForm"].validate((valid) => {
-        var hotel = {
-          nameEnglish: this.formhotel.nameEnglish,
-          nameSpanish: this.formhotel.nameSpanish,
-          category: this.formhotel.category,
-          cityId: this.formhotel.cityId,
-          providerId: this.formhotel.providerId,
+        var category = {
+          categoryName: this.formCategory.categoryName,
         };
         if (valid) {
           axios
-            .post(this.url + "Hotel", hotel)
+            .post(this.url + "HotelCategories", category)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -485,7 +393,7 @@ export default {
                 type: "success",
                 duration: 2000,
               });
-              this.getHotel();
+              this.getCategory();
             })
             .catch((error) => {
               console.error(error.response);
@@ -493,10 +401,10 @@ export default {
         }
       });
     },
-    getHotel() {
+    getCategory() {
       this.listLoading = true;
       axios
-        .get(this.url + "Hotel")
+        .get(this.url + "HotelCategories")
         .then((response) => {
           console.log(response.data);
           this.list = response.data;
@@ -508,7 +416,7 @@ export default {
     },
     handleDelete(row) {
       axios
-        .delete(this.url + "Stadium/" + row.id)
+        .delete(this.url + "HotelCategories/" + row.id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -516,7 +424,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getHotel();
+          this.getCategory();
         })
         .catch((error) => {
           console.error(error.response);
@@ -571,8 +479,8 @@ export default {
     },
     handleSelect(item) {
       console.log(item);
-      this.formhotel.city_name = item.nameEnglish;
-      this.formhotel.cityId = item.id;
+      this.formCategory.city_name = item.nameEnglish;
+      this.formCategory.cityId = item.id;
     },
     handleIconClick(ev) {
       console.log(ev);
@@ -599,10 +507,16 @@ export default {
       };
     },
     handleSelectProvider(item) {
-      this.formhotel.providerName = item.name;
-      this.formhotel.providerId = item.id;
+      this.formCategory.providerName = item.name;
+      this.formCategory.providerId = item.id;
     },
   },
 };
 </script>
 <style lang="scss">
+@media (max-width: 600px) {
+    .el-dialog {
+        width: 100% !important;
+    }
+}
+</style>

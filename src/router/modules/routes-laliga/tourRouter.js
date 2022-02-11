@@ -3,9 +3,9 @@
 import Layout from '@/layout'
 
 const tourRouter = {
-  path: '/tour',
+  path: '/',
   component: Layout,
-  redirect: 'noRedirect',
+  redirect: '/manageTour',
   name: 'tour',
   meta: {
     title: 'tour',

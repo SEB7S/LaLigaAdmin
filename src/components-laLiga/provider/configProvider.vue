@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-            <el-input
+      <el-input
         placeholder="Search"
         style="width: 200px"
         class="filter-item"
@@ -24,7 +24,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        {{$t('table.add')}}
+        {{ $t("table.add") }}
       </el-button>
       <el-button
         v-waves
@@ -34,7 +34,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        {{$t('table.export')}}
+        {{ $t("table.export") }}
       </el-button>
     </div>
     <el-table
@@ -59,27 +59,47 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('provider.nameProvider')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('provider.nameProvider')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('provider.taxIDProvider')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('provider.taxIDProvider')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.document }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('provider.phoneProvider')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('provider.phoneProvider')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('provider.emailProvier')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('provider.emailProvier')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('provider.statusProvier')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('provider.statusProvier')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <el-switch
             v-model="row.status"
@@ -97,7 +117,7 @@
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{$t('table.edit') }}
+            {{ $t("table.edit") }}
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -105,7 +125,7 @@
             type="danger"
             @click="confirmDelete(row)"
           >
-            {{$t('table.delete') }}
+            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -119,33 +139,35 @@
     />
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
-        ref="dataForm"
+        ref="formProvider"
+        :model="formProvider"
         :rules="rules"
-        :model="temp"
-        label-position="left"
+        label-position="top"
         label-width="120px"
-        style="width: 50%; margin-left: 50px"
+        style="margin-left: 50px"
       >
-        <el-form-item :label="$t('provider.nameProvider')">
+        <el-form-item :label="$t('provider.nameProvider')" prop="name">
           <el-input v-model="formProvider.name" />
         </el-form-item>
-        <el-form-item :label="$t('provider.taxIDProvider')">
+        <el-form-item :label="$t('provider.taxIDProvider')" prop="document">
           <el-input v-model="formProvider.document" />
         </el-form-item>
-        <el-form-item :label="$t('provider.phoneProvider')">
+        <el-form-item :label="$t('provider.phoneProvider')" prop="phone">
           <el-input v-model="formProvider.phone" type="tel" />
         </el-form-item>
-        <el-form-item :label="$t('provider.emailProvier')">
+        <el-form-item :label="$t('provider.emailProvier')" prop="email">
           <el-input v-model="formProvider.email" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> {{$t('table.cancel')}} </el-button>
+        <el-button @click="dialogFormVisible = false">
+          {{ $t("table.cancel") }}
+        </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? postProvider() : updateData()"
         >
-          {{$t('table.confirm')}}
+          {{ $t("table.confirm") }}
         </el-button>
       </div>
     </el-dialog>
@@ -169,48 +191,45 @@
   </div>
 </template>
 <script>
-import {
-  fetchList,
-  fetchPv
-} from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
+import { fetchList, fetchPv } from "@/api/article";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'ConfigProvider',
+  name: "ConfigProvider",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   data() {
     return {
       tableKey: 0,
-      list: null,
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -219,279 +238,333 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
-      rules: {
-        type: [
-          { required: true, message: 'type is required', trigger: 'change' }
-        ],
-        timestamp: [
-          {
-            type: 'date',
-            required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
-          }
-        ],
-        title: [
-          { required: true, message: 'title is required', trigger: 'blur' }
-        ]
-      },
       downloadLoading: false,
       /** FormStadium */
       formProvider: {
-        name: '',
-        document: '',
+        name: "",
+        document: "",
         status: true,
-        phone: '',
-        email: ''
+        phone: "",
+        email: "",
+      },
+      rules: {
+        name: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "blur",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+        document: [
+          {
+            required: true,
+            message: "Please input document",
+            trigger: "blur",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+        phone: [
+          {
+            required: true,
+            message: "Please input longitude",
+            trigger: "blur",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+        email: [
+          {
+            required: true,
+            message: "Please input city",
+            trigger: "blur",
+          },
+          {
+            type: "email",
+            message: "Please input correct email address",
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       providerUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      search: ''
-    }
+      search: "",
+    };
   },
   created() {
     /*     this.getList(); */
-    this.getProvider()
+    this.getProvider();
   },
   methods: {
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getProvider()
+      this.listQuery.page = 1;
+      this.getProvider();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
+      this.formProvider = {
+        name: "",
+        document: "",
+        status: true,
+        phone: "",
+        email: "",
+      };
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'name', 'document', 'phone', 'email']
-        const filterVal = ['id', 'name', 'document', 'phone', 'email']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "document", "phone", "email"];
+        const filterVal = ["id", "name", "document", "phone", "email"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Providers' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "Providers" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.city_name = ''
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.city_name = "";
     },
     postProvider() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs["formProvider"].validate((valid) => {
         var provider = {
           name: this.formProvider.name,
           document: this.formProvider.document,
           status: this.formProvider.status,
           phone: this.formProvider.phone,
-          email: this.formProvider.email
-        }
+          email: this.formProvider.email,
+        };
         if (valid) {
           axios
-            .post(this.url + 'Provider', provider)
+            .post(this.url + "Provider", provider)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: 'Success',
-                message: 'Proveedor Agregado con éxito',
-                type: 'success',
-                duration: 2000
-              })
-              this.getProvider()
+                title: "Success",
+                message: "Proveedor Agregado con éxito",
+                type: "success",
+                duration: 2000,
+              });
+              this.getProvider();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     getProvider() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'Provider')
+        .get(this.url + "Provider")
         .then((response) => {
-          console.log(response.data)
-          this.list = response.data
-          this.listLoading = false
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     handleDelete(row) {
       axios
-        .delete(this.url + 'Provider/' + row.id)
+        .delete(this.url + "Provider/" + row.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
-            type: 'success',
-            duration: 2000
-          })
-          this.getProvider()
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getProvider();
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        "This will permanently delete the file. Continue?",
+        "Warning",
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-            message: 'Delete completed'
-          })
-          this.handleDelete(row)
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: 'Delete canceled'
-          })
-        })
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
     changeStatus(data, status) {
-      var provider = {
-        id: data.id,
-        name: data.name,
-        document: data.document,
-        status: status,
-        phone: data.phone,
-        email: data.email
-      }
-      axios
-        .put(this.url + 'Provider', provider)
-        .then((response) => {
-          this.dialogFormVisible = false
-          this.$notify({
-            title: 'Success',
-            message: 'Status changed Successfully',
-            type: 'success',
-            duration: 2000
-          })
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          var provider = {
+            id: data.id,
+            name: data.name,
+            document: data.document,
+            status: status,
+            phone: data.phone,
+            email: data.email,
+          };
+          axios
+            .put(this.url + "Provider", provider)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Status changed Successfully",
+                type: "success",
+                duration: 2000,
+              });
 
-          this.getProvider()
+              this.getProvider();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
         })
-        .catch((error) => {
-          console.error(error.response)
-        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+          this.getProvider();
+        });
     },
     handleUpdate(row) {
-      console.log(row)
-      this.providerUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formProvider.name = row.name
-      this.formProvider.document = row.document
-      this.formProvider.status = row.status
-      this.formProvider.phone = row.phone
-      this.formProvider.email = row.email
+      console.log(row);
+      this.providerUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formProvider.name = row.name;
+      this.formProvider.document = row.document;
+      this.formProvider.status = row.status;
+      this.formProvider.phone = row.phone;
+      this.formProvider.email = row.email;
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs["formProvider"].validate((valid) => {
         if (valid) {
           var provider = {
             id: this.providerUpdate.id,
@@ -499,48 +572,48 @@ export default {
             document: this.formProvider.document,
             status: this.formProvider.status,
             phone: this.formProvider.phone,
-            email: this.formProvider.email
-          }
+            email: this.formProvider.email,
+          };
           axios
-            .put(this.url + 'Provider', provider)
+            .put(this.url + "Provider", provider)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: 'Success',
-                message: 'Update Successfully',
-                type: 'success',
-                duration: 2000
-              })
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
 
-              this.getProvider()
+              this.getProvider();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
-    }
+      });
+    },
   },
-    computed: {
+  computed: {
     provider() {
-      if (this.list) {
+      if (this.list.length > 0) {
         return this.list.filter((item) => {
-          return item.name
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.document
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.phone
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.email
-            .toLowerCase()
-            .includes(this.search.toLowerCase());
+          return (
+            item.name.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.document.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.phone.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.email.toLowerCase().includes(this.search.toLowerCase())
+          );
         });
       }
     },
   },
-}
+};
 </script>
-<style lang="scss" >
+<style lang="scss">
+@media (max-width: 600px) {
+  .el-dialog {
+    width: 100% !important;
+  }
+}
+</style>

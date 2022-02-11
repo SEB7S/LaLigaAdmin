@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-           <el-input
+      <el-input
         placeholder="Search"
         style="width: 200px"
         class="filter-item"
@@ -25,7 +25,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        {{$t('table.add')}}
+        {{ $t("table.add") }}
       </el-button>
       <el-button
         v-waves
@@ -35,10 +35,9 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        {{$t('table.export')}}
+        {{ $t("table.export") }}
       </el-button>
     </div>
-
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -61,22 +60,38 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.nameStadium')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('stadium.nameStadium')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.cityStadium')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('stadium.cityStadium')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.cityName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.latitudeStadium')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('stadium.latitudeStadium')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.latitude }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('stadium.longitudeStadium')" min-width="100px" align="center">
+      <el-table-column
+        :label="$t('stadium.longitudeStadium')"
+        min-width="100px"
+        align="center"
+      >
         <template slot-scope="{ row }">
           <span>{{ row.longitude }}</span>
         </template>
@@ -89,7 +104,7 @@
       >
         <template slot-scope="{ row }">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{$t('table.edit')}}
+            {{ $t("table.edit") }}
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -97,12 +112,11 @@
             type="danger"
             @click="confirmDelete(row)"
           >
-            {{$t('table.delete')}}
+            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
     </el-table>
-
     <pagination
       v-show="total > 0"
       :total="total"
@@ -110,56 +124,102 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="left"
-        label-width="120px"
-        style="width: 800px; margin-left: 50px"
+    <el-dialog
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogFormVisible"
+      class="mobile"
+    >
+      <el-dialog
+        :title="textMap[dialogStatus]"
+        :visible.sync="dialogFormVisible"
       >
-        <el-form-item :label="$t('stadium.nameStadium')">
-          <el-input v-model="formStadium.name" />
-        </el-form-item>
-        <el-form-item :label="$t('stadium.latitudeStadium')">
-          <el-input v-model="formStadium.latitude" />
-        </el-form-item>
-        <el-form-item :label="$t('stadium.longitudeStadium')">
-          <el-input v-model="formStadium.longitude" />
-        </el-form-item>
-        <el-form-item :label="$t('stadium.cityStadium')">
-          <el-autocomplete
-            v-model="formStadium.city_name"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getCities"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
+        <el-steps :active="active" align-center finish-status="success">
+          <el-step title="General Data"></el-step>
+          <el-step title="Image / Description"></el-step>
+        </el-steps>
+        <div v-if="active == 0">
+          <el-form
+            ref="formStadium"
+            :model="formStadium"
+            :rules="rules"
+            label-position="top"
+            label-width="100px"
+            style="margin: 30px"
           >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.nameEnglish }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> {{$t('table.cancel')}} </el-button>
-        <el-button
-          type="primary"
-          @click="dialogStatus === 'create' ? postStadium() : updateData()"
-        >
-          {{$t('table.confirm')}}
-        </el-button>
-      </div>
-    </el-dialog>
+            <el-form-item :label="$t('stadium.nameStadium')" prop="name">
+              <el-input v-model="formStadium.name" />
+            </el-form-item>
+            <el-form-item
+              :label="$t('stadium.latitudeStadium')"
+              prop="latitude"
+            >
+              <el-input v-model="formStadium.latitude" />
+            </el-form-item>
+            <el-form-item
+              :label="$t('stadium.longitudeStadium')"
+              prop="longitude"
+            >
+              <el-input v-model="formStadium.longitude" />
+            </el-form-item>
+            <el-form-item :label="$t('stadium.cityStadium')" prop="city_name">
+              <el-autocomplete
+                v-model="formStadium.city_name"
+                popper-class="my-autocomplete"
+                :fetch-suggestions="getCities"
+                placeholder="Please input"
+                style="width: 100%"
+                @select="handleSelect"
+              >
+                <i
+                  slot="suffix"
+                  class="el-icon-edit el-input__icon"
+                  @click="handleIconClick"
+                />
+                <template slot-scope="{ item }">
+                  <div class="value">{{ item.nameEnglish }}</div>
+                </template>
+              </el-autocomplete>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div v-if="active == 1">
+          <el-form
+            ref="formHotel"
+            label-position="top"
+            label-width="120px"
+            style="margin: 30px"
+          >
+            <el-form-item :label="$t('hotel.image')">
+              <el-upload
+                :action="url + 'StadiumMediaContent/SendStadiumImage'"
+                list-type="picture-card"
+                :on-preview="handlePictureCardPreview"
+                :on-remove="handleRemove"
+                name="UploadImage"
+                :data="formImageStadium"
+              >
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </el-form-item>
+          </el-form>
 
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="" />
+          </el-dialog>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">
+            {{ $t("table.cancel") }}
+          </el-button>
+          <el-button
+            type="primary"
+            @click="dialogStatus === 'create' ? postStadium() : updateData()"
+          >
+            {{ $t("table.confirm") }}
+          </el-button>
+        </div>
+      </el-dialog>
+    </el-dialog>
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table
         :data="pvData"
@@ -184,46 +244,53 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle
-} from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
+  updateArticle,
+} from "@/api/article";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'ConfigStadium',
+  name: "ConfigStadium",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   data() {
+    var validateNumber = (rule, value, callback) => {
+      if (isNaN(value)) {
+        callback(new Error("Please input numbers"));
+      } else {
+        callback();
+      }
+    };
     return {
       tableKey: 0,
-      list: null,
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -232,334 +299,391 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
-      rules: {
-        type: [
-          { required: true, message: 'type is required', trigger: 'change' }
-        ],
-        timestamp: [
-          {
-            type: 'date',
-            required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
-          }
-        ],
-        title: [
-          { required: true, message: 'title is required', trigger: 'blur' }
-        ]
-      },
+
       downloadLoading: false,
       /** FormCity  */
-      city_name: '',
-      city_nameEs: '',
+      city_name: "",
+      city_nameEs: "",
       cities: [],
       /** FormStadium */
       formStadium: {
-        name: '',
-        latitude: '',
-        longitude: '',
-        cityId: '',
-        city_name: ''
+        name: "",
+        latitude: "",
+        longitude: "",
+        cityId: "",
+        city_name: "",
       },
       stadiumUpdate: [],
-      search: '',
+      search: "",
+      active: 0,
+      formImageStadium: {
+        MediaContentType: 0,
+        idStadium: 0,
+      },
       /* EndPoint */
-      url: this.$store.getters.url
-    }
+      url: this.$store.getters.url,
+      rules: {
+        name: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "change",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+        ],
+        latitude: [
+          {
+            required: true,
+            message: "Please input latitude",
+            trigger: "blur",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+          {
+            validator: validateNumber,
+            trigger: "blur",
+          },
+        ],
+        longitude: [
+          {
+            required: true,
+            message: "Please input longitude",
+            trigger: "blur",
+          },
+          {
+            min: 3,
+            message: "Length should be 3",
+            trigger: "blur",
+          },
+          {
+            validator: validateNumber,
+            trigger: "blur",
+          },
+        ],
+        city_name: [
+          {
+            required: true,
+            message: "Please input city",
+            trigger: "change",
+          },
+        ],
+      },
+      /* Images */
+      dialogImageUrl: "",
+      dialogVisible: false,
+    };
   },
   created() {
     /*     this.getList(); */
-    this.getStadium()
+    this.getStadium();
   },
   methods: {
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getStadium()
+      this.listQuery.page = 1;
+      this.getStadium();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
+      (this.formStadium = {
+        name: "",
+        latitude: "",
+        longitude: "",
+        cityId: "",
+        city_name: "",
+      }),
+        (this.city_name = "");
     },
     handleUpdate(row) {
-      console.log(row)
-      this.stadiumUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formStadium.name = row.name
-      this.formStadium.latitude = row.latitude
-      this.formStadium.longitude = row.longitude
-      this.formStadium.city_name = row.cityId
+      console.log(row);
+      this.stadiumUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formStadium.name = row.name;
+      this.formStadium.latitude = row.latitude;
+      this.formStadium.longitude = row.longitude;
+      this.formStadium.city_name = row.cityName;
+      this.formStadium.cityId = row.cityId;
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs["formStadium"].validate((valid) => {
         if (valid) {
           var stadium = {
             id: this.stadiumUpdate.id,
             cityId: this.formStadium.cityId,
             name: this.formStadium.name,
             latitude: this.formStadium.latitude,
-            longitude: this.formStadium.longitude
-          }
+            longitude: this.formStadium.longitude,
+          };
           axios
-            .put(this.url + 'Stadium', stadium)
+            .put(this.url + "Stadium", stadium)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: 'Success',
-                message: 'Update Successfully',
-                type: 'success',
-                duration: 2000
-              })
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
 
-              this.getStadium()
+              this.getStadium();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'name', 'Ciudad', 'longitude', 'latitude']
-        const filterVal = ['id', 'name', 'cityId', 'longitude', 'latitude']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
+        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Stadiums' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "Stadiums" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.city_name = ''
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
     },
     postStadium() {
-      this.$refs['dataForm'].validate((valid) => {
+      this.$refs["formStadium"].validate((valid) => {
         var stadium = {
           stadiumName: this.formStadium.name,
           latitude: this.formStadium.latitude,
           longitude: this.formStadium.longitude,
-          cityId: this.formStadium.cityId
-        }
+          cityId: this.formStadium.cityId,
+        };
         if (valid) {
           axios
-            .post(this.url + 'Stadium', stadium)
+            .post(this.url + "Stadium", stadium)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.formImageStadium.idStadium = response.data.id;
+              this.next();
               this.$notify({
-                title: 'Success',
-                message: 'Estadio Agregado con éxito',
-                type: 'success',
-                duration: 2000
-              })
-              this.getStadium()
+                title: "Success",
+                message: "Estadio Agregado con éxito",
+                type: "success",
+                duration: 2000,
+              });
+              this.getStadium();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     getStadium() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'Stadium')
+        .get(this.url + "Stadium")
         .then((response) => {
-          console.log(response.data)
-          this.list = response.data
-          this.listLoading = false
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     handleDelete(row) {
       axios
-        .delete(this.url + 'Stadium/' + row.id)
+        .delete(this.url + "Stadium/" + row.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
-            type: 'success',
-            duration: 2000
-          })
-          this.getStadium()
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getStadium();
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        "This will permanently delete the file. Continue?",
+        "Warning",
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-            message: 'Delete completed'
-          })
-          this.handleDelete(row)
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: 'Delete canceled'
-          })
-        })
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
     getCities(queryString, cb) {
       axios
-        .get(this.url + 'City')
+        .get(this.url + "City")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     createFilter(queryString) {
       return (link) => {
         return (
           link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
-        )
-      }
+        );
+      };
     },
     handleSelect(item) {
-      console.log(item)
-      this.formStadium.city_name = item.nameEnglish
-      this.formStadium.cityId = item.id
+      console.log(item);
+      this.formStadium.city_name = item.nameEnglish;
+      this.formStadium.cityId = item.id;
     },
     handleIconClick(ev) {
-      console.log(ev)
-    }
+      console.log(ev);
+    },
+    next() {
+      if (this.active++ > 2) this.active = 0;
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      console.log(file);
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
   },
-    computed: {
+  computed: {
     stadium() {
-      if (this.list) {
+      if (this.list.length > 0) {
         return this.list.filter((item) => {
-          return item.name
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.cityName
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.latitude
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.longitude
-            .toLowerCase()
-            .includes(this.search.toLowerCase());
+          return (
+            item.name.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.cityName.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.latitude.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.longitude.toLowerCase().includes(this.search.toLowerCase())
+          );
         });
       }
     },
   },
-}
+};
 </script>
 <style lang="scss">
+@media (max-width: 600px) {
+  .el-dialog {
+    width: 100% !important;
+  }
+}
+</style>

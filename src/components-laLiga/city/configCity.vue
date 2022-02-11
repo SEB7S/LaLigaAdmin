@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-            <el-input
+      <el-input
         placeholder="Nombre En"
         style="width: 200px"
         class="filter-item"
@@ -38,7 +38,6 @@
         {{ $t("table.export") }}
       </el-button>
     </div>
-
     <el-table
       :key="tableKey"
       v-loading="listLoading"
@@ -110,7 +109,6 @@
         </template>
       </el-table-column>
     </el-table>
-
     <pagination
       v-show="total > 0"
       :total="total"
@@ -118,20 +116,18 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form
-        ref="dataForm"
+        ref="formCity"
+        :model="formCity"
         :rules="rules"
-        :model="temp"
-        label-position="left"
+        label-position="top"
         label-width="70px"
-        style="width: 800px; margin-left: 50px"
+        style="margin-left: 50px"
       >
-        <el-form-item>
-          <span class="demo-input-label">{{ $t("city.nameEnCity") }}</span>
+        <el-form-item :label="$t('city.nameEnCity')" prop="city_name">
           <el-autocomplete
-            v-model="city_name"
+            v-model="formCity.city_name"
             popper-class="my-autocomplete"
             :fetch-suggestions="getCities"
             placeholder="Please input"
@@ -150,7 +146,7 @@
         </el-form-item>
         <el-form-item v-if="dialogStatus == 'update'">
           <span class="demo-input-label">{{ $t("city.nameEsCity") }}</span>
-          <el-input v-model="city_nameEs" placeholder="Please input" />
+          <el-input v-model="formCity.city_nameEs" placeholder="Please input" />
         </el-form-item>
         <el-form-item>
           <span style="margin-right: 5px">Duplicar Nombre en Español: </span>
@@ -233,7 +229,7 @@ export default {
   data() {
     return {
       tableKey: 0,
-      list: null,
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -269,32 +265,28 @@ export default {
       },
       dialogPvVisible: false,
       pvData: [],
-      rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" },
-        ],
-        timestamp: [
-          {
-            type: "date",
-            required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
-        ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
-        ],
-      },
       downloadLoading: false,
       /** FormCity  */
+      formCity: {
+        city_name: "",
+        city_nameEs: "",
+      },
+      duplicateCity: false,
       cityUpdate: [],
-      city_name: "",
-      city_nameEs: "",
       cities: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      duplicateCity: false,
-      search: ''
+      
+      search: "",
+      rules: {
+        city_name: [
+          {
+            required: true,
+            message: "Please input city",
+            trigger: "change",
+          },
+        ],
+      },
     };
   },
   created() {
@@ -340,21 +332,17 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
+      this.formCity = {
+        city_name: "",
+        city_nameEs: "",
       };
+      this.duplicateCity = false;
     },
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.city_name = "";
+      this.formCity.city_name = "";
     },
     createData() {
       this.$refs["dataForm"].validate((valid) => {
@@ -377,8 +365,8 @@ export default {
     handleUpdate(row) {
       console.log(row);
       this.cityUpdate = row;
-      this.city_name = row.nameEnglish;
-      this.city_nameEs = row.nameEspanish;
+      this.formCity.city_name = row.nameEnglish;
+      this.formCity.city_nameEs = row.nameEspanish;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
     },
@@ -388,7 +376,7 @@ export default {
           var city = {
             id: this.cityUpdate.id,
             nameEnglish: this.cities.city + ", " + this.cities.country,
-            nameEspanish: this.city_nameEs,
+            nameEspanish: this.formCity.city_nameEs,
             latitude: this.cityUpdate.latitude,
             longitude: this.cityUpdate.longitude,
           };
@@ -482,14 +470,14 @@ export default {
     },
     handleSelect(item) {
       console.log(item);
-      this.city_name = item.city + ", " + item.country;
+      this.formCity.city_name = item.city + ", " + item.country;
       this.cities = item;
     },
     handleIconClick(ev) {
       console.log(ev);
     },
     postCity() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formCity"].validate((valid) => {
         var city = {
           cityNameEnglish: this.cities.city + ", " + this.cities.country,
           cityNameEspanish: "sin definir",
@@ -497,7 +485,7 @@ export default {
           longitude: this.cities.longitude.toString(),
         };
         if (this.duplicateCity) {
-          city.cityNameEspanish = this.cities.city + ", " + this.cities.country
+          city.cityNameEspanish = this.cities.city + ", " + this.cities.country;
         }
         if (valid) {
           axios
@@ -574,20 +562,18 @@ export default {
   },
   computed: {
     city() {
-      if (this.list) {
+      if (this.list.length > 0) {
         return this.list.filter((item) => {
-          return item.nameEnglish
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
+          return (
+            item.nameEnglish
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
             item.nameEspanish
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.latitude
-            .toLowerCase()
-            .includes(this.search.toLowerCase()) ||
-            item.longitude
-            .toLowerCase()
-            .includes(this.search.toLowerCase());
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.latitude.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.longitude.toLowerCase().includes(this.search.toLowerCase())
+          );
         });
       }
     },
@@ -613,5 +599,11 @@ export default {
 
 .el-autocomplete-suggestion {
   width: 300px !important;
+}
+
+@media (max-width: 600px) {
+  .el-dialog {
+    width: 100% !important;
+  }
 }
 </style>
