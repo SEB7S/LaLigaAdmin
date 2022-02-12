@@ -104,7 +104,7 @@ export default {
     status: 'Status',
     image: 'Image',
     description: 'Description',
-    max_pax: 'Max Pax',
+    max_pax: 'Max Pax'
   },
   provider: {
     nameProvider: 'Name',
@@ -125,7 +125,7 @@ export default {
     latitudeStadium: 'Latitude',
     longitudeStadium: 'Longitude'
   },
-  user:{
+  user: {
     nameUser: 'Usuario',
     rolUser: '',
     permission: ''
