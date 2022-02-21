@@ -5,8 +5,9 @@ import Layout from '@/layout'
 const stadiumRouter = {
   path: '/stadium',
   component: Layout,
-  redirect: 'noRedirect',
+  redirect: '/stadium/manageStadium',
   name: 'ComponentDemo',
+  alwaysShow: true,
   meta: {
     title: 'stadium',
     icon: 'example'
@@ -17,12 +18,6 @@ const stadiumRouter = {
       component: () => import('@/components-laLiga/stadium/configStadium'),
       name: 'Manage Stadium',
       meta: { title: 'manageStadium' }
-    },
-    {
-      path: 'markdown',
-      component: () => import('@/views/components-demo/markdown'),
-      name: 'Manage Stadium',
-      meta: { title: 'Manage Stadium' }
     }
   ]
 }

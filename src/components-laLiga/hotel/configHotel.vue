@@ -151,7 +151,11 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogFormVisible"
+      :before-close="handleClose"
+    >
       <el-steps :active="active" align-center finish-status="success">
         <el-step title="General Data"></el-step>
         <el-step title="Image / Description"></el-step>
@@ -242,6 +246,8 @@
               :on-remove="handleRemove"
               name="UploadImage"
               :data="formImageHotel"
+              :file-list="fileList"
+              :on-success="handleSuccess"
             >
               <i class="el-icon-plus"></i>
             </el-upload>
@@ -327,7 +333,11 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+    <el-dialog
+      :visible.sync="dialogPvVisible"
+      title="Reading statistics"
+      :before-close="handleClose"
+    >
       <el-table
         :data="pvData"
         border
@@ -372,7 +382,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {});
 
 export default {
-  name: "ConfigStadium",
+  name: "ConfigHotel",
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -525,6 +535,7 @@ export default {
       formImageHotel: {
         MediaContentType: 0,
         idHotel: null,
+        id:null
       },
       formRoomType: [
         {
@@ -538,6 +549,8 @@ export default {
       /* Images */
       dialogImageUrl: "",
       dialogVisible: false,
+      roomType: {},
+      fileList: [],
     };
   },
   created() {
@@ -596,6 +609,7 @@ export default {
       this.city_name = "";
     },
     handleUpdate(row) {
+      this.getImageByIdHotel(row);
       console.log(row);
       this.active = 0;
       this.hotelUpdate = row;
@@ -607,23 +621,59 @@ export default {
       this.formHotel.city_name = row.cityName;
       this.formHotel.providerName = row.providerName;
       this.formHotel.statusActive = row.statusActive;
+      this.formHotel.cityId = row.cityId;
+      this.formHotel.categoryId = row.categoryId;
+      this.formHotel.providerId = row.providerId;
     },
     updateData() {
-      this.$refs["formHotel"].validate((valid) => {
-        if (valid) {
+      if (this.active == 0) {
+        this.$refs["formHotel"].validate((valid) => {
+          if (valid) {
+            console.log(this.formHotel);
+            var hotel = {
+              id: this.hotelUpdate.id,
+              cityId: this.formHotel.cityId,
+              nameEnglish: this.formHotel.nameEnglish,
+              nameSpanish: this.formHotel.nameSpanish,
+              categoryId: this.formHotel.categoryId,
+              providerId: this.formHotel.providerId,
+              statusActive: this.formHotel.statusActive,
+            };
+            axios
+              .put(this.url + "Hotel", hotel)
+              .then((response) => {
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Update Successfully",
+                  type: "success",
+                  duration: 2000,
+                });
+
+                this.getHotel();
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+          }
+        });
+      } else if (this.active == 1) {
+        this.next()
+        console.log(this.active);
+      } else if (this.active == 2) {
+        this.getRoomTypeById().then((response) => {
           var hotel = {
             id: this.hotelUpdate.id,
-            cityId: this.formHotel.cityId,
-            nameEnglish: this.formHotel.nameEnglish,
-            nameSpanish: this.formHotel.nameSpanish,
-            category: this.formHotel.category,
-            providerId: this.formHotel.providerId,
-            statusActive: this.formHotel.statusActive,
+            nameEspanish: response.data.nameEspanish,
+            nameEnglish: response.data.nameEnglish,
+            maxPax: response.data.maxPax,
+            hotelId: response.data.hotelId,
           };
           axios
             .put(this.url + "Hotel", hotel)
             .then((response) => {
               this.dialogFormVisible = false;
+              this.next();
               this.$notify({
                 title: "Success",
                 message: "Update Successfully",
@@ -636,8 +686,32 @@ export default {
             .catch((error) => {
               console.error(error.response);
             });
-        }
-      });
+        });
+      }
+    },
+    getRoomTypeById() {
+      var hotel = {
+        id: this.formImageHotel.idHotel,
+      };
+      axios
+        .get(this.url + "RoomType/GetRoomTypeById", hotel)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    getImageByIdHotel(hotel) {
+      axios
+        .get(this.url + "HotelMediaImage/GetAllByHotel?idhotel=" + hotel.id)
+        .then((response) => {
+          console.log(response.data);
+          this.fileList = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -679,6 +753,7 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
+      this.active = 0;
     },
     postHotel() {
       if (this.active == 0) {
@@ -697,6 +772,7 @@ export default {
               .then((response) => {
                 this.formImageHotel.idHotel = response.data.id;
                 console.log(response);
+
                 this.next();
                 this.$notify({
                   title: "Success",
@@ -711,28 +787,31 @@ export default {
               });
           }
         });
-      }
-      if (this.active == 1) {
-        next();
-      }
-      if (this.active == 2) {
-        this.formRoomType.forEach((element) => {
+        console.error("0", this.active);
+      } else if (this.active == 1) {
+        console.error("1", this.active);
+        this.next();
+      } else if (this.active == 2) {
+        console.error("2", this.active);
+        this.formRoomType.forEach((element, index) => {
           var roomType = {
             nameEnglish: element.nameEnglish,
             nameEspanish: element.nameEspanish,
             maxPax: parseInt(element.maxPax),
             /* hotelId: this.formImageHotel.idHotel, */
-            hotelId: 12,
+            hotelId: this.formImageHotel.idHotel,
           };
           axios
             .post(this.url + "RoomType", roomType)
             .then((response) => {
               console.log(response);
               element.id = response.data.id;
+              this.active = 0;
               this.dialogFormVisible = false;
+              /*    this.dialogFormVisible = false; */
               this.$notify({
                 title: "Success",
-                message: "Hotel Agregado con éxito",
+                message: "Room Agregado con éxito",
                 type: "success",
                 duration: 2000,
               });
@@ -934,11 +1013,31 @@ export default {
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
+      var hotel = {
+        id: this.formImageHotel.idHotel,
+      };
+      axios
+        .delete(this.url + "HotelMediaImage/Delete", hotel)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
     },
     handlePictureCardPreview(file) {
       console.log(file);
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    handleSuccess(response, file, fileList) {
+      this.formImageHotel.id = response.id;
+      console.log(this.formImageStadium.id, response);
     },
     addRoom() {
       this.formRoomType.push({
@@ -950,6 +1049,13 @@ export default {
     },
     deleteRoom(counter) {
       this.formRoomType.splice(counter, 1);
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
     },
   },
   computed: {

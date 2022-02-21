@@ -7,6 +7,7 @@ const cityRouter = {
   component: Layout,
   redirect: 'noRedirect',
   name: 'ComponentDemo',
+  alwaysShow: true,
   meta: {
     title: 'city',
     icon: 'international'
@@ -17,12 +18,6 @@ const cityRouter = {
       component: () => import('@/components-laLiga/city/configCity'),
       name: 'Manage City',
       meta: { title: 'manageCity' }
-    },
-    {
-      path: 'city',
-      component: () => import('@/views/components-demo/tinymce'),
-      name: 'Manage City',
-      meta: { title: 'Manage City' }
     }
   ]
 }

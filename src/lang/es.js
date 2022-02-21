@@ -87,7 +87,8 @@ export default {
     durationTour: 'Duración (Días)',
     status: 'Estado',
     stepOneName: 'Datos Generales',
-    stepTwoName: 'Detalle de Días'
+    stepTwoName: 'Detalle de Días',
+    image: 'Cargar Imágen',
   },
   match: {},
   hotel: {
@@ -97,7 +98,7 @@ export default {
     cityHotel: 'Ciudad',
     providerHotel: 'Proveedor',
     status: 'Estado',
-    image: 'Imagen',
+    image: 'Cargar Imágen',
     description: 'Descripción',
     max_pax: 'Max Pax'
   },
@@ -118,7 +119,8 @@ export default {
     nameStadium: 'Nombre',
     cityStadium: 'Ciudad',
     latitudeStadium: 'Latitud',
-    longitudeStadium: 'Longitud'
+    longitudeStadium: 'Longitud',
+    image: 'Cargar Imágen',
   },
   user: {
     nameUser: 'Usuario',

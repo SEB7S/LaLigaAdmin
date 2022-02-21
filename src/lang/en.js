@@ -92,7 +92,8 @@ export default {
     status: 'Status',
     action: 'Actions',
     stepOneName: 'General Data',
-    stepTwoName: 'Detail Days'
+    stepTwoName: 'Detail Days',
+    image: 'Choose Image',
   },
   match: {},
   hotel: {
@@ -102,7 +103,7 @@ export default {
     cityHotel: 'City',
     providerHotel: 'Provider',
     status: 'Status',
-    image: 'Image',
+    image: 'Choose Image',
     description: 'Description',
     max_pax: 'Max Pax'
   },
@@ -123,7 +124,8 @@ export default {
     nameStadium: 'Name',
     cityStadium: 'City',
     latitudeStadium: 'Latitude',
-    longitudeStadium: 'Longitude'
+    longitudeStadium: 'Longitude',
+    image: 'Choose Image',
   },
   user: {
     nameUser: 'Usuario',

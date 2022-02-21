@@ -7,6 +7,7 @@ const tourRouter = {
   component: Layout,
   redirect: '/manageTour',
   name: 'tour',
+  alwaysShow: true,
   meta: {
     title: 'tour',
     icon: 'education'
@@ -17,12 +18,6 @@ const tourRouter = {
       component: () => import('@/components-laLiga/tour/configTour'),
       name: 'manageTour',
       meta: { title: 'manageTour' }
-    },
-    {
-      path: 'tinymce',
-      component: () => import('@/views/components-demo/tinymce'),
-      name: 'Manage Tour',
-      meta: { title: 'Manage Tour' }
     }
   ]
 }

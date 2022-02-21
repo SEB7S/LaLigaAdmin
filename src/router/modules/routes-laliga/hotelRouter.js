@@ -13,12 +13,6 @@ const hotelRouter = {
   },
   children: [
     {
-      path: 'manageCategory',
-      component: () => import('@/components-laLiga/hotel/categoryHotel'),
-      name: 'Hotel Category',
-      meta: { title: 'hotelCategory' }
-    },
-    {
       path: 'manageHotel',
       component: () => import('@/components-laLiga/hotel/configHotel'),
       name: 'Manage Hotel',

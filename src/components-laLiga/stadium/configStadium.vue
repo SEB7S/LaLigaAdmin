@@ -103,16 +103,20 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{ $t("table.edit") }}
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleUpdate(row)"
+            icon="el-icon-edit"
+          >
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="confirmDelete(row)"
+            icon="el-icon-delete"
           >
-            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -127,98 +131,93 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
+      :before-close="handleClose"
       class="mobile"
     >
-      <el-dialog
-        :title="textMap[dialogStatus]"
-        :visible.sync="dialogFormVisible"
-      >
-        <el-steps :active="active" align-center finish-status="success">
-          <el-step title="General Data"></el-step>
-          <el-step title="Image / Description"></el-step>
-        </el-steps>
-        <div v-if="active == 0">
-          <el-form
-            ref="formStadium"
-            :model="formStadium"
-            :rules="rules"
-            label-position="top"
-            label-width="100px"
-            style="margin: 30px"
+      <el-steps :active="active" align-center finish-status="success">
+        <el-step title="General Data"></el-step>
+        <el-step title="Update Images"></el-step>
+      </el-steps>
+      <div v-if="active == 0">
+        <el-form
+          ref="formStadium"
+          :model="formStadium"
+          :rules="rules"
+          label-position="top"
+          label-width="100px"
+          style="margin: 30px"
+        >
+          <el-form-item :label="$t('stadium.nameStadium')" prop="name">
+            <el-input v-model="formStadium.name" />
+          </el-form-item>
+          <el-form-item :label="$t('stadium.latitudeStadium')" prop="latitude">
+            <el-input v-model="formStadium.latitude" />
+          </el-form-item>
+          <el-form-item
+            :label="$t('stadium.longitudeStadium')"
+            prop="longitude"
           >
-            <el-form-item :label="$t('stadium.nameStadium')" prop="name">
-              <el-input v-model="formStadium.name" />
-            </el-form-item>
-            <el-form-item
-              :label="$t('stadium.latitudeStadium')"
-              prop="latitude"
+            <el-input v-model="formStadium.longitude" />
+          </el-form-item>
+          <el-form-item :label="$t('stadium.cityStadium')" prop="city_name">
+            <el-autocomplete
+              v-model="formStadium.city_name"
+              popper-class="my-autocomplete"
+              :fetch-suggestions="getCities"
+              placeholder="Please input"
+              style="width: 100%"
+              @select="handleSelect"
             >
-              <el-input v-model="formStadium.latitude" />
-            </el-form-item>
-            <el-form-item
-              :label="$t('stadium.longitudeStadium')"
-              prop="longitude"
+              <i
+                slot="suffix"
+                class="el-icon-edit el-input__icon"
+                @click="handleIconClick"
+              />
+              <template slot-scope="{ item }">
+                <div class="value">{{ item.nameEnglish }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div v-if="active == 1">
+        <el-form
+          ref="formHotel"
+          label-position="top"
+          label-width="120px"
+          style="margin: 30px"
+        >
+          <el-form-item :label="$t('stadium.image')">
+            <el-upload
+              :action="url + 'StadiumMediaContent/SendStadiumImage'"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              :file-list="fileList"
+              name="UploadImage"
+              :data="formImageStadium"
+              :on-success="handleSuccess"
             >
-              <el-input v-model="formStadium.longitude" />
-            </el-form-item>
-            <el-form-item :label="$t('stadium.cityStadium')" prop="city_name">
-              <el-autocomplete
-                v-model="formStadium.city_name"
-                popper-class="my-autocomplete"
-                :fetch-suggestions="getCities"
-                placeholder="Please input"
-                style="width: 100%"
-                @select="handleSelect"
-              >
-                <i
-                  slot="suffix"
-                  class="el-icon-edit el-input__icon"
-                  @click="handleIconClick"
-                />
-                <template slot-scope="{ item }">
-                  <div class="value">{{ item.nameEnglish }}</div>
-                </template>
-              </el-autocomplete>
-            </el-form-item>
-          </el-form>
-        </div>
-        <div v-if="active == 1">
-          <el-form
-            ref="formHotel"
-            label-position="top"
-            label-width="120px"
-            style="margin: 30px"
-          >
-            <el-form-item :label="$t('hotel.image')">
-              <el-upload
-                :action="url + 'StadiumMediaContent/SendStadiumImage'"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :on-remove="handleRemove"
-                name="UploadImage"
-                :data="formImageStadium"
-              >
-                <i class="el-icon-plus"></i>
-              </el-upload>
-            </el-form-item>
-          </el-form>
+              <i class="el-icon-plus"></i>
+            </el-upload>
+          </el-form-item>
+        </el-form>
 
-          <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt="" />
-          </el-dialog>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">
-            {{ $t("table.cancel") }}
-          </el-button>
-          <el-button
-            type="primary"
-            @click="dialogStatus === 'create' ? postStadium() : updateData()"
-          >
-            {{ $t("table.confirm") }}
-          </el-button>
-        </div>
-      </el-dialog>
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="" />
+        </el-dialog>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">
+          {{ $t("table.cancel") }}
+        </el-button>
+        <el-button
+          type="primary"
+          @click="dialogStatus === 'create' ? postStadium() : updateData()"
+        >
+          {{ $t("table.confirm") }}
+        </el-button>
+      </div>
     </el-dialog>
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table
@@ -346,6 +345,7 @@ export default {
       formImageStadium: {
         MediaContentType: 0,
         idStadium: 0,
+        id: null,
       },
       /* EndPoint */
       url: this.$store.getters.url,
@@ -405,6 +405,7 @@ export default {
       /* Images */
       dialogImageUrl: "",
       dialogVisible: false,
+      fileList: [],
     };
   },
   created() {
@@ -460,7 +461,9 @@ export default {
         (this.city_name = "");
     },
     handleUpdate(row) {
+      this.getImageByIdStadium(row);
       console.log(row);
+      this.active = 0;
       this.stadiumUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
@@ -469,35 +472,41 @@ export default {
       this.formStadium.longitude = row.longitude;
       this.formStadium.city_name = row.cityName;
       this.formStadium.cityId = row.cityId;
+      this.formImageStadium.idStadium = row.id
     },
     updateData() {
-      this.$refs["formStadium"].validate((valid) => {
-        if (valid) {
-          var stadium = {
-            id: this.stadiumUpdate.id,
-            cityId: this.formStadium.cityId,
-            name: this.formStadium.name,
-            latitude: this.formStadium.latitude,
-            longitude: this.formStadium.longitude,
-          };
-          axios
-            .put(this.url + "Stadium", stadium)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
+      if (this.active == 0) {
+        this.$refs["formStadium"].validate((valid) => {
+          if (valid) {
+            var stadium = {
+              id: this.stadiumUpdate.id,
+              cityId: this.formStadium.cityId,
+              name: this.formStadium.name,
+              latitude: this.formStadium.latitude,
+              longitude: this.formStadium.longitude,
+            };
+            axios
+              .put(this.url + "Stadium", stadium)
+              .then((response) => {
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Update Successfully",
+                  type: "success",
+                  duration: 2000,
+                });
 
-              this.getStadium();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
+                this.getStadium();
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+          }
+        });
+      }
+      else if (this.active == 1){
+        this.dialogFormVisible = false;
+      }
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -539,6 +548,7 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
+      this.active = 0;
     },
     postStadium() {
       this.$refs["formStadium"].validate((valid) => {
@@ -657,11 +667,51 @@ export default {
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
+      var stadium = {
+        id: this.formImageStadium.id,
+      };
+      axios
+        .delete(this.url + "StadiumMediaImage/DeleteStadiumMedia", stadium)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    handleSuccess(response, file, fileList) {
+      this.formImageStadium.id = response.id;
+      console.log(this.formImageStadium.id, response);
     },
     handlePictureCardPreview(file) {
       console.log(file);
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    getImageByIdStadium(stadium) {
+      axios
+        .get(
+          this.url + "StadiumMediaImage/GetAllByStadium?idStadium=" + stadium.id
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.fileList = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
     },
   },
   computed: {

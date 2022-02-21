@@ -106,16 +106,20 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{ $t("table.edit") }}
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleUpdate(row)"
+            icon="el-icon-edit"
+          >
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="confirmDelete(row)"
+            icon="el-icon-delete"
           >
-            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -127,7 +131,11 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogFormVisible"
+      :before-close="handleClose"
+    >
       <div>
         <el-steps :active="active" finish-status="success" align-center>
           <el-step :title="$t('tour.nameTour')" icon="el-icon-edit" />
@@ -169,13 +177,18 @@
               </el-autocomplete>
             </el-form-item>
             <el-form-item label="Hotel Category">
-              <el-select v-model="formTour.hotel_category" placeholder="Select">
+              <el-select
+                v-model="formTour.hotel_category"
+                multiple
+                placeholder="Select"
+              >
                 <el-option
                   v-for="item in formTour.options"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
-                />
+                >
+                </el-option>
               </el-select>
             </el-form-item>
           </el-form>
@@ -200,7 +213,10 @@
           <el-collapse v-model="activeNames" accordion>
             <div v-for="(formDay, counter) in formDayDetail" :key="counter">
               <div class="grid-content">
-                <el-collapse-item :title="formDay.dayName" :name="counter">
+                <el-collapse-item
+                  :title="formDay.dayName + formDay.startDate"
+                  :name="counter"
+                >
                   <el-form
                     ref="dataForm"
                     :rules="rules"
@@ -227,6 +243,14 @@
                             <div class="value">{{ item.nameEnglish }}</div>
                           </template>
                         </el-autocomplete>
+                      </el-form-item>
+                      <el-form-item label="">
+                        <el-switch
+                          v-model="formDay.match_day"
+                          active-text="Enable for match"
+                          inactive-text=""
+                        >
+                        </el-switch>
                       </el-form-item>
                       <el-form-item label="Image">
                         <el-upload
@@ -401,7 +425,7 @@ export default {
         name: "",
         duration_in_days: 0,
         status: true,
-        idProvider: "",
+        idProvider: 0,
         providerName: "",
         hotel_category: "",
         options: [
@@ -429,6 +453,7 @@ export default {
       },
       idTourCreated: 0,
       formDayDetail: [],
+      getDayDescription: [],
       arrayPosition: 0,
       tourUpdate: [],
       /* EndPoint */
@@ -442,6 +467,8 @@ export default {
         MediaContentType: 0,
         idTour: 0,
       },
+      editTourDayDescription: false,
+      editFormTourDayDescription: [],
     };
   },
   created() {
@@ -487,15 +514,37 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
+      this.formTour = {
+        name: "",
+        duration_in_days: 0,
+        status: true,
+        idProvider: "",
+        providerName: "",
+        hotel_category: "",
+        options: [
+          {
+            value: "Option1",
+            label: "Option1",
+          },
+          {
+            value: "Option2",
+            label: "Option2",
+          },
+          {
+            value: "Option3",
+            label: "Option3",
+          },
+          {
+            value: "Option4",
+            label: "Option4",
+          },
+          {
+            value: "Option5",
+            label: "Option5",
+          },
+        ],
       };
+      this.formDayDetail = [];
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -538,6 +587,7 @@ export default {
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.active = 0;
+      this.editTourDayDescription = false;
     },
     postTour() {
       if (this.active == 0) {
@@ -552,16 +602,36 @@ export default {
             axios
               .post(this.url + "Tour", tour)
               .then((response) => {
-                this.formImageTour.idTour = response.data.id
+                this.formImageTour.idTour = response.data.id;
+                this.getDayDescription = response.data.tourDayDescriptions;
                 this.next();
-                this.idTourCreated = response.id;
               })
               .catch((error) => {
                 console.error(error.response);
               });
           }
         });
-      } else {
+      }
+      if (this.active == 1) {
+        let waitresponse = false;
+        this.formDayDetail.forEach((element, index) => {
+          var dayDescription = {
+            dayNumber: index + 1,
+            dayDescription: element.description_language,
+            start_time: element.startDate,
+            tourId: this.formImageTour.idTour,
+            id: this.getDayDescription[index].id,
+          };
+          axios
+            .put(this.url + "Tour_Day_Description", dayDescription)
+            .then((response) => {
+              this.dialogFormVisible = false;
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+          console.log(this.formDayDetail);
+        });
       }
     },
     getTour() {
@@ -620,6 +690,8 @@ export default {
     },
     handleUpdate(row) {
       console.log(row);
+      this.editFormTourDayDescription = [];
+      this.active = 0;
       this.tourUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
@@ -628,34 +700,59 @@ export default {
       this.formTour.status = row.status;
       this.formTour.idProvider = row.idProvider;
       this.formTour.providerName = row.providerName;
+      this.editFormTourDayDescription = row.tourDayDescriptions;
+      this.editTourDayDescription = true;
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          var tour = {
-            name: this.formTour.name,
-            duration_in_days: this.formTour.duration_in_days,
-            status: this.formTour.status,
-            idProvider: this.formTour.idProvider,
-          };
-          axios
-            .put(this.url + "Tour", tour)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
+      if (this.active == 0) {
+        this.$refs["dataForm"].validate((valid) => {
+          if (valid) {
+            var tour = {
+              name: this.formTour.name,
+              duration_in_days: this.formTour.duration_in_days,
+              status: this.formTour.status,
+              idProvider: this.formTour.idProvider,
+              id: this.tourUpdate.id,
+            };
+            axios
+              .put(this.url + "Tour", tour)
+              .then((response) => {
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Update Successfully",
+                  type: "success",
+                  duration: 2000,
+                });
+              })
+              .catch((error) => {
+                console.error(error.response);
               });
-
-              this.getTour();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
+          }
+        });
+      } else if (this.active == 1) {
+        if (this.active == 1) {
+          let waitresponse = false;
+          this.formDayDetail.forEach((element, index) => {
+            var dayDescription = {
+              dayNumber: index + 1,
+              dayDescription: element.description_language,
+              start_time: element.startDate,
+              tourId: this.formImageTour.idTour,
+              id: this.getDayDescription[index].id,
+            };
+            axios
+              .put(this.url + "Tour_Day_Description", dayDescription)
+              .then((response) => {
+                this.dialogFormVisible = false;
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+            console.log(this.formDayDetail);
+          });
         }
-      });
+      }
     },
     getProviders(queryString, cb) {
       axios
@@ -721,6 +818,22 @@ export default {
     /** Images */
     handleRemove(file, fileList) {
       console.log(file, fileList);
+      var tour = {
+        id: this.formImageTour.idTour,
+      };
+      axios
+        .delete(this.url + "TourMediaImage/DeleteTourMedia", tour)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
@@ -766,6 +879,7 @@ export default {
       };
     },
     calculateDays(item) {
+      this.formDayDetail = [];
       const dateFormat =
         this.start_date.getDate() +
         "/" +
@@ -778,16 +892,32 @@ export default {
         index++
       ) {
         console.log(dateFormat);
-        var day = {
-          dayName:
-            "Day " + (index + 1) + " - " + this.addDate(index, dateFormat),
-          city_name: "",
-          cityId: 0,
-          description_language: "English",
-          description_english: "",
-          description_spanish: "",
-        };
-        this.formDayDetail.push(day);
+        if (!this.editTourDayDescription) {
+          var day = {
+            dayName: "Day " + (index + 1) + " - ",
+            startDate: this.addDate(index, dateFormat),
+            city_name: "",
+            cityId: 0,
+            description_language: "English",
+            description_english: "",
+            description_spanish: "",
+            match_day: false,
+          };
+          this.formDayDetail.push(day);
+        } else {
+          this.start_date = this.editFormTourDayDescription[index].startTime;
+          var day = {
+            dayName: "Day " + (index + 1) + " - ",
+            startDate: this.addDate(index, dateFormat),
+            city_name: "",
+            cityId: 0,
+            description_language: "English",
+            description_english: this.editFormTourDayDescription[index].dayDescription,
+            description_spanish: "",
+            match_day: false,
+          };
+          this.formDayDetail[index] = day;
+        }
       }
     },
     addDate(d, fecha) {
@@ -811,6 +941,13 @@ export default {
       dia = dia < 10 ? "0" + dia : dia;
       var fechaFinal = dia + sep + mes + sep + anno;
       return fechaFinal;
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
     },
   },
 };

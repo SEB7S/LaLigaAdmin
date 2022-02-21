@@ -7,6 +7,7 @@ const providerRouter = {
   component: Layout,
   redirect: 'noRedirect',
   name: 'ComponentDemo',
+  alwaysShow: true,
   meta: {
     title: 'provider',
     icon: 'peoples'
@@ -19,11 +20,11 @@ const providerRouter = {
       meta: { title: 'manageProvider' }
     },
     {
-      path: 'provider',
-      component: () => import('@/views/components-demo/split-pane'),
-      name: 'Admin provider',
-      meta: { title: 'Manage Provider' }
-    }
+      path: 'manageCategory',
+      component: () => import('@/components-laLiga/provider/categoryProvider'),
+      name: 'Provider Category',
+      meta: { title: 'hotelCategory' }
+    },
   ]
 
 }

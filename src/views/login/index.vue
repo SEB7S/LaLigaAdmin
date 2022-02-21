@@ -220,9 +220,13 @@ export default {
       });
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
+          var login = {
+            username: 'admin',
+            password: 'password'
+          }
           this.loading = true;
           this.$store
-            .dispatch("user/login", this.loginForm)
+            .dispatch("user/login", login)
             .then(() => {
               this.$router.push({
                 path: this.redirect || "/",

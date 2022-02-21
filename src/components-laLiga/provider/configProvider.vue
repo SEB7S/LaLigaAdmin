@@ -116,16 +116,20 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            {{ $t("table.edit") }}
+          <el-button
+            type="primary"
+            size="mini"
+            @click="handleUpdate(row)"
+            icon="el-icon-edit"
+          >
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="confirmDelete(row)"
+            icon="el-icon-delete"
           >
-            {{ $t("table.delete") }}
           </el-button>
         </template>
       </el-table-column>
@@ -137,7 +141,7 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :before-close="handleClose">
       <el-form
         ref="formProvider"
         :model="formProvider"
@@ -171,7 +175,7 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :before-close="handleClose">
       <el-table
         :data="pvData"
         border
@@ -592,6 +596,13 @@ export default {
             });
         }
       });
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
     },
   },
   computed: {
