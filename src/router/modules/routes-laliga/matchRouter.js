@@ -13,20 +13,20 @@ const matchRouter = {
   },
   children: [
     {
-      path: 'tinymce',
-      component: () => import('@/views/components-demo/tinymce'),
-      name: 'Setting Match',
+      path: 'configMatch',
+      component: () => import('@/components-laLiga/match/ConfigMatch'),
+      name: 'Config Match',
       meta: { title: 'manageMatch' }
     },
     {
-      path: 'markdown',
-      component: () => import('@/views/components-demo/markdown'),
+      path: 'configMatchRate',
+      component: () => import('@/components-laLiga/match/ConfigMatchRate'),
       name: 'Match Rates',
       meta: { title: 'manageRates' }
     },
     {
-      path: 'json-editor',
-      component: () => import('@/views/components-demo/json-editor'),
+      path: 'configClub',
+      component: () => import('@/components-laLiga/match/ConfigClub'),
       name: 'Clubs',
       meta: { title: 'clubs' }
     }

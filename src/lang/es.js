@@ -79,6 +79,7 @@ export default {
     manageProvider: 'Gestionar Proveedor',
     stadium: 'Estadio',
     manageStadium: 'Gestionar Estadio',
+    categoryStadium: 'Categoría Estadio',
     user: 'Usuario'
   },
   tour: {
@@ -90,7 +91,20 @@ export default {
     stepTwoName: 'Detalle de Días',
     image: 'Cargar Imágen',
   },
-  match: {},
+  match: {
+    nameClub: 'Club',
+    cityClub: 'Ciudad',
+    clubGuest: 'Visitante',
+    clubHome: 'Local',
+    stadium: 'Estadio',
+    date: 'Fecha',
+    paxType:'Pasajero',
+    startDate: 'Fecha Inicial',
+    finalDate: 'Fecha Final',
+    matchPrice: 'Precio',
+    matchName: 'Partido',
+    stadiumCategory: 'Categoría de estadio'
+  },
   hotel: {
     nameEnHotel: 'Nombre En',
     nameEsHotel: 'Nombre Es',
@@ -121,6 +135,10 @@ export default {
     latitudeStadium: 'Latitud',
     longitudeStadium: 'Longitud',
     image: 'Cargar Imágen',
+    nameEnglish: 'Nombre en Inglés',
+    nameEspanish: "Nombre en Español",
+    priority: 'Prioridad',
+    stadiumId: 'Estadio'
   },
   user: {
     nameUser: 'Usuario',

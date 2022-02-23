@@ -18,6 +18,12 @@ const stadiumRouter = {
       component: () => import('@/components-laLiga/stadium/configStadium'),
       name: 'Manage Stadium',
       meta: { title: 'manageStadium' }
+    },
+    {
+      path: 'categoryStadium',
+      component: () => import('@/components-laLiga/stadium/categoryStadium'),
+      name: 'Category Stadium',
+      meta: { title: 'categoryStadium' }
     }
   ]
 }

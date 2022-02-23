@@ -79,7 +79,9 @@ export default {
     manageProvider: 'Manage Provider',
     stadium: 'Stadium',
     manageStadium: 'Manage Stadium',
+    categoryStadium: 'Category Stadium',
     user: 'User'
+    
   },
   tour: {
     add: 'Add',
@@ -95,7 +97,20 @@ export default {
     stepTwoName: 'Detail Days',
     image: 'Choose Image',
   },
-  match: {},
+  match: {
+    nameClub: 'Club',
+    cityClub: 'City',
+    clubGuest: 'Guest',
+    clubHome: 'Home',
+    stadium: 'Stadium',
+    date: 'Date',
+    paxType:'Pax Type',
+    startDate: 'Start Date',
+    finalDate: 'Final Date',
+    matchPrice: 'Price',
+    matchName: 'Match',
+    stadiumCategory: 'Stadium Category'
+  },
   hotel: {
     nameEnHotel: 'Name En',
     nameEsHotel: 'Name Es',
@@ -126,6 +141,10 @@ export default {
     latitudeStadium: 'Latitude',
     longitudeStadium: 'Longitude',
     image: 'Choose Image',
+    nameEnglish: 'Name English',
+    nameEspanish: "Name Spanish",
+    priority: 'Priority',
+    stadiumId: 'Stadium'
   },
   user: {
     nameUser: 'Usuario',
