@@ -91,7 +91,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.stadiumId }}</span>
+          <span>{{ row.stadiumName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -146,7 +146,7 @@
           <el-input v-model="formCategory.nameEspanish" />
         </el-form-item>
         <el-form-item :label="$t('stadium.priority')">
-          <el-input v-model="formCategory.priorityOrder" />
+          <el-input v-model="formCategory.priorityOrder" type="number" />
         </el-form-item>
         <el-form-item :label="$t('stadium.stadiumId')" prop="stadiumId">
           <el-autocomplete
@@ -309,7 +309,7 @@ export default {
       formCategory: {
         nameEnglish: "",
         nameEspanish: "",
-        priorityOrder: "",
+        priorityOrder: 0,
         stadiumId: "",
         stadiumName: "",
       },
@@ -456,7 +456,7 @@ export default {
         var category = {
           nameEnglish: this.formCategory.nameEnglish,
           nameEspanish: this.formCategory.nameEspanish,
-          priority: this.formCategory.priority,
+          priority: this.formCategory.priorityOrder,
           stadiumId: this.formCategory.stadiumId,
         };
         if (valid) {

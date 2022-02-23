@@ -65,7 +65,16 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.matchId }}</span>
+          <span>{{ row.matchName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('match.stadiumCategory')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row.stadioCategoryNameEnglish }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -83,7 +92,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.paxType }}</span>
+          <span>{{  row.paxTypeId == 1 ? 'Adult' : 'Child'  }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -218,7 +227,7 @@
               @click="handleIconClickCatStad"
             />
             <template slot-scope="{ item }">
-              <div class="value">{{ item.stadiumName }}</div>
+              <div class="value">{{ item.name }}</div>
             </template>
           </el-autocomplete>
         </el-form-item>
@@ -592,16 +601,18 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          var provider = {
+          var matchRate = {
             id: data.id,
-            name: data.name,
-            document: data.document,
-            status: status,
-            phone: data.phone,
-            email: data.email,
+            paxTypeIn: data.paxTypeIn,
+            stadiumCategoryId: data.stadiumCategoryId,
+            match_price: data.match_price,
+            start_date: data.start_date,
+            final_date: data.final_date,
+            available: data.available,
+            matchId: data.matchId,
           };
           axios
-            .put(this.url + "Provider", provider)
+            .put(this.url + "MatchRate", matchRate)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -635,8 +646,10 @@ export default {
       this.formMatchRate.start_date = row.startDate;
       this.formMatchRate.final_date = row.finalDate;
       this.formMatchRate.stadiumCategoryId = row.stadiumCategoryId;
-      this.formMatchRate.paxTypeIn = row.paxType;
-
+      this.formMatchRate.stadiumCategoryName = row.stadioCategoryNameEnglish;
+      this.formMatchRate.paxTypeIn = row.paxTypeId;
+      this.formMatchRate.matchName = row.matchName;
+      
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {
@@ -650,7 +663,6 @@ export default {
             final_date: this.formMatchRate.final_date,
             available: this.formMatchRate.available,
             matchId: this.formMatchRate.matchId,
-
           };
           axios
             .put(this.url + "MatchRate", matchRate)
@@ -695,12 +707,12 @@ export default {
     },
     createFilterCatStad(queryString) {
       return (link) => {
-        return link.stadiumName.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
       };
     },
     handleSelectCatStad(item) {
       console.log(item);
-      this.formMatchRate.stadiumCategoryName = item.stadiumName;
+      this.formMatchRate.stadiumCategoryName = item.name;
       this.formMatchRate.stadiumCategoryId = item.id;
     },
     handleIconClickCatStad(ev) {
@@ -723,7 +735,9 @@ export default {
     },
     createFilterMatch(queryString) {
       return (link) => {
-        return link.clubs.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return (
+          link.clubs.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+        );
       };
     },
     handleSelectMatch(item) {

@@ -460,11 +460,19 @@ export default {
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     getCities(queryString, cb) {
+      var config = {
+        headers: {
+          "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
+          "x-rapidapi-key":
+            "0513e4a37fmsh5c1de65b72f3182p1ebac7jsn85844b4c6a0e"
+        }
+      };
+
       var url =
-        "http://geodb-free-service.wirefreethought.com/v1/geo/cities?limit=5&offset=0&namePrefix=";
+        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&namePrefix=";
       if (queryString.length > 2) {
         axios
-          .get(url + queryString)
+          .get(url + queryString, config)
           .then((response) => {
             console.log(response.data["data"]);
             cb(response.data["data"]);
