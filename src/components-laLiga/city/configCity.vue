@@ -469,7 +469,7 @@ export default {
       };
 
       var url =
-        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&namePrefix=";
+        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&types=CITY&namePrefix=";
       if (queryString.length > 2) {
         axios
           .get(url + queryString, config)

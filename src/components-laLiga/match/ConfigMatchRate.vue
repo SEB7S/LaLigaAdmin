@@ -92,7 +92,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{  row.paxTypeId == 1 ? 'Adult' : 'Child'  }}</span>
+          <span>{{  row.paxTypeName  }}</span>
         </template>
       </el-table-column>
       <el-table-column
