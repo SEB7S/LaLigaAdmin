@@ -74,7 +74,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.city_id }}</span>
+          <span>{{ row.cityName }}</span>
         </template>
       </el-table-column>
       <el-table-column
