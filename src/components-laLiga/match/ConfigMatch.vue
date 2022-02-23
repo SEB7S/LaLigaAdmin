@@ -65,7 +65,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.club_home_id }}</span>
+          <span>{{ row.clubHome }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -74,7 +74,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.club_guest_id }}</span>
+          <span>{{ row.clubGuest }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -83,7 +83,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.stadium_id }}</span>
+          <span>{{ row.stadiumName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -613,9 +613,9 @@ export default {
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.formMatch.club_guest_id = row.club_guest_id;
-      this.formMatch.clubGuestName = row.clubGuestName;
+      this.formMatch.clubGuestName = row.clubGuest;
       this.formMatch.club_home_id = row.club_home_id;
-      this.formMatch.clubHomeName = row.clubHomeName;
+      this.formMatch.clubHomeName = row.clubHome;
       this.formMatch.stadium_id = row.stadium_id;
       this.formMatch.stadiumName = row.stadiumName;
       this.formMatch.date = row.date;

@@ -158,7 +158,6 @@
       <el-form
         ref="formMatchRate"
         :model="formMatchRate"
-        :rules="rules"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
@@ -178,19 +177,19 @@
               @click="handleIconClickMatch"
             />
             <template slot-scope="{ item }">
-              <div class="value">{{ item.matchId }}</div>
+              <div class="value">{{ item.clubs }}</div>
             </template>
           </el-autocomplete>
         </el-form-item>
         <el-form-item :label="$t('match.matchPrice')" prop="document">
-          <el-input v-model="formMatchRate.matchPrice" />
+          <el-input v-model="formMatchRate.match_price" />
         </el-form-item>
         <el-form-item :label="$t('match.paxType')" prop="phone">
           <el-input v-model="formMatchRate.paxTypeIn" type="number" />
         </el-form-item>
         <el-form-item :label="$t('match.startDate')" prop="email">
           <el-date-picker
-            v-model="formMatchRate.startDate"
+            v-model="formMatchRate.start_date"
             type="datetime"
             placeholder="Select date and time"
           >
@@ -198,7 +197,7 @@
         </el-form-item>
         <el-form-item :label="$t('match.finalDate')" prop="email">
           <el-date-picker
-            v-model="formMatchRate.finalDate"
+            v-model="formMatchRate.final_date"
             type="datetime"
             placeholder="Select date and time"
           >
@@ -206,7 +205,7 @@
         </el-form-item>
         <el-form-item :label="$t('match.stadiumCategory')" prop="stadiumId">
           <el-autocomplete
-            v-model="formMatchRate.stadiumId"
+            v-model="formMatchRate.stadiumCategoryName"
             popper-class="my-autocomplete"
             :fetch-suggestions="getCategoryStadium"
             placeholder="Please input"
@@ -219,7 +218,7 @@
               @click="handleIconClickCatStad"
             />
             <template slot-scope="{ item }">
-              <div class="value">{{ item.nameEnglish }}</div>
+              <div class="value">{{ item.stadiumName }}</div>
             </template>
           </el-autocomplete>
         </el-form-item>
@@ -230,7 +229,7 @@
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? postProvider() : updateData()"
+          @click="dialogStatus === 'create' ? postMatchRate() : updateData()"
         >
           {{ $t("table.confirm") }}
         </el-button>
@@ -341,7 +340,6 @@ export default {
         matchName: "",
         start_date: true,
         final_date: "",
-        available: true,
         stadiumCategoryId: 1,
         stadiumCategoryName: "",
         paxTypeIn: 1,
@@ -397,7 +395,7 @@ export default {
           },
         ],
       },
-      providerUpdate: [],
+      matchRateUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
       search: "",
@@ -496,18 +494,20 @@ export default {
       this.dialogFormVisible = true;
       this.city_name = "";
     },
-    postProvider() {
+    postMatchRate() {
       this.$refs["formMatchRate"].validate((valid) => {
-        var provider = {
-          name: this.formMatchRate.name,
-          document: this.formMatchRate.document,
-          status: this.formMatchRate.status,
-          phone: this.formMatchRate.phone,
-          email: this.formMatchRate.email,
+        var matchRate = {
+          start_date: this.formMatchRate.start_date,
+          final_date: this.formMatchRate.final_date,
+          available: true,
+          stadiumCategoryId: this.formMatchRate.stadiumCategoryId,
+          matchId: this.formMatchRate.matchId,
+          paxTypeIn: parseInt(this.formMatchRate.paxTypeIn),
+          match_price: this.formMatchRate.match_price,
         };
         if (valid) {
           axios
-            .post(this.url + "Provider", provider)
+            .post(this.url + "MatchRate", matchRate)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -539,7 +539,7 @@ export default {
     },
     handleDelete(row) {
       axios
-        .delete(this.url + "Provider/" + row.id)
+        .delete(this.url + "MatchRate/" + row.id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -627,28 +627,33 @@ export default {
     },
     handleUpdate(row) {
       console.log(row);
-      this.providerUpdate = row;
+      this.matchRateUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.formMatchRate.name = row.name;
-      this.formMatchRate.document = row.document;
-      this.formMatchRate.status = row.status;
-      this.formMatchRate.phone = row.phone;
-      this.formMatchRate.email = row.email;
+      this.formMatchRate.matchId = row.matchId;
+      /* this.formMatchRate.matchName = row.matchName; */
+      this.formMatchRate.start_date = row.startDate;
+      this.formMatchRate.final_date = row.finalDate;
+      this.formMatchRate.stadiumCategoryId = row.stadiumCategoryId;
+      this.formMatchRate.paxTypeIn = row.paxType;
+
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {
         if (valid) {
-          var provider = {
-            id: this.providerUpdate.id,
-            name: this.formMatchRate.name,
-            document: this.formMatchRate.document,
-            status: this.formMatchRate.status,
-            phone: this.formMatchRate.phone,
-            email: this.formMatchRate.email,
+          var matchRate = {
+            id: this.matchRateUpdate.id,
+            paxTypeIn: this.formMatchRate.paxTypeIn,
+            stadiumCategoryId: this.formMatchRate.stadiumCategoryId,
+            match_price: this.formMatchRate.match_price,
+            start_date: this.formMatchRate.start_date,
+            final_date: this.formMatchRate.final_date,
+            available: this.formMatchRate.available,
+            matchId: this.formMatchRate.matchId,
+
           };
           axios
-            .put(this.url + "Provider", provider)
+            .put(this.url + "MatchRate", matchRate)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -690,12 +695,12 @@ export default {
     },
     createFilterCatStad(queryString) {
       return (link) => {
-        return link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return link.stadiumName.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
       };
     },
     handleSelectCatStad(item) {
       console.log(item);
-      this.formMatchRate.stadiumCategoryName = item.nameEnglish;
+      this.formMatchRate.stadiumCategoryName = item.stadiumName;
       this.formMatchRate.stadiumCategoryId = item.id;
     },
     handleIconClickCatStad(ev) {
@@ -718,13 +723,13 @@ export default {
     },
     createFilterMatch(queryString) {
       return (link) => {
-        return link.index.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return link.clubs.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
       };
     },
     handleSelectMatch(item) {
       console.log(item);
       this.formMatchRate.matchId = item.id;
-      this.formMatchRate.matchName = item.date;
+      this.formMatchRate.matchName = item.clubs;
     },
     handleIconClickMatch(ev) {
       console.log(ev);
