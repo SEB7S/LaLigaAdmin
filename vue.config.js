@@ -31,6 +31,7 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     port: port,
+    proxy: 'https://htleague.herokuapp.com/Api/v1/',
     open: true,
     overlay: {
       warnings: false,
@@ -88,7 +89,7 @@ module.exports = {
             .plugin('ScriptExtHtmlWebpackPlugin')
             .after('html')
             .use('script-ext-html-webpack-plugin', [{
-            // `runtime` must same as runtimeChunk name. default is `runtime`
+              // `runtime` must same as runtimeChunk name. default is `runtime`
               inline: /runtime\..*\.js$/
             }])
             .end()
