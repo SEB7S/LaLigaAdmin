@@ -184,9 +184,9 @@
               >
                 <el-option
                   v-for="item in formTour.options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  :key="item.id"
+                  :label="item.categoryName"
+                  :value="item.id"
                 >
                 </el-option>
               </el-select>
@@ -521,28 +521,7 @@ export default {
         idProvider: "",
         providerName: "",
         hotel_category: "",
-        options: [
-          {
-            value: "Option1",
-            label: "Option1",
-          },
-          {
-            value: "Option2",
-            label: "Option2",
-          },
-          {
-            value: "Option3",
-            label: "Option3",
-          },
-          {
-            value: "Option4",
-            label: "Option4",
-          },
-          {
-            value: "Option5",
-            label: "Option5",
-          },
-        ],
+        options: [],
       };
       this.formDayDetail = [];
     },
@@ -778,6 +757,7 @@ export default {
     handleSelect(item) {
       this.formTour.providerName = item.name;
       this.formTour.idProvider = item.id;
+      this.getCatProv(item.id);
     },
     handleSelectCity(item) {
       console.log(item, this.arrayPosition);
@@ -786,6 +766,17 @@ export default {
     },
     handleIconClick(ev) {
       console.log(ev);
+    },
+    getCatProv(id) {
+      axios
+        .get(this.url + "hotel/GetCategoriesByProviderId?id="+ id)
+        .then((response) => {
+          this.formTour.options = response.data
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.log(error.response);
+        });
     },
     changeStatus(data, status) {
       console.log(status);
@@ -912,7 +903,8 @@ export default {
             city_name: "",
             cityId: 0,
             description_language: "English",
-            description_english: this.editFormTourDayDescription[index].dayDescription,
+            description_english:
+              this.editFormTourDayDescription[index].dayDescription,
             description_spanish: "",
             match_day: false,
           };
