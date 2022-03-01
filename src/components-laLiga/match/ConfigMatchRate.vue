@@ -36,6 +36,25 @@
       >
         {{ $t("table.export") }}
       </el-button>
+      <el-button
+        v-if="showReviewer && this.stadiumList.length > 0"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="handleDeleteAll"
+      >
+        {{ $t("table.delete") }}
+      </el-button>
+      <el-checkbox
+        v-model="showReviewer"
+        class="filter-item"
+        style="margin-left: 15px"
+        @change="tableKey = tableKey + 1"
+      >
+        {{ $t("table.select") }}
+      </el-checkbox>
     </div>
     <el-table
       :key="tableKey"
@@ -47,6 +66,21 @@
       style="width: 100%"
       @sort-change="sortChange"
     >
+      <el-table-column
+        v-if="showReviewer"
+        :label="$t('table.select')"
+        width="110px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <el-checkbox
+            class="filter-item"
+            style="margin-left: 15px"
+            @change="isSelected(row, $event)"
+          >
+          </el-checkbox>
+        </template>
+      </el-table-column>
       <el-table-column
         label="ID"
         prop="id"
@@ -92,7 +126,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{  row.paxTypeName  }}</span>
+          <span>{{ row.paxTypeName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -194,7 +228,15 @@
           <el-input v-model="formMatchRate.match_price" />
         </el-form-item>
         <el-form-item :label="$t('match.paxType')" prop="phone">
-          <el-input v-model="formMatchRate.paxTypeIn" type="number" />
+          <el-select v-model="formMatchRate.paxTypeIn" placeholder="Select">
+            <el-option
+              v-for="item in paxTypeInOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item :label="$t('match.startDate')" prop="email">
           <el-date-picker
@@ -227,7 +269,7 @@
               @click="handleIconClickCatStad"
             />
             <template slot-scope="{ item }">
-              <div class="value">{{ item.name }}</div>
+              <div class="value">{{ item.nameEnglish }}</div>
             </template>
           </el-autocomplete>
         </el-form-item>
@@ -351,7 +393,7 @@ export default {
         final_date: "",
         stadiumCategoryId: 1,
         stadiumCategoryName: "",
-        paxTypeIn: 1,
+        paxTypeIn: "",
         match_price: 0,
       },
       rules: {
@@ -408,6 +450,17 @@ export default {
       /* EndPoint */
       url: this.$store.getters.url,
       search: "",
+      stadiumList: [],
+      paxTypeInOption: [
+        {
+          value: 1,
+          label: "Adult",
+        },
+        {
+          value: 2,
+          label: "Child",
+        },
+      ],
     };
   },
   created() {
@@ -546,9 +599,10 @@ export default {
           this.status = "error";
         });
     },
-    handleDelete(row) {
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + "MatchRate/" + row.id)
+        .delete(this.url + "MatchRate/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -557,6 +611,8 @@ export default {
             duration: 2000,
           });
           this.getMatchRate();
+          this.showReviewer = false;
+          this.stadiumList = [];
         })
         .catch((error) => {
           console.error(error.response);
@@ -577,7 +633,7 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.handleDelete(row);
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
@@ -585,6 +641,32 @@ export default {
             message: "Delete canceled",
           });
         });
+    },
+    isSelected(arr, select) {
+      console.log(select);
+      if (select) {
+        this.stadiumList.push(arr.id);
+      } else {
+        this.removeItemFromArr(this.stadiumList, arr.id);
+      }
+      console.log(this.stadiumList);
+    },
+    removeItemFromArr(arr, item) {
+      var i = arr.indexOf(item);
+
+      if (i !== -1) {
+        arr.splice(i, 1);
+      }
+    },
+    handleDeleteAll() {
+      /* delet duplicated id's */
+      console.log(this.stadiumList);
+      const clearList = [...new Set(this.stadiumList)];
+      console.log(clearList);
+      clearList.forEach((value) => {
+        console.log(value);
+        this.handleDelete(value, true);
+      });
     },
     changeStatus(data, status) {
       this.$confirm(
@@ -649,7 +731,6 @@ export default {
       this.formMatchRate.stadiumCategoryName = row.stadioCategoryNameEnglish;
       this.formMatchRate.paxTypeIn = row.paxTypeId;
       this.formMatchRate.matchName = row.matchName;
-      
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {
@@ -707,12 +788,15 @@ export default {
     },
     createFilterCatStad(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return (
+          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
       };
     },
     handleSelectCatStad(item) {
       console.log(item);
-      this.formMatchRate.stadiumCategoryName = item.name;
+      this.formMatchRate.stadiumCategoryName = item.nameEnglish;
       this.formMatchRate.stadiumCategoryId = item.id;
     },
     handleIconClickCatStad(ev) {

@@ -37,6 +37,25 @@
       >
         {{ $t("table.export") }}
       </el-button>
+      <el-button
+        v-if="showReviewer && this.cityList.length > 0"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="handleDeleteAll"
+      >
+        {{ $t("table.delete") }}
+      </el-button>
+      <el-checkbox
+        v-model="showReviewer"
+        class="filter-item"
+        style="margin-left: 15px"
+        @change="tableKey = tableKey + 1"
+      >
+        {{ $t("table.select") }}
+      </el-checkbox>
     </div>
     <el-table
       :key="tableKey"
@@ -48,6 +67,21 @@
       style="width: 100%"
       @sort-change="sortChange"
     >
+      <el-table-column
+        v-if="showReviewer"
+        :label="$t('table.select')"
+        width="110px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <el-checkbox
+            class="filter-item"
+            style="margin-left: 15px"
+            @change="isSelected(row, $event)"
+          >
+          </el-checkbox>
+        </template>
+      </el-table-column>
       <el-table-column
         label="ID"
         prop="id"
@@ -299,6 +333,7 @@ export default {
           },
         ],
       },
+      cityList: [],
     };
   },
   created() {
@@ -389,8 +424,15 @@ export default {
         if (valid) {
           var city = {
             id: this.cityUpdate.id,
-            nameEnglish: this.cities == [] ? this.cities.city + ", " + this.cities.country : this.formCity.city_name,
-            nameEspanish: this.duplicateCity ? this.cities == [] ? this.cities.city + ", " + this.cities.country : this.formCity.city_name : this.formCity.city_nameEs,
+            nameEnglish:
+              this.cities == []
+                ? this.cities.city + ", " + this.cities.country
+                : this.formCity.city_name,
+            nameEspanish: this.duplicateCity
+              ? this.cities == []
+                ? this.cities.city + ", " + this.cities.country
+                : this.formCity.city_name
+              : this.formCity.city_nameEs,
             latitude: this.cityUpdate.latitude,
             longitude: this.cityUpdate.longitude,
           };
@@ -541,9 +583,10 @@ export default {
           this.status = "error";
         });
     },
-    handleDelete(row) {
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + "City/" + row.id)
+        .delete(this.url + "City/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -552,6 +595,8 @@ export default {
             duration: 2000,
           });
           this.getCity();
+          this.showReviewer = false;
+          this.cityList = [];
         })
         .catch((error) => {
           console.error(error.response);
@@ -572,7 +617,7 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.handleDelete(row);
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
@@ -580,6 +625,32 @@ export default {
             message: "Delete canceled",
           });
         });
+    },
+    isSelected(arr, select) {
+      console.log(select);
+      if (select) {
+        this.cityList.push(arr.id);
+      } else {
+        this.removeItemFromArr(this.cityList, arr.id);
+      }
+      console.log(this.cityList);
+    },
+    removeItemFromArr(arr, item) {
+      var i = arr.indexOf(item);
+
+      if (i !== -1) {
+        arr.splice(i, 1);
+      }
+    },
+    handleDeleteAll() {
+      /* delet duplicated id's */
+      console.log(this.cityList);
+      const clearList = [...new Set(this.cityList)];
+      console.log(clearList);
+      clearList.forEach((value) => {
+        console.log(value);
+        this.handleDelete(value, true);
+      });
     },
     handleClose(done) {
       this.$confirm("Are you sure to close this form?")

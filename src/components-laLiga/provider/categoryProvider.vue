@@ -35,6 +35,25 @@
       >
         {{ $t("table.export") }}
       </el-button>
+      <el-button
+        v-if="showReviewer && this.categoryProviderList.length > 0"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="handleDeleteAll"
+      >
+        {{ $t("table.delete") }}
+      </el-button>
+      <el-checkbox
+        v-model="showReviewer"
+        class="filter-item"
+        style="margin-left: 15px"
+        @change="tableKey = tableKey + 1"
+      >
+        {{ $t("table.select") }}
+      </el-checkbox>
     </div>
     <el-table
       :key="tableKey"
@@ -46,6 +65,21 @@
       style="width: 100%"
       @sort-change="sortChange"
     >
+      <el-table-column
+        v-if="showReviewer"
+        :label="$t('table.select')"
+        width="110px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <el-checkbox
+            class="filter-item"
+            style="margin-left: 15px"
+            @change="isSelected(row, $event)"
+          >
+          </el-checkbox>
+        </template>
+      </el-table-column>
       <el-table-column
         label="ID"
         prop="id"
@@ -99,7 +133,11 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :before-close="handleClose">
+    <el-dialog
+      :title="textMap[dialogStatus]"
+      :visible.sync="dialogFormVisible"
+      :before-close="handleClose"
+    >
       <el-form
         ref="dataForm"
         :rules="rules"
@@ -125,7 +163,11 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :before-close="handleClose">
+    <el-dialog
+      :visible.sync="dialogPvVisible"
+      title="Reading statistics"
+      :before-close="handleClose"
+    >
       <el-table
         :data="pvData"
         border
@@ -250,6 +292,7 @@ export default {
         categoryName: "",
       },
       hotelUpdate: [],
+      categoryProviderList: [],
       /* EndPoint */
       url: this.$store.getters.url,
     };
@@ -418,9 +461,10 @@ export default {
           this.status = "error";
         });
     },
-    handleDelete(row) {
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + "HotelCategories/" + row.id)
+        .delete(this.url + "HotelCategories/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -429,6 +473,8 @@ export default {
             duration: 2000,
           });
           this.getCategory();
+          this.showReviewer = false;
+          this.categoryProviderList = [];
         })
         .catch((error) => {
           console.error(error.response);
@@ -449,7 +495,7 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.handleDelete(row);
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
@@ -457,6 +503,32 @@ export default {
             message: "Delete canceled",
           });
         });
+    },
+    isSelected(arr, select) {
+      console.log(select);
+      if (select) {
+        this.categoryProviderList.push(arr.id);
+      } else {
+        this.removeItemFromArr(this.categoryProviderList, arr.id);
+      }
+      console.log(this.categoryProviderList);
+    },
+    removeItemFromArr(arr, item) {
+      var i = arr.indexOf(item);
+
+      if (i !== -1) {
+        arr.splice(i, 1);
+      }
+    },
+    handleDeleteAll() {
+      /* delet duplicated id's */
+      console.log(this.categoryProviderList);
+      const clearList = [...new Set(this.categoryProviderList)];
+      console.log(clearList);
+      clearList.forEach((value) => {
+        console.log(value);
+        this.handleDelete(value, true);
+      });
     },
     getCities(queryString, cb) {
       axios
