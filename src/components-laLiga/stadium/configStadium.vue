@@ -459,6 +459,7 @@ export default {
         city_name: "",
       }),
         (this.city_name = "");
+        this.fileList = [];
     },
     handleUpdate(row) {
       this.getImageByIdStadium(row);
@@ -472,7 +473,7 @@ export default {
       this.formStadium.longitude = row.longitude;
       this.formStadium.city_name = row.cityName;
       this.formStadium.cityId = row.cityId;
-      this.formImageStadium.idStadium = row.id
+      this.formImageStadium.idStadium = row.id;
     },
     updateData() {
       if (this.active == 0) {
@@ -503,8 +504,7 @@ export default {
               });
           }
         });
-      }
-      else if (this.active == 1){
+      } else if (this.active == 1) {
         this.dialogFormVisible = false;
       }
     },
@@ -551,32 +551,36 @@ export default {
       this.active = 0;
     },
     postStadium() {
-      this.$refs["formStadium"].validate((valid) => {
-        var stadium = {
-          stadiumName: this.formStadium.name,
-          latitude: this.formStadium.latitude,
-          longitude: this.formStadium.longitude,
-          cityId: this.formStadium.cityId,
-        };
-        if (valid) {
-          axios
-            .post(this.url + "Stadium", stadium)
-            .then((response) => {
-              this.formImageStadium.idStadium = response.data.id;
-              this.next();
-              this.$notify({
-                title: "Success",
-                message: "Estadio Agregado con éxito",
-                type: "success",
-                duration: 2000,
+      if (this.active == 0) {
+        this.$refs["formStadium"].validate((valid) => {
+          var stadium = {
+            stadiumName: this.formStadium.name,
+            latitude: this.formStadium.latitude,
+            longitude: this.formStadium.longitude,
+            cityId: this.formStadium.cityId,
+          };
+          if (valid) {
+            axios
+              .post(this.url + "Stadium", stadium)
+              .then((response) => {
+                this.formImageStadium.idStadium = response.data.id;
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Estadio Agregado con éxito",
+                  type: "success",
+                  duration: 2000,
+                });
+                this.getStadium();
+              })
+              .catch((error) => {
+                console.error(error.response);
               });
-              this.getStadium();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
+          }
+        });
+      }else{
+         this.dialogFormVisible = false;
+      }
     },
     getStadium() {
       this.listLoading = true;
@@ -663,15 +667,12 @@ export default {
       console.log(ev);
     },
     next() {
-      if (this.active++ > 2) this.active = 0;
+      if (this.active++ > 1) this.active = 0;
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
-      var stadium = {
-        id: this.formImageStadium.id,
-      };
       axios
-        .delete(this.url + "StadiumMediaImage/DeleteStadiumMedia", stadium)
+        .delete(this.url + "StadiumMediaImage/DeleteStadiumMedia?id="+ file.id)
         .then((response) => {
           this.$notify({
             title: "Success",

@@ -293,7 +293,7 @@ export default {
         ],
         document: [
           {
-            required: true,
+            required: false,
             message: "Please input document",
             trigger: "blur",
           },

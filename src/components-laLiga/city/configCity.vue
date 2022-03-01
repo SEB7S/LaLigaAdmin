@@ -381,14 +381,16 @@ export default {
       this.formCity.city_nameEs = row.nameEspanish;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
+      this.cities = [];
+      this.duplicateCity = false;
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formCity"].validate((valid) => {
         if (valid) {
           var city = {
             id: this.cityUpdate.id,
-            nameEnglish: this.cities.city + ", " + this.cities.country,
-            nameEspanish: this.formCity.city_nameEs,
+            nameEnglish: this.cities == [] ? this.cities.city + ", " + this.cities.country : this.formCity.city_name,
+            nameEspanish: this.duplicateCity ? this.cities == [] ? this.cities.city + ", " + this.cities.country : this.formCity.city_name : this.formCity.city_nameEs,
             latitude: this.cityUpdate.latitude,
             longitude: this.cityUpdate.longitude,
           };
@@ -464,8 +466,8 @@ export default {
         headers: {
           "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
           "x-rapidapi-key":
-            "0513e4a37fmsh5c1de65b72f3182p1ebac7jsn85844b4c6a0e"
-        }
+            "0513e4a37fmsh5c1de65b72f3182p1ebac7jsn85844b4c6a0e",
+        },
       };
 
       var url =

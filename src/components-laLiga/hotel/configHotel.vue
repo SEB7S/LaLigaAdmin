@@ -535,7 +535,7 @@ export default {
       formImageHotel: {
         MediaContentType: 0,
         idHotel: null,
-        id:null
+        id: null
       },
       formRoomType: [
         {
@@ -607,11 +607,21 @@ export default {
         statusActive: true,
       };
       this.city_name = "";
+      this.fileList = [];
+      this.formRoomType = [
+        {
+          id: "",
+          nameEspanish: "",
+          nameEnglish: "",
+          maxPax: 0,
+        },
+      ];
+      this.active = 0;
     },
     handleUpdate(row) {
+      this.resetTemp();
       this.getImageByIdHotel(row);
-      console.log(row);
-      this.active = 0;
+      this.getRoomTypeById(row);
       this.hotelUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
@@ -624,6 +634,7 @@ export default {
       this.formHotel.cityId = row.cityId;
       this.formHotel.categoryId = row.categoryId;
       this.formHotel.providerId = row.providerId;
+      this.formImageHotel.idHotel = row.id
     },
     updateData() {
       if (this.active == 0) {
@@ -658,19 +669,19 @@ export default {
           }
         });
       } else if (this.active == 1) {
-        this.next()
+        this.next();
         console.log(this.active);
       } else if (this.active == 2) {
-        this.getRoomTypeById().then((response) => {
-          var hotel = {
-            id: this.hotelUpdate.id,
-            nameEspanish: response.data.nameEspanish,
-            nameEnglish: response.data.nameEnglish,
-            maxPax: response.data.maxPax,
-            hotelId: response.data.hotelId,
+        this.formRoomType.forEach((element, index) => {
+          var roomType = {
+            id: element.id,
+            nameEspanish: element.nameEspanish,
+            nameEnglish: element.nameEnglish,
+            maxPax: element.maxPax,
+            hotelId: element.hotelId,
           };
           axios
-            .put(this.url + "Hotel", hotel)
+            .put(this.url + "RoomType", roomType)
             .then((response) => {
               this.dialogFormVisible = false;
               this.next();
@@ -686,17 +697,16 @@ export default {
             .catch((error) => {
               console.error(error.response);
             });
+          console.log(this.formRoomType);
         });
       }
     },
-    getRoomTypeById() {
-      var hotel = {
-        id: this.formImageHotel.idHotel,
-      };
+    getRoomTypeById(hotel) {
       axios
-        .get(this.url + "RoomType/GetRoomTypeById", hotel)
+        .get(this.url + "Hotel/GetHotelById?id=" + hotel.id)
         .then((response) => {
-          console.log(response.data);
+          console.log(response.data[0].hotelRoomTypes);
+          this.formRoomType = response.data[0].hotelRoomTypes;
         })
         .catch((error) => {
           this.status = "error";
@@ -787,13 +797,10 @@ export default {
               });
           }
         });
-        console.error("0", this.active);
       } else if (this.active == 1) {
-        console.error("1", this.active);
         this.next();
       } else if (this.active == 2) {
-        console.error("2", this.active);
-        this.formRoomType.forEach((element, index) => {
+          this.formRoomType.forEach((element, index) => {
           var roomType = {
             nameEnglish: element.nameEnglish,
             nameEspanish: element.nameEspanish,
@@ -1013,11 +1020,8 @@ export default {
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
-      var hotel = {
-        id: this.formImageHotel.idHotel,
-      };
       axios
-        .delete(this.url + "HotelMediaImage/Delete", hotel)
+        .delete(this.url + "HotelMediaImage/DeleteHotelMedia?id=" + file.id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -1037,7 +1041,6 @@ export default {
     },
     handleSuccess(response, file, fileList) {
       this.formImageHotel.id = response.id;
-      console.log(this.formImageStadium.id, response);
     },
     addRoom() {
       this.formRoomType.push({

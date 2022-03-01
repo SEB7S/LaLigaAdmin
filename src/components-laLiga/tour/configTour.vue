@@ -428,28 +428,7 @@ export default {
         idProvider: 0,
         providerName: "",
         hotel_category: "",
-        options: [
-          {
-            value: "Option1",
-            label: "Option1",
-          },
-          {
-            value: "Option2",
-            label: "Option2",
-          },
-          {
-            value: "Option3",
-            label: "Option3",
-          },
-          {
-            value: "Option4",
-            label: "Option4",
-          },
-          {
-            value: "Option5",
-            label: "Option5",
-          },
-        ],
+        options: [],
       },
       idTourCreated: 0,
       formDayDetail: [],
@@ -583,6 +562,7 @@ export default {
               .then((response) => {
                 this.formImageTour.idTour = response.data.id;
                 this.getDayDescription = response.data.tourDayDescriptions;
+                this.postTourCategory();
                 this.next();
               })
               .catch((error) => {
@@ -612,6 +592,24 @@ export default {
           console.log(this.formDayDetail);
         });
       }
+    },
+    postTourCategory() {
+      console.log(this.formImageTour.idTour);
+      this.formTour.options.forEach((option) => {
+        var tourCategory = {
+          tourId: this.formImageTour.idTour,
+          hotelCategoryId: option.id,
+        };
+        axios
+          .post(this.url + "TourCategory", tourCategory)
+          .then((response) => {
+            console.log(this.formTour.options);
+            this.next();
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+      });
     },
     getTour() {
       this.listLoading = true;
@@ -769,9 +767,9 @@ export default {
     },
     getCatProv(id) {
       axios
-        .get(this.url + "hotel/GetCategoriesByProviderId?id="+ id)
+        .get(this.url + "hotel/GetCategoriesByProviderId?id=" + id)
         .then((response) => {
-          this.formTour.options = response.data
+          this.formTour.options = response.data;
         })
         .catch((error) => {
           this.status = "error";
