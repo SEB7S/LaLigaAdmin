@@ -145,12 +145,21 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <el-switch
-            v-model="row.statusActive"
-            active-color="#619b97"
-            inactive-color="#f5365c"
-            @change="changeStatus(row, $event)"
-          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="provider disabled"
+            placement="top-start"
+            :disabled="row.providerStatus"
+          >
+            <el-switch
+              v-model="row.statusActive"
+              active-color="#619b97"
+              inactive-color="#f5365c"
+              @change="changeStatus(row, $event)"
+              :disabled="!row.providerStatus"
+            />
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column

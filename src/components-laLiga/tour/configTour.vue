@@ -125,12 +125,21 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <el-switch
-            v-model="row.status"
-            active-color="#619b97"
-            inactive-color="#f5365c"
-            @change="changeStatus(row, $event)"
-          />
+          <el-tooltip
+            class="item"
+            effect="dark"
+            content="provider disabled"
+            placement="top-start"
+            :disabled="row.providerStatus"
+          >
+            <el-switch
+              v-model="row.status"
+              active-color="#619b97"
+              inactive-color="#f5365c"
+              @change="changeStatus(row, $event)"
+              :disabled="!row.providerStatus"
+            />
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column
@@ -757,7 +766,7 @@ export default {
             axios
               .put(this.url + "Tour", tour)
               .then((response) => {
-                console.log("PUT")
+                console.log("PUT");
                 this.next();
                 this.$notify({
                   title: "Success",
@@ -785,7 +794,7 @@ export default {
             axios
               .put(this.url + "Tour_Day_Description", dayDescription)
               .then((response) => {
-                console.log("PUT")
+                console.log("PUT");
                 this.dialogFormVisible = false;
               })
               .catch((error) => {
@@ -933,7 +942,7 @@ export default {
       };
     },
     calculateDays(item) {
-      console.log(this.start_date)
+      console.log(this.start_date);
       this.formDayDetail = [];
       const dateFormat =
         this.start_date.getDate() +
@@ -943,7 +952,7 @@ export default {
         this.start_date.getFullYear();
       for (
         let index = 0;
-        index < parseInt(this.formTour.duration_in_days)-1;
+        index < parseInt(this.formTour.duration_in_days) - 1;
         index++
       ) {
         console.log(dateFormat);
@@ -961,7 +970,7 @@ export default {
           this.formDayDetail.push(day);
         } else {
           /* this.start_date = this.editFormTourDayDescription[index].startTime; */
-          console.log(this.editFormTourDayDescription, index );
+          console.log(this.editFormTourDayDescription, index);
           var day = {
             dayName: "Day " + (index + 1) + " - ",
             startDate: this.addDate(index, dateFormat),
@@ -969,7 +978,7 @@ export default {
             cityId: 0,
             description_language: "English",
             description_english:
-              this.editFormTourDayDescription[index]['dayDescription'],
+              this.editFormTourDayDescription[index]["dayDescription"],
             description_spanish: "",
             match_day: false,
           };
