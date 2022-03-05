@@ -37,6 +37,17 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
+        v-if="showReviewer"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="deleteAll"
+      >
+        {{ $t("table.deleteAll") }}
+      </el-button>
+      <el-button
         v-if="showReviewer && this.clubList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -148,37 +159,71 @@
       :visible.sync="dialogFormVisible"
       :before-close="handleClose"
     >
-      <el-form
-        ref="formClub"
-        :model="formClub"
-        :rules="rules"
-        label-position="top"
-        label-width="120px"
-        style="margin-left: 50px"
-      >
-        <el-form-item :label="$t('match.nameClub')" prop="clubName">
-          <el-input v-model="formClub.clubName" />
-        </el-form-item>
-        <el-form-item :label="$t('match.cityClub')" prop="cityClub">
-          <el-autocomplete
-            v-model="formClub.cityName"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getCities"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
-          >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.nameEnglish }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-      </el-form>
+      <el-steps :active="active" align-center finish-status="success">
+        <el-step title="General Data"></el-step>
+        <el-step title="Update Images"></el-step>
+      </el-steps>
+
+      <div v-if="active == 0">
+        <el-form
+          ref="formClub"
+          :model="formClub"
+          :rules="rules"
+          label-position="top"
+          label-width="120px"
+          style="margin-left: 50px"
+        >
+          <el-form-item :label="$t('match.nameClub')" prop="clubName">
+            <el-input v-model="formClub.clubName" />
+          </el-form-item>
+          <el-form-item :label="$t('match.cityClub')" prop="cityClub">
+            <el-autocomplete
+              v-model="formClub.cityName"
+              popper-class="my-autocomplete"
+              :fetch-suggestions="getCities"
+              placeholder="Please input"
+              style="width: 100%"
+              @select="handleSelect"
+            >
+              <i
+                slot="suffix"
+                class="el-icon-edit el-input__icon"
+                @click="handleIconClick"
+              />
+              <template slot-scope="{ item }">
+                <div class="value">{{ item.nameEnglish }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div v-if="active == 1">
+        <el-form
+          ref="formClub"
+          label-position="top"
+          label-width="120px"
+          style="margin: 30px"
+        >
+          <el-form-item :label="$t('stadium.image')">
+            <el-upload
+              :action="url + 'ClubMediaContent/SendClubImage'"
+              list-type="picture-card"
+              :on-preview="handlePictureCardPreview"
+              :on-remove="handleRemove"
+              :file-list="fileList"
+              name="UploadImage"
+              :data="formImageClub"
+              :on-success="handleSuccess"
+            >
+              <i class="el-icon-plus"></i>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt="" />
+        </el-dialog>
+      </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
@@ -351,6 +396,15 @@ export default {
       url: this.$store.getters.url,
       search: "",
       clubList: [],
+      active: 0,
+      dialogImageUrl: "",
+      dialogVisible: false,
+      fileList: [],
+      formImageClub: {
+        MediaContentType: 0,
+        idClub: 0,
+        id: null,
+      },
     };
   },
   created() {
@@ -443,31 +497,42 @@ export default {
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.city_name = "";
+      this.active = 0;
     },
     postClub() {
-      this.$refs["formClub"].validate((valid) => {
-        var club = {
-          clubName: this.formClub.clubName,
-          cityId: this.formClub.cityId,
-        };
-        if (valid) {
-          axios
-            .post(this.url + "Club", club)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Club Agregado con éxito",
-                type: "success",
-                duration: 2000,
+      if (this.active == 0) {
+        this.$refs["formClub"].validate((valid) => {
+          var club = {
+            clubName: this.formClub.clubName,
+            cityId: this.formClub.cityId,
+          };
+          if (valid) {
+            axios
+              .post(this.url + "Club", club)
+              .then((response) => {
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Club Agregado con éxito",
+                  type: "success",
+                  duration: 2000,
+                });
+
+                this.formImageClub.idClub = response.data.id;
+                this.getClub();
+                console.log(this.formImageClub.idClub);
+              })
+              .catch((error) => {
+                console.error(error.response);
               });
-              this.getClub();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
+          }
+        });
+      } else if (this.active == 1) {
+        this.dialogFormVisible = false;
+      }
+    },
+    next() {
+      if (this.active++ > 1) this.active = 0;
     },
     getClub() {
       this.listLoading = true;
@@ -551,6 +616,32 @@ export default {
         this.handleDelete(value, true);
       });
     },
+    deleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.list.forEach((value) => {
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
     changeStatus(data, status) {
       this.$confirm(
         "This will permanently delete the file. Continue?",
@@ -600,39 +691,46 @@ export default {
         });
     },
     handleUpdate(row) {
+      this.getImageByIdClub(row);
       console.log(row);
       this.clubUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.formClub.clubName = row.name;
       this.formClub.cityId = row.city_id;
+      this.formClub.cityName = row.cityName;
+      this.active = 0;
     },
     updateData() {
-      this.$refs["formClub"].validate((valid) => {
-        if (valid) {
-          var provider = {
-            id: this.clubUpdate.id,
-            clubName: this.formClub.clubName,
-            cityId: this.formClub.cityId,
-          };
-          axios
-            .put(this.url + "Club", provider)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
+      if (this.active == 0) {
+        this.$refs["formClub"].validate((valid) => {
+          if (valid) {
+            var provider = {
+              id: this.clubUpdate.id,
+              clubName: this.formClub.clubName,
+              cityId: this.formClub.cityId,
+            };
+            axios
+              .put(this.url + "Club", provider)
+              .then((response) => {
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Update Successfully",
+                  type: "success",
+                  duration: 2000,
+                });
 
-              this.getClub();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
+                this.getClub();
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+          }
+        });
+      } else if (this.active == 1) {
+        this.dialogFormVisible = false;
+      }
     },
     handleClose(done) {
       this.$confirm("Are you sure to close this form?")
@@ -671,6 +769,42 @@ export default {
     },
     handleIconClick(ev) {
       console.log(ev);
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+      axios
+        .delete(this.url + "ClubMediaImage/DeleteClubMedia?id=" + file.id)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    handleSuccess(response, file, fileList) {
+      this.formImageClub.id = response.id;
+      console.log(this.formImageClub.id, response);
+    },
+    handlePictureCardPreview(file) {
+      console.log(file);
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    getImageByIdClub(club) {
+      axios
+        .get(this.url + "ClubMediaImage/GetAllByClub?idClub=" + club.id)
+        .then((response) => {
+          console.log(response.data);
+          this.fileList = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
     },
   },
   computed: {

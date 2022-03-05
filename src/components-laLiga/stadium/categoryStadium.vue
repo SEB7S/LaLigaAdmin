@@ -36,6 +36,17 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
+        v-if="showReviewer"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="deleteAll"
+      >
+        {{ $t("table.deleteAll") }}
+      </el-button>
+      <el-button
         v-if="showReviewer && this.categoryStadiumList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -594,6 +605,32 @@ export default {
         console.log(value);
         this.handleDelete(value, true);
       });
+    },
+    deleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.list.forEach((value) => {
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
     getStadium(queryString, cb) {
       axios

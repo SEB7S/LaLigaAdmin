@@ -37,6 +37,17 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
+        v-if="showReviewer"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="deleteAll"
+      >
+        {{ $t("table.deleteAll") }}
+      </el-button>
+      <el-button
         v-if="showReviewer && this.stadiumList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -389,7 +400,7 @@ export default {
       formMatchRate: {
         matchId: "",
         matchName: "",
-        start_date: true,
+        start_date: "",
         final_date: "",
         stadiumCategoryId: 1,
         stadiumCategoryName: "",
@@ -507,12 +518,21 @@ export default {
     },
     resetTemp() {
       this.formMatchRate = {
-        name: "",
-        document: "",
-        status: true,
-        phone: "",
-        email: "",
+        matchId: "",
+        matchName: "",
+        start_date: "",
+        final_date: "",
+        stadiumCategoryId: 1,
+        stadiumCategoryName: "",
+        paxTypeIn: "",
+        match_price: 0,
       };
+    },
+    resetFormContinue() {
+      console.log(this.formMatchRate);
+      this.formMatchRate.match_price = "";
+      this.stadiumCategoryId= 1,
+      this.stadiumCategoryName= ""
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -551,10 +571,10 @@ export default {
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleCreate() {
-      this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.city_name = "";
+      this.resetTemp();
     },
     postMatchRate() {
       this.$refs["formMatchRate"].validate((valid) => {
@@ -571,14 +591,24 @@ export default {
           axios
             .post(this.url + "MatchRate", matchRate)
             .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Proveedor Agregado con éxito",
-                type: "success",
-                duration: 2000,
-              });
-              this.getMatchRate();
+              setTimeout(() => {
+                this.$confirm(
+                  "Partido agregado con éxito. Deseas llenar otro formulario?",
+                  "Info",
+                  {
+                    confirmButtonText: "OK",
+                    cancelButtonText: "Cancel",
+                    type: "success",
+                  }
+                )
+                  .then(() => {
+                    this.resetFormContinue();
+                  })
+                  .catch(() => {
+                    this.dialogFormVisible = false;
+                  });
+                this.getMatchRate();
+              }, 1000);
             })
             .catch((error) => {
               console.error(error.response);
@@ -668,6 +698,32 @@ export default {
         this.handleDelete(value, true);
       });
     },
+    deleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.list.forEach((value) => {
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
     changeStatus(data, status) {
       this.$confirm(
         "This will permanently delete the file. Continue?",
@@ -731,6 +787,7 @@ export default {
       this.formMatchRate.stadiumCategoryName = row.stadioCategoryNameEnglish;
       this.formMatchRate.paxTypeIn = row.paxTypeId;
       this.formMatchRate.matchName = row.matchName;
+      this.formMatchRate.match_price = row.matchPrice
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {
