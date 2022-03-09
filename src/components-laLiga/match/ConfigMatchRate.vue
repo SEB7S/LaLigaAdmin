@@ -254,6 +254,10 @@
             v-model="formMatchRate.start_date"
             type="datetime"
             placeholder="Select date and time"
+            :picker-options="pickerOptions"
+            :default-value="defaultDate"
+            @change="sss"
+            
           >
           </el-date-picker>
         </el-form-item>
@@ -262,6 +266,7 @@
             v-model="formMatchRate.final_date"
             type="datetime"
             placeholder="Select date and time"
+            :picker-options="pickerOptions"
           >
           </el-date-picker>
         </el-form-item>
@@ -396,16 +401,18 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       downloadLoading: false,
-      /** FormStadium */
+
+      /** FormMatchRate */
       formMatchRate: {
         matchId: "",
         matchName: "",
-        start_date: "",
+        start_date:"",
         final_date: "",
         stadiumCategoryId: 1,
         stadiumCategoryName: "",
         paxTypeIn: "",
         match_price: 0,
+        stadium_id:0
       },
       rules: {
         name: [
@@ -462,6 +469,7 @@ export default {
       url: this.$store.getters.url,
       search: "",
       stadiumList: [],
+      defaultDate: new Date(),
       paxTypeInOption: [
         {
           value: 1,
@@ -472,6 +480,11 @@ export default {
           label: "Child",
         },
       ],
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now();
+        },
+      },
     };
   },
   created() {
@@ -490,6 +503,10 @@ export default {
           this.listLoading = false;
         }, 1.5 * 1000);
       });
+    },
+    sss(){
+      var esto = new Date()
+      console.log(this.formMatchRate.start_date,esto)
     },
     handleFilter() {
       this.listQuery.page = 1;
@@ -531,8 +548,7 @@ export default {
     resetFormContinue() {
       console.log(this.formMatchRate);
       this.formMatchRate.match_price = "";
-      this.stadiumCategoryId= 1,
-      this.stadiumCategoryName= ""
+      (this.stadiumCategoryId = 1), (this.stadiumCategoryName = "");
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -593,11 +609,11 @@ export default {
             .then((response) => {
               setTimeout(() => {
                 this.$confirm(
-                  "Partido agregado con éxito. Deseas llenar otro formulario?",
+                  "Match added, Do you want add other match?",
                   "Info",
                   {
-                    confirmButtonText: "OK",
-                    cancelButtonText: "Cancel",
+                    confirmButtonText: "Yes",
+                    cancelButtonText: "No",
                     type: "success",
                   }
                 )
@@ -618,6 +634,7 @@ export default {
     },
     getMatchRate() {
       this.listLoading = true;
+      console.log(this.defaultDate)
       axios
         .get(this.url + "MatchRate")
         .then((response) => {
@@ -726,11 +743,11 @@ export default {
     },
     changeStatus(data, status) {
       this.$confirm(
-        "This will permanently delete the file. Continue?",
+        "Do you want to diable this match rate?",
         "Warning",
         {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
           type: "warning",
         }
       )
@@ -787,7 +804,7 @@ export default {
       this.formMatchRate.stadiumCategoryName = row.stadioCategoryNameEnglish;
       this.formMatchRate.paxTypeIn = row.paxTypeId;
       this.formMatchRate.matchName = row.matchName;
-      this.formMatchRate.match_price = row.matchPrice
+      this.formMatchRate.match_price = row.matchPrice;
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {
@@ -830,10 +847,10 @@ export default {
     },
     getCategoryStadium(queryString, cb) {
       axios
-        .get(this.url + "StadiumCategory")
+        .get(this.url + "Stadium/GetStadiumById?id="+ this.formMatchRate.stadium_id)
         .then((response) => {
           console.log(response.data);
-          var links = response.data;
+          var links = response.data[0].stadiumCategories;
           var results = queryString
             ? links.filter(this.createFilterCatStad(queryString))
             : links;
@@ -885,6 +902,7 @@ export default {
       console.log(item);
       this.formMatchRate.matchId = item.id;
       this.formMatchRate.matchName = item.clubs;
+      this.formMatchRate.stadium_id = item.stadium_id
     },
     handleIconClickMatch(ev) {
       console.log(ev);

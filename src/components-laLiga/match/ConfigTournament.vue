@@ -48,7 +48,7 @@
         {{ $t("table.deleteAll") }}
       </el-button>
       <el-button
-        v-if="showReviewer && this.providerList.length > 0"
+        v-if="showReviewer && this.clubList.length > 0"
         v-waves
         :loading="downloadLoading"
         class="filter-item"
@@ -105,66 +105,12 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('provider.nameProvider')"
+        :label="$t('match.tournamentName')"
         min-width="100px"
         align="center"
       >
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.taxIDProvider')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.document }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.phoneProvider')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.phone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.emailProvier')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.email }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.categories')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <el-tree
-            :data="row.categories"
-            :props="defaultProps"
-            @node-click="handleNodeClick"
-          ></el-tree>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.statusProvier')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <el-switch
-            v-model="row.status"
-            active-color="#619b97"
-            inactive-color="#f5365c"
-            @change="changeStatus(row, $event)"
-          />
         </template>
       </el-table-column>
       <el-table-column
@@ -205,33 +151,25 @@
       :before-close="handleClose"
     >
       <el-form
-        ref="formProvider"
-        :model="formProvider"
+        ref="formTournament"
+        :model="formTournament"
         :rules="rules"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('provider.nameProvider')" prop="name">
-          <el-input v-model="formProvider.name" />
-        </el-form-item>
-        <el-form-item :label="$t('provider.taxIDProvider')" prop="document">
-          <el-input v-model="formProvider.document" />
-        </el-form-item>
-        <el-form-item :label="$t('provider.phoneProvider')" prop="phone">
-          <el-input v-model="formProvider.phone" type="tel" />
-        </el-form-item>
-        <el-form-item :label="$t('provider.emailProvier')" prop="email">
-          <el-input v-model="formProvider.email" />
+        <el-form-item :label="$t('match.tournamentName')" prop="tournamentName">
+          <el-input v-model="formTournament.tounamentName" />
         </el-form-item>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? postProvider() : updateData()"
+          @click="dialogStatus === 'create' ? postTournament() : updateData()"
         >
           {{ $t("table.confirm") }}
         </el-button>
@@ -299,10 +237,6 @@ export default {
   data() {
     return {
       tableKey: 0,
-      defaultProps: {
-        children: "children",
-        label: "name",
-      },
       list: [],
       total: 0,
       listLoading: true,
@@ -341,12 +275,8 @@ export default {
       pvData: [],
       downloadLoading: false,
       /** FormStadium */
-      formProvider: {
-        name: "",
-        document: "",
-        status: true,
-        phone: "",
-        email: "",
+      formTournament: {
+        tounamentName: "",
       },
       rules: {
         name: [
@@ -363,7 +293,7 @@ export default {
         ],
         document: [
           {
-            required: false,
+            required: true,
             message: "Please input document",
             trigger: "blur",
           },
@@ -398,16 +328,25 @@ export default {
           },
         ],
       },
-      providerUpdate: [],
+      tournamentUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
       search: "",
-      providerList: [],
+      clubList: [],
+      active: 0,
+      dialogImageUrl: "",
+      dialogVisible: false,
+      fileList: [],
+      formImageClub: {
+        MediaContentType: 0,
+        idClub: 0,
+        id: null,
+      },
     };
   },
   created() {
     /*     this.getList(); */
-    this.getProvider();
+    this.getTournament();
   },
   methods: {
     getList() {
@@ -424,7 +363,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1;
-      this.getProvider();
+      this.getTournament();
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -448,12 +387,8 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.formProvider = {
-        name: "",
-        document: "",
-        status: true,
-        phone: "",
-        email: "",
+      this.formTournament = {
+        tounamentName: "",
       };
     },
     handleFetchPv(pv) {
@@ -496,29 +431,26 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.city_name = "";
     },
-    postProvider() {
-      this.$refs["formProvider"].validate((valid) => {
-        var provider = {
-          name: this.formProvider.name,
-          document: this.formProvider.document,
-          status: this.formProvider.status,
-          phone: this.formProvider.phone,
-          email: this.formProvider.email,
+    postTournament() {
+      this.$refs["formTournament"].validate((valid) => {
+        var club = {
+          tounamentName: this.formTournament.tounamentName,
         };
         if (valid) {
           axios
-            .post(this.url + "Provider", provider)
+            .post(this.url + "Tournament", club)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
                 title: "Success",
-                message: "Proveedor Agregado con éxito",
+                message: "Tournament Add",
                 type: "success",
                 duration: 2000,
               });
-              this.getProvider();
+
+              this.getTournament();
+              console.log(this.formImageClub.idClub);
             })
             .catch((error) => {
               console.error(error.response);
@@ -526,10 +458,13 @@ export default {
         }
       });
     },
-    getProvider() {
+    next() {
+      if (this.active++ > 1) this.active = 0;
+    },
+    getTournament() {
       this.listLoading = true;
       axios
-        .get(this.url + "Provider")
+        .get(this.url + "Tournament")
         .then((response) => {
           console.log(response.data);
           this.list = response.data;
@@ -542,7 +477,7 @@ export default {
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
-        .delete(this.url + "Provider/" + id)
+        .delete(this.url + "Tournament/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -550,9 +485,9 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getProvider();
+          this.getTournament();
           this.showReviewer = false;
-          this.providerList = [];
+          this.clubList = [];
         })
         .catch((error) => {
           console.error(error.response);
@@ -585,11 +520,11 @@ export default {
     isSelected(arr, select) {
       console.log(select);
       if (select) {
-        this.providerList.push(arr.id);
+        this.clubList.push(arr.id);
       } else {
-        this.removeItemFromArr(this.providerList, arr.id);
+        this.removeItemFromArr(this.clubList, arr.id);
       }
-      console.log(this.providerList);
+      console.log(this.clubList);
     },
     removeItemFromArr(arr, item) {
       var i = arr.indexOf(item);
@@ -600,8 +535,8 @@ export default {
     },
     handleDeleteAll() {
       /* delet duplicated id's */
-      console.log(this.providerList);
-      const clearList = [...new Set(this.providerList)];
+      console.log(this.clubList);
+      const clearList = [...new Set(this.clubList)];
       console.log(clearList);
       clearList.forEach((value) => {
         console.log(value);
@@ -668,7 +603,7 @@ export default {
                 duration: 2000,
               });
 
-              this.getProvider();
+              this.getTournament();
             })
             .catch((error) => {
               console.error(error.response);
@@ -679,43 +614,36 @@ export default {
             type: "info",
             message: "Delete canceled",
           });
-          this.getProvider();
+          this.getTournament();
         });
     },
     handleUpdate(row) {
       console.log(row);
-      this.providerUpdate = row;
+      this.tournamentUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.formProvider.name = row.name;
-      this.formProvider.document = row.document;
-      this.formProvider.status = row.status;
-      this.formProvider.phone = row.phone;
-      this.formProvider.email = row.email;
+      this.formTournament.tounamentName = row.name;
+      this.active = 0;
     },
     updateData() {
-      this.$refs["formProvider"].validate((valid) => {
+      this.$refs["formTournament"].validate((valid) => {
         if (valid) {
-          var provider = {
-            id: this.providerUpdate.id,
-            name: this.formProvider.name,
-            document: this.formProvider.document,
-            status: this.formProvider.status,
-            phone: this.formProvider.phone,
-            email: this.formProvider.email,
+          var tournament = {
+            id: this.tournamentUpdate.id,
+            tounamentName: this.formTournament.tounamentName,
           };
           axios
-            .put(this.url + "Provider", provider)
+            .put(this.url + "Tournament", tournament)
             .then((response) => {
-              this.dialogFormVisible = false;
+              this.next();
               this.$notify({
                 title: "Success",
                 message: "Update Successfully",
                 type: "success",
                 duration: 2000,
               });
-
-              this.getProvider();
+              this.dialogFormVisible = false;
+              this.getTournament();
             })
             .catch((error) => {
               console.error(error.response);
@@ -730,16 +658,69 @@ export default {
         })
         .catch((_) => {});
     },
+    getCities(queryString, cb) {
+      axios
+        .get(this.url + "City")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    createFilter(queryString) {
+      return (link) => {
+        return (
+          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    handleSelect(item) {
+      console.log(item);
+      this.formTournament.cityName = item.nameEnglish;
+      this.formTournament.cityId = item.id;
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+      axios
+        .delete(this.url + "ClubMediaImage/DeleteClubMedia?id=" + file.id)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    handleSuccess(response, file, fileList) {
+      this.formImageClub.id = response.id;
+      console.log(this.formImageClub.id, response);
+    },
+    handlePictureCardPreview(file) {
+      console.log(file);
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
   },
   computed: {
     provider() {
       if (this.list.length > 0) {
         return this.list.filter((item) => {
           return (
-            item.name.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.document.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.phone.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.email.toLowerCase().includes(this.search.toLowerCase())
+            item.name.toLowerCase().includes(this.search.toLowerCase())
           );
         });
       }

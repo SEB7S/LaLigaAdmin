@@ -270,7 +270,7 @@
                     <div>
                       <el-form-item label="City">
                         <el-autocomplete
-                          v-model="formDay.city_name"
+                          v-model="formDay.cityName"
                           popper-class="my-autocomplete"
                           :fetch-suggestions="getCities"
                           placeholder="Please input"
@@ -289,7 +289,7 @@
                       </el-form-item>
                       <el-form-item label="">
                         <el-switch
-                          v-model="formDay.match_day"
+                          v-model="formDay.matchable"
                           active-text="Enable for match"
                           inactive-text=""
                         >
@@ -620,13 +620,16 @@ export default {
         this.formDayDetail.forEach((element, index) => {
           var dayDescription = {
             dayNumber: index + 1,
-            dayDescription: element.description_language,
-            start_time: element.startDate,
+            dayDescriptionEnglish: element.description_english,
+            dayDescriptionSpanish: element.description_spanish,
+            startTime: element.startDateFormat,
             tourId: this.formImageTour.idTour,
             id: this.getDayDescription[index].id,
+            matchable: element.matchable
+            
           };
           axios
-            .put(this.url + "Tour_Day_Description", dayDescription)
+            .put(this.url + "TourDayDescription", dayDescription)
             .then((response) => {
               this.dialogFormVisible = false;
             })
@@ -833,7 +836,7 @@ export default {
     },
     handleSelectCity(item) {
       console.log(item, this.arrayPosition);
-      this.formDayDetail[this.arrayPosition].city_name = item.nameEnglish;
+      this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
       this.formDayDetail[this.arrayPosition].cityId = item.id;
     },
     handleIconClick(ev) {
@@ -960,12 +963,13 @@ export default {
           var day = {
             dayName: "Day " + (index + 1) + " - ",
             startDate: this.addDate(index, dateFormat),
-            city_name: "",
+            startDateFormat: this.start_date,
+            cityName: "",
             cityId: 0,
             description_language: "English",
             description_english: "",
             description_spanish: "",
-            match_day: false,
+            matchable: false,
           };
           this.formDayDetail.push(day);
         } else {
@@ -974,13 +978,14 @@ export default {
           var day = {
             dayName: "Day " + (index + 1) + " - ",
             startDate: this.addDate(index, dateFormat),
-            city_name: "",
+            startDateFormat: this.start_date,
+            cityName: "",
             cityId: 0,
             description_language: "English",
             description_english:
               this.editFormTourDayDescription[index]["dayDescription"],
             description_spanish: "",
-            match_day: false,
+            matchable: false,
           };
           this.formDayDetail[index] = day;
         }

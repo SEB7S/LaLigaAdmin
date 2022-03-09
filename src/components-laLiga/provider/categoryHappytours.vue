@@ -1,13 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input
-        placeholder="Search"
+      <!--       <el-input
+        placeholder="Nombre En"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
-      /><!-- 
+      />
       <el-button
         v-waves
         class="filter-item"
@@ -48,7 +47,7 @@
         {{ $t("table.deleteAll") }}
       </el-button>
       <el-button
-        v-if="showReviewer && this.providerList.length > 0"
+        v-if="showReviewer && this.categoryProviderList.length > 0"
         v-waves
         :loading="downloadLoading"
         class="filter-item"
@@ -70,7 +69,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="provider"
+      :data="list"
       border
       fit
       highlight-current-row
@@ -105,66 +104,12 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('provider.nameProvider')"
+        :label="$t('hotel.categoryHotel')"
         min-width="100px"
         align="center"
       >
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.taxIDProvider')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.document }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.phoneProvider')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.phone }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.emailProvier')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.email }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.categories')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <el-tree
-            :data="row.categories"
-            :props="defaultProps"
-            @node-click="handleNodeClick"
-          ></el-tree>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('provider.statusProvier')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <el-switch
-            v-model="row.status"
-            active-color="#619b97"
-            inactive-color="#f5365c"
-            @change="changeStatus(row, $event)"
-          />
         </template>
       </el-table-column>
       <el-table-column
@@ -205,24 +150,30 @@
       :before-close="handleClose"
     >
       <el-form
-        ref="formProvider"
-        :model="formProvider"
+        ref="dataForm"
         :rules="rules"
+        :model="temp"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('provider.nameProvider')" prop="name">
-          <el-input v-model="formProvider.name" />
+        <el-form-item :label="$t('hotel.categoryHotel')">
+          <el-input v-model="formCategory.categoryName" />
         </el-form-item>
-        <el-form-item :label="$t('provider.taxIDProvider')" prop="document">
-          <el-input v-model="formProvider.document" />
-        </el-form-item>
-        <el-form-item :label="$t('provider.phoneProvider')" prop="phone">
-          <el-input v-model="formProvider.phone" type="tel" />
-        </el-form-item>
-        <el-form-item :label="$t('provider.emailProvier')" prop="email">
-          <el-input v-model="formProvider.email" />
+        <el-form-item :label="$t('hotel.providerHotel')" prop="providerName">
+          <el-autocomplete
+            v-model="formCategory.providerName"
+            popper-class="my-autocomplete"
+            :fetch-suggestions="getProviders"
+            placeholder="Please input"
+            style="width: 100%"
+            @select="handleSelectProvider"
+          >
+            <i slot="suffix" class="el-icon-edit el-input__icon" />
+            <template slot-scope="{ item }">
+              <div class="value">{{ item.name }}</div>
+            </template>
+          </el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -231,12 +182,13 @@
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? postProvider() : updateData()"
+          @click="dialogStatus === 'create' ? postCategory() : updateData()"
         >
           {{ $t("table.confirm") }}
         </el-button>
       </div>
     </el-dialog>
+
     <el-dialog
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
@@ -261,7 +213,12 @@
   </div>
 </template>
 <script>
-import { fetchList, fetchPv } from "@/api/article";
+import {
+  fetchList,
+  fetchPv,
+  createArticle,
+  updateArticle,
+} from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
@@ -280,7 +237,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {});
 
 export default {
-  name: "ConfigProvider",
+  name: "categoryProvider",
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -299,11 +256,7 @@ export default {
   data() {
     return {
       tableKey: 0,
-      defaultProps: {
-        children: "children",
-        label: "name",
-      },
-      list: [],
+      list: null,
       total: 0,
       listLoading: true,
       listQuery: {
@@ -339,75 +292,41 @@ export default {
       },
       dialogPvVisible: false,
       pvData: [],
-      downloadLoading: false,
-      /** FormStadium */
-      formProvider: {
-        name: "",
-        document: "",
-        status: true,
-        phone: "",
-        email: "",
-      },
       rules: {
-        name: [
+        type: [
+          { required: true, message: "type is required", trigger: "change" },
+        ],
+        timestamp: [
           {
+            type: "date",
             required: true,
-            message: "Please input name",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
+            message: "timestamp is required",
+            trigger: "change",
           },
         ],
-        document: [
-          {
-            required: false,
-            message: "Please input document",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: "Please input longitude",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
-        email: [
-          {
-            required: true,
-            message: "Please input city",
-            trigger: "blur",
-          },
-          {
-            type: "email",
-            message: "Please input correct email address",
-            trigger: ["blur", "change"],
-          },
+        title: [
+          { required: true, message: "title is required", trigger: "blur" },
         ],
       },
-      providerUpdate: [],
+      downloadLoading: false,
+      /** FormCity  */
+      city_name: "",
+      city_nameEs: "",
+      cities: [],
+      /** FormStadium */
+      formCategory: {
+        categoryName: "",
+        providerId: "",
+        providerName: "",
+      },
+      categoryUpdate: [],
+      categoryProviderList: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      search: "",
-      providerList: [],
     };
   },
   created() {
-    /*     this.getList(); */
-    this.getProvider();
+    this.getCategory();
   },
   methods: {
     getList() {
@@ -424,7 +343,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1;
-      this.getProvider();
+      this.getCategory();
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -448,13 +367,47 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.formProvider = {
-        name: "",
-        document: "",
-        status: true,
-        phone: "",
-        email: "",
+      this.formCategory = {
+        categoryName: "",
+        providerId: 0,
+        providerName: "",
       };
+    },
+    handleUpdate(row) {
+      console.log(row);
+      this.categoryUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formCategory.categoryName = row.name;
+      this.formCategory.providerName = row.providerName;
+      this.formCategory.providerId = row.providerId;
+    },
+    updateData() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          var category = {
+            id: this.categoryUpdate.id,
+            name: this.formCategory.categoryName,
+            providerId: this.formCategory.providerId
+          };
+          axios
+            .put(this.url + "ProviderCategories", category)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
+
+              this.getCategory();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -465,14 +418,14 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
+        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
+        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Providers" + date,
+          filename: "Stadiums" + date,
         });
         this.downloadLoading = false;
       });
@@ -496,29 +449,25 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.city_name = "";
     },
-    postProvider() {
-      this.$refs["formProvider"].validate((valid) => {
-        var provider = {
-          name: this.formProvider.name,
-          document: this.formProvider.document,
-          status: this.formProvider.status,
-          phone: this.formProvider.phone,
-          email: this.formProvider.email,
+    postCategory() {
+      this.$refs["dataForm"].validate((valid) => {
+        var category = {
+          name: this.formCategory.categoryName,
+          providerId: this.formCategory.providerId,
         };
         if (valid) {
           axios
-            .post(this.url + "Provider", provider)
+            .post(this.url + "ProviderCategories", category)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
                 title: "Success",
-                message: "Proveedor Agregado con éxito",
+                message: "Hotel Agregado con éxito",
                 type: "success",
                 duration: 2000,
               });
-              this.getProvider();
+              this.getCategory();
             })
             .catch((error) => {
               console.error(error.response);
@@ -526,10 +475,10 @@ export default {
         }
       });
     },
-    getProvider() {
+    getCategory() {
       this.listLoading = true;
       axios
-        .get(this.url + "Provider")
+        .get(this.url + "ProviderCategories")
         .then((response) => {
           console.log(response.data);
           this.list = response.data;
@@ -542,7 +491,7 @@ export default {
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
-        .delete(this.url + "Provider/" + id)
+        .delete(this.url + "ProviderCategories/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -550,9 +499,9 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getProvider();
+          this.getCategory();
           this.showReviewer = false;
-          this.providerList = [];
+          this.categoryProviderList = [];
         })
         .catch((error) => {
           console.error(error.response);
@@ -585,11 +534,11 @@ export default {
     isSelected(arr, select) {
       console.log(select);
       if (select) {
-        this.providerList.push(arr.id);
+        this.categoryProviderList.push(arr.id);
       } else {
-        this.removeItemFromArr(this.providerList, arr.id);
+        this.removeItemFromArr(this.categoryProviderList, arr.id);
       }
-      console.log(this.providerList);
+      console.log(this.categoryProviderList);
     },
     removeItemFromArr(arr, item) {
       var i = arr.indexOf(item);
@@ -600,8 +549,8 @@ export default {
     },
     handleDeleteAll() {
       /* delet duplicated id's */
-      console.log(this.providerList);
-      const clearList = [...new Set(this.providerList)];
+      console.log(this.categoryProviderList);
+      const clearList = [...new Set(this.categoryProviderList)];
       console.log(clearList);
       clearList.forEach((value) => {
         console.log(value);
@@ -634,94 +583,36 @@ export default {
           });
         });
     },
-    changeStatus(data, status) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          var provider = {
-            id: data.id,
-            name: data.name,
-            document: data.document,
-            status: status,
-            phone: data.phone,
-            email: data.email,
-          };
-          axios
-            .put(this.url + "Provider", provider)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Status changed Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getProvider();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
+    getCities(queryString, cb) {
+      axios
+        .get(this.url + "City")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links;
+          cb(results);
         })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-          this.getProvider();
+        .catch((error) => {
+          this.status = "error";
         });
     },
-    handleUpdate(row) {
-      console.log(row);
-      this.providerUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formProvider.name = row.name;
-      this.formProvider.document = row.document;
-      this.formProvider.status = row.status;
-      this.formProvider.phone = row.phone;
-      this.formProvider.email = row.email;
+    createFilter(queryString) {
+      return (link) => {
+        return (
+          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
     },
-    updateData() {
-      this.$refs["formProvider"].validate((valid) => {
-        if (valid) {
-          var provider = {
-            id: this.providerUpdate.id,
-            name: this.formProvider.name,
-            document: this.formProvider.document,
-            status: this.formProvider.status,
-            phone: this.formProvider.phone,
-            email: this.formProvider.email,
-          };
-          axios
-            .put(this.url + "Provider", provider)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getProvider();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
+    handleSelect(item) {
+      console.log(item);
+      this.formCategory.city_name = item.nameEnglish;
+      this.formCategory.cityId = item.id;
+    },
+    handleIconClick(ev) {
+      console.log(ev);
     },
     handleClose(done) {
       this.$confirm("Are you sure to close this form?")
@@ -730,19 +621,30 @@ export default {
         })
         .catch((_) => {});
     },
-  },
-  computed: {
-    provider() {
-      if (this.list.length > 0) {
-        return this.list.filter((item) => {
-          return (
-            item.name.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.document.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.phone.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.email.toLowerCase().includes(this.search.toLowerCase())
-          );
+    getProviders(queryString, cb) {
+      axios
+        .get(this.url + "Provider")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterProvider(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
         });
-      }
+    },
+    createFilterProvider(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelectProvider(item) {
+      this.formCategory.providerName = item.name;
+      this.formCategory.providerId = item.id;
     },
   },
 };

@@ -68,7 +68,7 @@ export default {
     city: 'Ciudad',
     manageCity: 'Gestionar Ciudad',
     hotel: 'Hotel',
-    hotelCategory: 'Gestionar Categoría',
+    hotelCategory: 'Categoría HappyTours',
     manageHotel: 'Gestionar Hotel',
     manageRoom: 'Gestionar Habitación',
     match: 'Partido',
@@ -80,7 +80,9 @@ export default {
     stadium: 'Estadio',
     manageStadium: 'Gestionar Estadio',
     categoryStadium: 'Categoría Estadio',
-    user: 'Usuario'
+    user: 'Usuario',
+    tournament: 'Gestionar Torneo',
+    categoryProvider:'Categoría Proveedor'
   },
   tour: {
     nameTour: 'Nombre',
@@ -103,25 +105,30 @@ export default {
     finalDate: 'Fecha Final',
     matchPrice: 'Precio',
     matchName: 'Partido',
-    stadiumCategory: 'Categoría de estadio'
+    stadiumCategory: 'Categoría de estadio',
+    tournamentName: 'Nombre del Torneo'
   },
   hotel: {
     nameEnHotel: 'Nombre En',
     nameEsHotel: 'Nombre Es',
-    categoryHotel: 'Categoría',
+    categoryHotel: 'Categoría - Happytour',
     cityHotel: 'Ciudad',
     providerHotel: 'Proveedor',
     status: 'Estado',
     image: 'Cargar Imágen',
     description: 'Descripción',
-    max_pax: 'Max Pax'
+    max_pax: 'Max Pax',
+    categoryProvider: 'Categorías - Proveedor'
   },
   provider: {
     nameProvider: 'Nombre',
     taxIDProvider: 'Tax ID',
     phoneProvider: 'Teléfono',
     emailProvier: 'Correo Electrónico',
-    statusProvier: 'Estado'
+    statusProvier: 'Estado',
+    categories:'Categorías HappyTour',
+
+
   },
   city: {
     nameEnCity: 'Nombre En',

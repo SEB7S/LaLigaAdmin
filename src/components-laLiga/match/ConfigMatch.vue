@@ -132,6 +132,15 @@
         </template>
       </el-table-column>
       <el-table-column
+        :label="$t('match.tournamentName')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row.tournamentName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         :label="$t('match.date')"
         min-width="100px"
         align="center"
@@ -237,6 +246,25 @@
               slot="suffix"
               class="el-icon-edit el-input__icon"
               @click="handleIconClickStadium"
+            />
+            <template slot-scope="{ item }">
+              <div class="value">{{ item.name }}</div>
+            </template>
+          </el-autocomplete>
+        </el-form-item>
+        <el-form-item :label="$t('match.tournamentName')" prop="stadiumId">
+          <el-autocomplete
+            v-model="formMatch.tournamentName"
+            popper-class="my-autocomplete"
+            :fetch-suggestions="getTournament"
+            placeholder="Please input"
+            style="width: 100%"
+            @select="handleSelectTournament"
+          >
+            <i
+              slot="suffix"
+              class="el-icon-edit el-input__icon"
+              @click="handleIconClickTournament"
             />
             <template slot-scope="{ item }">
               <div class="value">{{ item.name }}</div>
@@ -372,6 +400,8 @@ export default {
         stadium_id: 0,
         stadiumName: "",
         date: "",
+        tournamentName: "",
+        tournament_id: 0,
       },
       rules: {
         name: [
@@ -481,6 +511,8 @@ export default {
         stadium_id: 0,
         stadiumName: "",
         date: "",
+        tournamentName: "",
+        tournament_id: 0
       };
     },
     handleFetchPv(pv) {
@@ -532,6 +564,7 @@ export default {
           club_guest_id: this.formMatch.club_guest_id,
           stadium_id: this.formMatch.stadium_id,
           date: this.formMatch.date,
+          tournament_id: this.formMatch.tournament_id,
         };
         if (valid) {
           axios
@@ -660,54 +693,6 @@ export default {
           });
         });
     },
-    changeStatus(data, status) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          var provider = {
-            id: data.id,
-            name: data.name,
-            document: data.document,
-            status: status,
-            phone: data.phone,
-            email: data.email,
-          };
-          axios
-            .put(this.url + "Provider", provider)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Status changed Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getMatch();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-          this.getMatch();
-        });
-    },
     handleUpdate(row) {
       console.log(row);
       this.matchUpdate = row;
@@ -719,6 +704,8 @@ export default {
       this.formMatch.clubHomeName = row.clubHome;
       this.formMatch.stadium_id = row.stadium_id;
       this.formMatch.stadiumName = row.stadiumName;
+      this.formMatch.tournamentName = row.tournamentName;
+      this.formMatch.tournament_id = row.tournament_id
       this.formMatch.date = row.date;
     },
     updateData() {
@@ -730,6 +717,7 @@ export default {
             club_home_id: this.formMatch.club_home_id,
             stadium_id: this.formMatch.stadium_id,
             date: this.formMatch.date,
+            tournament_id: this.formMatch.tournament_id,
           };
           axios
             .put(this.url + "Match", match)
@@ -820,6 +808,34 @@ export default {
       this.formMatch.stadium_id = item.id;
     },
     handleIconClickStadium(ev) {
+      console.log(ev);
+    },
+    getTournament(queryString, cb) {
+      axios
+        .get(this.url + "Tournament")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterTournament(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    createFilterTournament(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelectTournament(item) {
+      console.log(item);
+      this.formMatch.tournamentName = item.name;
+      this.formMatch.tournament_id = item.id;
+    },
+    handleIconClickTournament(ev) {
       console.log(ev);
     },
   },

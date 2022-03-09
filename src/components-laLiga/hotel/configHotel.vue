@@ -99,7 +99,6 @@
         sortable="custom"
         align="center"
         width="80"
-        :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
@@ -127,6 +126,7 @@
         :label="$t('hotel.categoryHotel')"
         min-width="100px"
         align="center"
+        :class-name="getSortClass('categoryName')"
       >
         <template slot-scope="{ row }">
           <span>{{ row.categoryName }}</span>
@@ -238,6 +238,24 @@
               placeholder="Please input"
               style="width: 100%"
               @select="handleSelectProvider"
+            >
+              <i slot="suffix" class="el-icon-edit el-input__icon" />
+              <template slot-scope="{ item }">
+                <div class="value">{{ item.name }}</div>
+              </template>
+            </el-autocomplete>
+          </el-form-item>
+          <el-form-item
+            :label="$t('hotel.categoryProvider')"
+            prop="providerName"
+          >
+            <el-autocomplete
+              v-model="formHotel.categoryProviderName"
+              popper-class="my-autocomplete"
+              :fetch-suggestions="getCatProvider"
+              placeholder="Please input"
+              style="width: 100%"
+              @select="handleSelectCatProvider"
             >
               <i slot="suffix" class="el-icon-edit el-input__icon" />
               <template slot-scope="{ item }">
@@ -506,6 +524,8 @@ export default {
         city_name: "",
         providerId: "",
         providerName: "",
+        categoryProviderName: "",
+        categoryProviderId: 0,
         statusActive: true,
       },
       hotelUpdate: [],
@@ -657,8 +677,10 @@ export default {
         categoryId: "",
         cityId: "",
         city_name: "",
-        providerId: "",
+        providerId: 0,
         providerName: "",
+        categoryProviderName: "",
+        categoryProviderId: 0,
         statusActive: true,
       };
       this.city_name = "";
@@ -689,6 +711,8 @@ export default {
       this.formHotel.cityId = row.cityId;
       this.formHotel.categoryId = row.categoryId;
       this.formHotel.providerId = row.providerId;
+      this.formHotel.categoryProviderName = row.providerCategoryName;
+      this.formHotel.categoryProviderId = row.providerCategoryId;
       this.formImageHotel.idHotel = row.id;
     },
     updateData() {
@@ -703,6 +727,7 @@ export default {
               nameSpanish: this.formHotel.nameSpanish,
               categoryId: this.formHotel.categoryId,
               providerId: this.formHotel.providerId,
+              providerCategoryId: this.formHotel.categoryProviderId,
               statusActive: this.formHotel.statusActive,
             };
             axios
@@ -811,8 +836,8 @@ export default {
       );
     },
     getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
+      const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending";
     },
     handleCreate() {
       this.resetTemp();
@@ -829,6 +854,7 @@ export default {
             categoryId: this.formHotel.categoryId,
             cityId: this.formHotel.cityId,
             providerId: this.formHotel.providerId,
+            providerCategoryId: this.formHotel.categoryProviderId,
             statusActive: this.formHotel.statusActive,
           };
           if (valid) {
@@ -1077,16 +1103,37 @@ export default {
       this.formHotel.providerName = item.name;
       this.formHotel.providerId = item.id;
     },
+    getCatProvider(queryString, cb) {
+      axios
+        .get(this.url + "ProviderCategories")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterCatProv(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilterCatProv(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelectCatProvider(item) {
+      this.formHotel.categoryProviderName = item.name;
+      this.formHotel.categoryProviderId = item.id;
+    },
     changeStatus(data, status) {
-      this.$confirm(
-        "This will permanently changed the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
+      this.$confirm("Do you want to diable this hotel?", "Warning", {
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        type: "warning",
+      })
         .then(() => {
           this.$message({
             type: "success",

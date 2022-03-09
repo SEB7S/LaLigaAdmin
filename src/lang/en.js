@@ -68,7 +68,7 @@ export default {
     city: 'City',
     manageCity: 'Manage City',
     hotel: 'Hotel',
-    hotelCategory: 'Manage Category',
+    hotelCategory: 'HappyTour Category',
     manageHotel: 'Manage Hotel',
     manageRoom: 'Manage Room',
     match: 'Match',
@@ -80,8 +80,10 @@ export default {
     stadium: 'Stadium',
     manageStadium: 'Manage Stadium',
     categoryStadium: 'Category Stadium',
-    user: 'User'
-    
+    user: 'User',
+    tournament: 'Tournament',
+    categoryProvider: 'Provider Category',
+
   },
   tour: {
     add: 'Add',
@@ -104,30 +106,34 @@ export default {
     clubHome: 'Home',
     stadium: 'Stadium',
     date: 'Date',
-    paxType:'Pax Type',
+    paxType: 'Pax Type',
     startDate: 'Start Date',
     finalDate: 'Final Date',
     matchPrice: 'Price',
     matchName: 'Match',
-    stadiumCategory: 'Stadium Category'
+    stadiumCategory: 'Stadium Category',
+    tournamentName: 'Tournament'
   },
   hotel: {
     nameEnHotel: 'Name En',
     nameEsHotel: 'Name Es',
-    categoryHotel: 'Category',
+    categoryHotel: 'Category - HappyTour',
     cityHotel: 'City',
     providerHotel: 'Provider',
     status: 'Status',
     image: 'Choose Image',
     description: 'Description',
-    max_pax: 'Max Pax'
+    max_pax: 'Max Pax',
+    categoryProvider: 'Categories - Provider'
   },
   provider: {
     nameProvider: 'Name',
     taxIDProvider: 'Tax ID',
     phoneProvider: 'Phone',
     emailProvier: 'Email',
-    statusProvier: 'Status'
+    statusProvier: 'Status',
+    categories: 'Categories HappyTour',
+
   },
   city: {
     nameEnCity: 'Name En',
@@ -222,7 +228,7 @@ export default {
     confirm: 'Confirm',
     next: 'Next',
     select: 'Select',
-    deleteAll:'Delete All'
+    deleteAll: 'Delete All'
   },
   example: {
     warning: 'Creating and editing pages cannot be cached by keep-alive because keep-alive include does not currently support caching based on routes, so it is currently cached based on component name. If you want to achieve a similar caching effect, you can use a browser caching scheme such as localStorage. Or do not use keep-alive include to cache all pages directly. See details'

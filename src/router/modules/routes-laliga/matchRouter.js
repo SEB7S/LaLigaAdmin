@@ -29,6 +29,12 @@ const matchRouter = {
       component: () => import('@/components-laLiga/match/ConfigClub'),
       name: 'Clubs',
       meta: { title: 'clubs' }
+    },
+    {
+      path: 'configTournament',
+      component: () => import('@/components-laLiga/match/ConfigTournament'),
+      name: 'Tournament',
+      meta: { title: 'tournament' }
     }
 
   ]

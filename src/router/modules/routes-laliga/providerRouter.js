@@ -25,6 +25,12 @@ const providerRouter = {
       name: 'Provider Category',
       meta: { title: 'hotelCategory' }
     },
+    {
+      path: 'categoryHappytours',
+      component: () => import('@/components-laLiga/provider/categoryHappytours'),
+      name: 'Provider Category',
+      meta: { title: 'categoryProvider' }
+    },
   ]
 
 }
