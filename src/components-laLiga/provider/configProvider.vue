@@ -141,19 +141,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('provider.categories')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <el-tree
-            :data="row.categories"
-            :props="defaultProps"
-            @node-click="handleNodeClick"
-          ></el-tree>
-        </template>
-      </el-table-column>
-      <el-table-column
         :label="$t('provider.statusProvier')"
         min-width="100px"
         align="center"

@@ -16,6 +16,13 @@
       >
         Search
       </el-button> -->
+      <el-input
+        placeholder="Search"
+        style="width: 200px"
+        class="filter-item"
+        v-model="search"
+        @keyup.enter.native="handleFilter"
+      />
       <el-button
         class="filter-item"
         style="margin-left: 10px"
@@ -69,7 +76,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list"
+      :data="stadiumCat"
       border
       fit
       highlight-current-row
@@ -121,7 +128,7 @@
           <span>{{ row.nameEspanish }}</span>
         </template>
       </el-table-column>
-<!--       <el-table-column
+      <!--       <el-table-column
         :label="$t('stadium.priority')"
         min-width="100px"
         align="center"
@@ -190,7 +197,7 @@
         <el-form-item :label="$t('stadium.nameEspanish')">
           <el-input v-model="formCategory.nameEspanish" />
         </el-form-item>
-<!--         <el-form-item :label="$t('stadium.priority')">
+        <!--         <el-form-item :label="$t('stadium.priority')">
           <el-input v-model="formCategory.priorityOrder" type="number" />
         </el-form-item> -->
         <el-form-item :label="$t('stadium.stadiumId')" prop="stadiumId">
@@ -296,6 +303,7 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
+      search: "",
       listQuery: {
         page: 1,
         limit: 10,
@@ -537,6 +545,19 @@ export default {
           this.status = "error";
         });
     },
+    getCategory() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "StadiumCategory")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -675,6 +696,23 @@ export default {
           done();
         })
         .catch((_) => {});
+    },
+  },
+  computed: {
+    stadiumCat() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return (
+            item.nameEnglish
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.nameEspanish
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.stadiumName.toLowerCase().includes(this.search.toLowerCase())
+          );
+        });
+      }
     },
   },
 };

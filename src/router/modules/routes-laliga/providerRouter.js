@@ -14,22 +14,22 @@ const providerRouter = {
   },
   children: [
     {
+      path: 'cateogoryProvider',
+      component: () => import('@/components-laLiga/provider/categoryProvider'),
+      name: 'Provider Category',
+      meta: { title: 'categoryProvider' }
+    },
+    {
       path: 'manageProvider',
       component: () => import('@/components-laLiga/provider/configProvider'),
       name: 'Admin provider',
       meta: { title: 'manageProvider' }
     },
     {
-      path: 'manageCategory',
-      component: () => import('@/components-laLiga/provider/categoryProvider'),
-      name: 'Provider Category',
-      meta: { title: 'hotelCategory' }
-    },
-    {
-      path: 'categoryHappytours',
+      path: 'manageCategoryHappyTour',
       component: () => import('@/components-laLiga/provider/categoryHappytours'),
       name: 'Provider Category',
-      meta: { title: 'categoryProvider' }
+      meta: { title: 'happyTourCategory' }
     },
   ]
 

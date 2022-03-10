@@ -68,7 +68,7 @@ export default {
     city: 'Ciudad',
     manageCity: 'Gestionar Ciudad',
     hotel: 'Hotel',
-    hotelCategory: 'Categoría HappyTours',
+    happyTourCategory: 'Categoría HappyTours',
     manageHotel: 'Gestionar Hotel',
     manageRoom: 'Gestionar Habitación',
     match: 'Partido',
@@ -111,24 +111,22 @@ export default {
   hotel: {
     nameEnHotel: 'Nombre En',
     nameEsHotel: 'Nombre Es',
-    categoryHotel: 'Categoría - Happytour',
     cityHotel: 'Ciudad',
     providerHotel: 'Proveedor',
     status: 'Estado',
     image: 'Cargar Imágen',
     description: 'Descripción',
     max_pax: 'Max Pax',
-    categoryProvider: 'Categorías - Proveedor'
+
   },
   provider: {
-    nameProvider: 'Nombre',
+    nameProvider: 'Proveedor',
     taxIDProvider: 'Tax ID',
     phoneProvider: 'Teléfono',
     emailProvier: 'Correo Electrónico',
     statusProvier: 'Estado',
-    categories:'Categorías HappyTour',
-
-
+    categories:'Categoría - HappyTour',
+    categoryProvider: 'Categoría - Proveedor'
   },
   city: {
     nameEnCity: 'Nombre En',

@@ -16,6 +16,13 @@
       >
         Search
       </el-button> -->
+      <el-input
+        placeholder="Search"
+        style="width: 200px"
+        class="filter-item"
+        v-model="search"
+        @keyup.enter.native="handleFilter"
+      />
       <el-button
         class="filter-item"
         style="margin-left: 10px"
@@ -69,7 +76,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list"
+      :data="providerList"
       border
       fit
       highlight-current-row
@@ -104,12 +111,30 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('hotel.categoryHotel')"
+        :label="$t('provider.categoryProvider')"
         min-width="100px"
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.categoryName }}</span>
+          <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('provider.categories')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row.happyTourCategoryName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('provider.nameProvider')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row.providerName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -157,8 +182,38 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('hotel.categoryProvider')">
+        <el-form-item :label="$t('provider.categoryProvider')">
           <el-input v-model="formCategory.categoryName" />
+        </el-form-item>
+        <el-form-item :label="$t('provider.categories')" prop="providerName">
+          <el-autocomplete
+            v-model="formCategory.HTCategoryName"
+            popper-class="my-autocomplete"
+            :fetch-suggestions="getHTCategory"
+            placeholder="Please input"
+            style="width: 100%"
+            @select="handleSelectHTCategory"
+          >
+            <i slot="suffix" class="el-icon-edit el-input__icon" />
+            <template slot-scope="{ item }">
+              <div class="value">{{ item.categoryName }}</div>
+            </template>
+          </el-autocomplete>
+        </el-form-item>
+        <el-form-item :label="$t('provider.nameProvider')" prop="providerName">
+          <el-autocomplete
+            v-model="formCategory.providerName"
+            popper-class="my-autocomplete"
+            :fetch-suggestions="getProviders"
+            placeholder="Please input"
+            style="width: 100%"
+            @select="handleSelectProvider"
+          >
+            <i slot="suffix" class="el-icon-edit el-input__icon" />
+            <template slot-scope="{ item }">
+              <div class="value">{{ item.name }}</div>
+            </template>
+          </el-autocomplete>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -243,6 +298,7 @@ export default {
       tableKey: 0,
       list: null,
       total: 0,
+      search: "",
       listLoading: true,
       listQuery: {
         page: 1,
@@ -301,8 +357,12 @@ export default {
       /** FormStadium */
       formCategory: {
         categoryName: "",
+        providerId: "",
+        providerName: "",
+        HTCategoryId: "",
+        HTCategoryName: "",
       },
-      hotelUpdate: [],
+      categoryUpdate: [],
       categoryProviderList: [],
       /* EndPoint */
       url: this.$store.getters.url,
@@ -350,32 +410,37 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
+      this.formCategory = {
+        categoryName: "",
+        providerId: 0,
+        providerName: "",
+        HTCategoryName: "",
+        HTCategoryId: 0
       };
     },
     handleUpdate(row) {
       console.log(row);
-      this.hotelUpdate = row;
+      this.categoryUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.formCategory.categoryName = row.categoryName;
+      this.formCategory.categoryName = row.name;
+      this.formCategory.providerName = row.providerName;
+      this.formCategory.providerId = row.providerId;
+      this.formCategory.HTCategoryName = row.happyTourCategoryName;
+      this.formCategory.HTCategoryId = row.happyTourCategoryId;
+
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
           var category = {
-            id: this.hotelUpdate.id,
-            categoryName: this.formCategory.categoryName,
+            id: this.categoryUpdate.id,
+            providerCategoryName: this.formCategory.categoryName,
+            providerId: this.formCategory.providerId,
+            happyTourCategoryId: this.formCategory.happyTourCategoryId
           };
           axios
-            .put(this.url + "HotelCategories", category)
+            .put(this.url + "ProviderCategories", category)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -433,16 +498,17 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.city_name = "";
     },
     postCategory() {
       this.$refs["dataForm"].validate((valid) => {
         var category = {
-          categoryName: this.formCategory.categoryName,
+          providerCategoryName: this.formCategory.categoryName,
+          providerId: this.formCategory.providerId,
+          happyTourCategoryId: this.formCategory.HTCategoryId
         };
         if (valid) {
           axios
-            .post(this.url + "HotelCategories", category)
+            .post(this.url + "ProviderCategories", category)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -462,7 +528,7 @@ export default {
     getCategory() {
       this.listLoading = true;
       axios
-        .get(this.url + "HotelCategories")
+        .get(this.url + "ProviderCategories")
         .then((response) => {
           console.log(response.data);
           this.list = response.data;
@@ -475,7 +541,7 @@ export default {
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
-        .delete(this.url + "HotelCategories/" + id)
+        .delete(this.url + "ProviderCategories/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -598,6 +664,13 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
     getProviders(queryString, cb) {
       axios
         .get(this.url + "Provider")
@@ -605,7 +678,7 @@ export default {
           console.log(response.data);
           var links = response.data;
           var results = queryString
-            ? links.filter(this.createFilter(queryString))
+            ? links.filter(this.createFilterProvider(queryString))
             : links;
           cb(results);
         })
@@ -614,7 +687,7 @@ export default {
           console.error(error.response);
         });
     },
-    createFilter(queryString) {
+    createFilterProvider(queryString) {
       return (link) => {
         return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
       };
@@ -623,12 +696,47 @@ export default {
       this.formCategory.providerName = item.name;
       this.formCategory.providerId = item.id;
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
+    getHTCategory(queryString, cb) {
+      axios
+        .get(this.url + "HappyTourCategories")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterHTCategory(queryString))
+            : links;
+          cb(results);
         })
-        .catch((_) => {});
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilterHTCategory(queryString) {
+      return (link) => {
+        return link.categoryName.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelectHTCategory(item) {
+      this.formCategory.HTCategoryName = item.categoryName;
+      this.formCategory.HTCategoryId = item.id;
+    },
+  },
+  computed: {
+    providerList() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return (
+            item.name
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.happyTourCategoryName
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.providerName.toLowerCase().includes(this.search.toLowerCase())
+          );
+        });
+      }
     },
   },
 };
