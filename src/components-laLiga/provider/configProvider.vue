@@ -300,7 +300,7 @@ export default {
     return {
       tableKey: 0,
       defaultProps: {
-        children: "children",
+        children: "hotels",
         label: "name",
       },
       list: [],
@@ -539,6 +539,7 @@ export default {
           this.status = "error";
         });
     },
+
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -729,6 +730,9 @@ export default {
           done();
         })
         .catch((_) => {});
+    },
+    handleNodeClick(data) {
+      console.log(data);
     },
   },
   computed: {

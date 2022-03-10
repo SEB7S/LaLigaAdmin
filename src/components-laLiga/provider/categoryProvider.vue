@@ -157,7 +157,7 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('hotel.categoryHotel')">
+        <el-form-item :label="$t('hotel.categoryProvider')">
           <el-input v-model="formCategory.categoryName" />
         </el-form-item>
       </el-form>

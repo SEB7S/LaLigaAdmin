@@ -121,7 +121,7 @@
           <span>{{ row.nameEspanish }}</span>
         </template>
       </el-table-column>
-      <el-table-column
+<!--       <el-table-column
         :label="$t('stadium.priority')"
         min-width="100px"
         align="center"
@@ -129,7 +129,7 @@
         <template slot-scope="{ row }">
           <span>{{ row.priorityOrder }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         :label="$t('stadium.stadiumId')"
         min-width="100px"
@@ -190,9 +190,9 @@
         <el-form-item :label="$t('stadium.nameEspanish')">
           <el-input v-model="formCategory.nameEspanish" />
         </el-form-item>
-        <el-form-item :label="$t('stadium.priority')">
+<!--         <el-form-item :label="$t('stadium.priority')">
           <el-input v-model="formCategory.priorityOrder" type="number" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item :label="$t('stadium.stadiumId')" prop="stadiumId">
           <el-autocomplete
             v-model="formCategory.stadiumName"
