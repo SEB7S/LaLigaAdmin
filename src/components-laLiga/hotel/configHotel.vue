@@ -256,7 +256,7 @@
             </el-autocomplete>
           </el-form-item>
           <el-form-item
-            :label="$t('hotel.categoryProvider')"
+            :label="$t('provider.categoryProvider')"
             prop="providerName"
           >
             <el-autocomplete
