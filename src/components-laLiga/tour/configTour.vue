@@ -645,7 +645,7 @@ export default {
       this.formTour.options.forEach((option) => {
         var tourCategory = {
           tourId: this.formImageTour.idTour,
-          hotelCategoryId: option.id,
+          providerCategoryId: option.id,
         };
         axios
           .post(this.url + "TourCategory", tourCategory)
