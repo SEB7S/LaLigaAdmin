@@ -267,6 +267,7 @@
             type="datetime"
             placeholder="Select date and time"
             :picker-options="pickerOptions"
+            default-value= "formMatchRate.final_date"
           >
           </el-date-picker>
         </el-form-item>
@@ -406,7 +407,7 @@ export default {
       formMatchRate: {
         matchId: "",
         matchName: "",
-        start_date:"",
+        start_date: new Date(),
         final_date: "",
         stadiumCategoryId: 1,
         stadiumCategoryName: "",

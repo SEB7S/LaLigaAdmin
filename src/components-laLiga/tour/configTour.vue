@@ -204,7 +204,7 @@
                 :max="35"
               />
             </el-form-item>
-            <el-form-item :label="$t('tour.nameProvider')">
+            <el-form-item :label="$t('provider.nameProvider')">
               <el-autocomplete
                 v-model="formTour.providerName"
                 popper-class="my-autocomplete"
@@ -219,7 +219,7 @@
                 </template>
               </el-autocomplete>
             </el-form-item>
-            <el-form-item label="Hotel Category">
+            <el-form-item :label="$t('provider.categoryProvider')">
               <el-select
                 v-model="formTour.hotel_category"
                 multiple
@@ -228,7 +228,7 @@
                 <el-option
                   v-for="item in formTour.options"
                   :key="item.id"
-                  :label="item.categoryName"
+                  :label="item.name"
                   :value="item.id"
                 >
                 </el-option>
@@ -832,7 +832,7 @@ export default {
     handleSelect(item) {
       this.formTour.providerName = item.name;
       this.formTour.idProvider = item.id;
-      this.getCatProv(item.id);
+      this.getCatProv()
     },
     handleSelectCity(item) {
       console.log(item, this.arrayPosition);
@@ -842,9 +842,9 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
-    getCatProv(id) {
+    getCatProv() {
       axios
-        .get(this.url + "hotel/GetCategoriesByProviderId?id=" + id)
+        .get(this.url + "ProviderCategories/GetProviderCategoriesbyIdProvider?id=" + this.formTour.idProvider)
         .then((response) => {
           this.formTour.options = response.data;
         })

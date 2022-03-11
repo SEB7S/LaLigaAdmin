@@ -481,6 +481,7 @@ export default {
       axios
         .delete(this.url + "HappyTourCategories/" + id)
         .then((response) => {
+          console.log(response);
           this.$notify({
             title: "Success",
             message: "Delete Successfully",
@@ -506,10 +507,6 @@ export default {
         }
       )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
           this.handleDelete(row, false);
         })
         .catch(() => {
