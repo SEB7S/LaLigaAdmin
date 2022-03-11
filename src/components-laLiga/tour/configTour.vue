@@ -606,6 +606,7 @@ export default {
               .then((response) => {
                 this.formImageTour.idTour = response.data.id;
                 this.getDayDescription = response.data.tourDayDescriptions;
+                console.log(this.getDayDescription);
                 this.getTour();
                 this.postTourCategory();
                 this.next();
@@ -955,7 +956,7 @@ export default {
         this.start_date.getFullYear();
       for (
         let index = 0;
-        index < parseInt(this.formTour.duration_in_days) - 1;
+        index < parseInt(this.formTour.duration_in_days);
         index++
       ) {
         console.log(dateFormat);
