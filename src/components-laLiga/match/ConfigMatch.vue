@@ -146,7 +146,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.date }}</span>
+          <span>{{ row.date | dateformat }}</span>
         </template>
       </el-table-column>
 
@@ -321,6 +321,7 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
+import moment from "moment";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -512,7 +513,7 @@ export default {
         stadiumName: "",
         date: "",
         tournamentName: "",
-        tournament_id: 0
+        tournament_id: 0,
       };
     },
     handleFetchPv(pv) {
@@ -559,6 +560,7 @@ export default {
     },
     postMatch() {
       this.$refs["formMatch"].validate((valid) => {
+        console.log(this.formMatch.date)
         var match = {
           club_home_id: this.formMatch.club_home_id,
           club_guest_id: this.formMatch.club_guest_id,
@@ -705,7 +707,7 @@ export default {
       this.formMatch.stadium_id = row.stadium_id;
       this.formMatch.stadiumName = row.stadiumName;
       this.formMatch.tournamentName = row.tournamentName;
-      this.formMatch.tournament_id = row.tournament_id
+      this.formMatch.tournament_id = row.tournament_id;
       this.formMatch.date = row.date;
     },
     updateData() {
@@ -851,6 +853,13 @@ export default {
             item
           );
         });
+      }
+    },
+  },
+  filters: {
+    dateformat: function (value) {
+      if (value) {
+        return moment(String(value)).format("MM/DD/YYYY hh:mm");
       }
     },
   },

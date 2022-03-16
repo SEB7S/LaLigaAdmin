@@ -102,6 +102,7 @@ export default {
   match: {
     nameClub: 'Club',
     cityClub: 'City',
+    stadiumClub: 'Stadium',
     clubGuest: 'Guest',
     clubHome: 'Home',
     stadium: 'Stadium',

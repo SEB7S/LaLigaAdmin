@@ -119,7 +119,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.cityName }}</span>
+          <span>{{ row.stadiumName }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -176,11 +176,11 @@
           <el-form-item :label="$t('match.nameClub')" prop="clubName">
             <el-input v-model="formClub.clubName" />
           </el-form-item>
-          <el-form-item :label="$t('match.cityClub')" prop="cityClub">
+          <el-form-item :label="$t('match.stadiumClub')" prop="cityClub">
             <el-autocomplete
-              v-model="formClub.cityName"
+              v-model="formClub.stadiumName"
               popper-class="my-autocomplete"
-              :fetch-suggestions="getCities"
+              :fetch-suggestions="getStadium"
               placeholder="Please input"
               style="width: 100%"
               @select="handleSelect"
@@ -191,7 +191,7 @@
                 @click="handleIconClick"
               />
               <template slot-scope="{ item }">
-                <div class="value">{{ item.nameEnglish }}</div>
+                <div class="value">{{ item.name }}</div>
               </template>
             </el-autocomplete>
           </el-form-item>
@@ -338,8 +338,8 @@ export default {
       /** FormStadium */
       formClub: {
         clubName: "",
-        cityId: "",
-        cityName: "",
+        stadiumId: "",
+        stadiumName: "",
       },
       rules: {
         name: [
@@ -452,8 +452,8 @@ export default {
     resetTemp() {
       this.formClub = {
         name: "",
-        cityId: "",
-        cityName: "",
+        stadiumId: "",
+        stadiumName: "",
       };
     },
     handleFetchPv(pv) {
@@ -504,7 +504,7 @@ export default {
         this.$refs["formClub"].validate((valid) => {
           var club = {
             clubName: this.formClub.clubName,
-            cityId: this.formClub.cityId,
+            stadiumId: this.formClub.stadiumId,
           };
           if (valid) {
             axios
@@ -697,8 +697,8 @@ export default {
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.formClub.clubName = row.name;
-      this.formClub.cityId = row.city_id;
-      this.formClub.cityName = row.cityName;
+      this.formClub.stadiumId = row.stadiumId;
+      this.formClub.stadiumName = row.stadiumName;
       this.active = 0;
     },
     updateData() {
@@ -708,7 +708,7 @@ export default {
             var provider = {
               id: this.clubUpdate.id,
               clubName: this.formClub.clubName,
-              cityId: this.formClub.cityId,
+              stadiumId: this.formClub.stadiumId,
             };
             axios
               .put(this.url + "Club", provider)
@@ -739,9 +739,9 @@ export default {
         })
         .catch((_) => {});
     },
-    getCities(queryString, cb) {
+    getStadium(queryString, cb) {
       axios
-        .get(this.url + "City")
+        .get(this.url + "Stadium")
         .then((response) => {
           console.log(response.data);
           var links = response.data;
@@ -757,15 +757,14 @@ export default {
     createFilter(queryString) {
       return (link) => {
         return (
-          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
+          link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
         );
       };
     },
     handleSelect(item) {
       console.log(item);
-      this.formClub.cityName = item.nameEnglish;
-      this.formClub.cityId = item.id;
+      this.formClub.stadiumName = item.name;
+      this.formClub.stadiumId = item.id;
     },
     handleIconClick(ev) {
       console.log(ev);

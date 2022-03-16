@@ -257,7 +257,7 @@
             <div v-for="(formDay, counter) in formDayDetail" :key="counter">
               <div class="grid-content">
                 <el-collapse-item
-                  :title="formDay.dayName + formDay.startDate"
+                  :title="formDay.dayName + formDay.startDate + formDay.dayName2"
                   :name="counter"
                 >
                   <el-form
@@ -642,7 +642,7 @@ export default {
       }
     },
     postTourCategory() {
-      console.log(this.formImageTour.idTour);
+      console.log(this.formTour);
       this.formTour.options.forEach((option) => {
         var tourCategory = {
           tourId: this.formImageTour.idTour,
@@ -753,8 +753,10 @@ export default {
       this.formTour.status = row.status;
       this.formTour.idProvider = row.idProvider;
       this.formTour.providerName = row.providerName;
+      this.formTour.options = row.tourCategories;
       this.editFormTourDayDescription = row.tourDayDescriptions;
       this.editTourDayDescription = true;
+      
     },
     updateData() {
       if (this.active == 0) {
@@ -946,7 +948,8 @@ export default {
       };
     },
     calculateDays(item) {
-      console.log(this.start_date);
+      let dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado","Domingo"];
+      console.log(this.start_date.getDay());
       this.formDayDetail = [];
       const dateFormat =
         this.start_date.getDate() +
@@ -963,7 +966,8 @@ export default {
         if (!this.editTourDayDescription) {
           var day = {
             dayName: "Day " + (index + 1) + " - ",
-            startDate: this.addDate(index, dateFormat),
+            dayName2: dias[this.start_date.getDay() + index],
+            startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: this.start_date,
             cityName: "",
             cityId: 0,
@@ -978,15 +982,16 @@ export default {
           console.log(this.editFormTourDayDescription, index);
           var day = {
             dayName: "Day " + (index + 1) + " - ",
-            startDate: this.addDate(index, dateFormat),
+            dayName2: dias[this.start_date.getDay() + index],
+            startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: this.start_date,
-            cityName: "",
+            cityName: this.editFormTourDayDescription[index]["cityName"],
             cityId: 0,
             description_language: "English",
             description_english:
-              this.editFormTourDayDescription[index]["dayDescription"],
-            description_spanish: "",
-            matchable: false,
+              this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
+            description_spanish: this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
+            matchable: this.editFormTourDayDescription[index]["matchable"],
           };
           this.formDayDetail[index] = day;
         }
