@@ -409,7 +409,6 @@ export default {
         ],
         latitude: [
           {
-            required: true,
             message: "Please input latitude",
             trigger: "blur",
           },
@@ -425,7 +424,6 @@ export default {
         ],
         longitude: [
           {
-            required: true,
             message: "Please input longitude",
             trigger: "blur",
           },

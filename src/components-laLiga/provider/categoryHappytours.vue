@@ -119,7 +119,7 @@
           <span>{{ row.categoryName }}</span>
         </template>
       </el-table-column>
-<!--       <el-table-column
+      <!--       <el-table-column
         :label="$t('provider.categories')"
         min-width="100px"
         align="center"
@@ -354,14 +354,9 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
+      /** FormStadium */
+      this.formCategory = {
+        categoryName: "",
       };
     },
     handleUpdate(row) {
@@ -636,11 +631,9 @@ export default {
     categoryHT() {
       if (this.list) {
         return this.list.filter((item) => {
-          return (
-            item.categoryName
-              .toLowerCase()
-              .includes(this.search.toLowerCase())
-          );
+          return item.categoryName
+            .toLowerCase()
+            .includes(this.search.toLowerCase());
         });
       }
     },

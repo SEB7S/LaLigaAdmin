@@ -414,15 +414,13 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: "",
-        timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+      this.formCategory = {
+        nameEnglish: "",
+        nameEspanish: "",
+        priorityOrder: 0,
+        stadiumId: "",
+        stadiumName: "",
+      }
     },
     handleUpdate(row) {
       console.log(row);
