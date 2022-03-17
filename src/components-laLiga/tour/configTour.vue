@@ -16,6 +16,13 @@
       >
         Search
       </el-button> -->
+      <el-input
+        placeholder="Search"
+        style="width: 200px"
+        class="filter-item"
+        v-model="search"
+        @keyup.enter.native="handleFilter"
+      />
       <el-button
         class="filter-item"
         style="margin-left: 10px"
@@ -58,7 +65,7 @@
     <el-table
       :key="tableKey"
       v-loading="listLoading"
-      :data="list"
+      :data="aTourList"
       border
       fit
       highlight-current-row
@@ -250,14 +257,17 @@
                 type="date"
                 placeholder="Pick a day"
                 @change="calculateDays"
-              />
+              >
+              </el-date-picker>
             </el-form-item>
           </el-form>
           <el-collapse v-model="activeNames" accordion>
             <div v-for="(formDay, counter) in formDayDetail" :key="counter">
               <div class="grid-content">
                 <el-collapse-item
-                  :title="formDay.dayName + formDay.startDate + formDay.dayName2"
+                  :title="
+                    formDay.dayName + formDay.startDate + formDay.dayName2
+                  "
                   :name="counter"
                 >
                   <el-form
@@ -310,24 +320,14 @@
                           <img width="100%" :src="dialogImageUrl" alt="" />
                         </el-dialog>
                       </el-form-item>
-                      <el-form-item label="Description">
-                        <el-radio-group v-model="formDay.description_language">
-                          <el-radio label="English" />
-                          <el-radio label="Spanish" />
-                        </el-radio-group>
-                      </el-form-item>
-                      <el-form-item
-                        v-if="formDay.description_language == 'English'"
-                      >
+                      <el-form-item label="Description English">
                         <el-input
                           v-model="formDay.description_english"
                           type="textarea"
                           placeholder="Please input"
                         />
                       </el-form-item>
-                      <el-form-item
-                        v-if="formDay.description_language == 'Spanish'"
-                      >
+                      <el-form-item label="Description Spanish">
                         <el-input
                           v-model="formDay.description_spanish"
                           type="textarea"
@@ -429,6 +429,7 @@ export default {
       ],
       statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
+      search: "",
       temp: {
         id: undefined,
         importance: 1,
@@ -470,7 +471,7 @@ export default {
         status: true,
         idProvider: 0,
         providerName: "",
-        hotel_category: "",
+        hotel_category: [],
         options: [],
       },
       idTourCreated: 0,
@@ -543,7 +544,7 @@ export default {
         status: true,
         idProvider: "",
         providerName: "",
-        hotel_category: "",
+        hotel_category: [],
         options: [],
       };
       this.formDayDetail = [];
@@ -591,6 +592,7 @@ export default {
       this.active = 0;
       this.editTourDayDescription = false;
     },
+    /* POST */
     postTour() {
       if (this.active == 0) {
         this.$refs["dataForm"].validate((valid) => {
@@ -617,7 +619,6 @@ export default {
           }
         });
       } else if (this.active == 1) {
-        let waitresponse = false;
         this.formDayDetail.forEach((element, index) => {
           var dayDescription = {
             dayNumber: index + 1,
@@ -626,27 +627,30 @@ export default {
             startTime: element.startDateFormat,
             tourId: this.formImageTour.idTour,
             id: this.getDayDescription[index].id,
-            matchable: element.matchable
-            
+            matchable: element.matchable,
           };
           axios
             .put(this.url + "TourDayDescription", dayDescription)
-            .then((response) => {
-              this.dialogFormVisible = false;
-            })
+            .then((response) => {})
             .catch((error) => {
               console.error(error.response);
             });
           console.log(this.formDayDetail);
+          setTimeout(() => {
+            this.postTourDayDesCity(
+              this.getDayDescription[index].id,
+              this.formDayDetail[index].cityId
+            );
+          }, 500);
         });
       }
     },
     postTourCategory() {
       console.log(this.formTour);
-      this.formTour.options.forEach((option) => {
+      this.formTour.hotel_category.forEach((option) => {
         var tourCategory = {
           tourId: this.formImageTour.idTour,
-          providerCategoryId: option.id,
+          providerCategoryId: option,
         };
         axios
           .post(this.url + "TourCategory", tourCategory)
@@ -658,6 +662,23 @@ export default {
           });
       });
     },
+    postTourDayDesCity(tourDayDescriptionId, cityId) {
+      var tourDayDesCity = {
+        tourDayDescriptionId: tourDayDescriptionId,
+        cityId: cityId,
+      };
+      axios
+        .post(this.url + "TourDayDescriptionCity", tourDayDesCity)
+        .then((response) => {
+          console.log(response);
+          this.dialogFormVisible = false;
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+
+    /* GET */
     getTour() {
       this.listLoading = true;
       axios
@@ -672,6 +693,52 @@ export default {
           console.log(error.response);
         });
     },
+    getCatProv() {
+      axios
+        .get(
+          this.url +
+            "ProviderCategories/GetProviderCategoriesbyIdProvider?id=" +
+            this.formTour.idProvider
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.formTour.options = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.log(error.response);
+        });
+    },
+    getProviders(queryString, cb) {
+      axios
+        .get(this.url + "Provider")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilter(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelect(item) {
+      this.formTour.providerName = item.name;
+      this.formTour.idProvider = item.id;
+      this.getCatProv();
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
+    /* DELETE */
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -715,6 +782,16 @@ export default {
           });
         });
     },
+    deleteTourCategory() {
+      this.tourUpdate.tourCategories.forEach((option) => {
+        axios
+          .delete(this.url + "TourCategory/" + option.id)
+          .then((response) => {})
+          .catch((error) => {
+            console.error(error.response);
+          });
+      });
+    },
     isSelected(arr, select) {
       console.log(select);
       if (select) {
@@ -741,8 +818,11 @@ export default {
         this.handleDelete(value, true);
       });
     },
+
+    /* UPDATE */
     handleUpdate(row) {
       console.log(row);
+      this.resetTemp();
       this.editFormTourDayDescription = [];
       this.active = 0;
       this.tourUpdate = row;
@@ -753,10 +833,15 @@ export default {
       this.formTour.status = row.status;
       this.formTour.idProvider = row.idProvider;
       this.formTour.providerName = row.providerName;
-      this.formTour.options = row.tourCategories;
       this.editFormTourDayDescription = row.tourDayDescriptions;
+      this.formImageTour.idTour = row.id;
       this.editTourDayDescription = true;
-      
+      this.start_date = row.tourDayDescriptions[0].startTime;
+      row.tourCategories.forEach((element, index) => {
+        this.formTour.hotel_category[index] = element.providerCategoryId;
+      });
+      this.getCatProv();
+      console.log(this.formTour, this.start_date);
     },
     updateData() {
       if (this.active == 0) {
@@ -774,6 +859,8 @@ export default {
               .then((response) => {
                 console.log("PUT");
                 this.next();
+                this.deleteTourCategory();
+                this.postTourCategory();
                 this.$notify({
                   title: "Success",
                   message: "Update Successfully",
@@ -787,75 +874,32 @@ export default {
           }
         });
       } else if (this.active == 1) {
-        if (this.active == 1) {
-          let waitresponse = false;
-          this.formDayDetail.forEach((element, index) => {
-            var dayDescription = {
-              dayNumber: index + 1,
-              dayDescription: element.description_language,
-              start_time: element.startDate,
-              tourId: this.formImageTour.idTour,
-              id: this.getDayDescription[index].id,
-            };
-            axios
-              .put(this.url + "Tour_Day_Description", dayDescription)
-              .then((response) => {
-                console.log("PUT");
-                this.dialogFormVisible = false;
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-            console.log(this.formDayDetail);
-          });
-        }
+        this.formDayDetail.forEach((element, index) => {
+          console.log(element);
+          var dayDescription = {
+            dayNumber: index + 1,
+            matchable: element.matchable,
+            dayDescriptionEnglish: element.description_english,
+            dayDescriptionSpanish: element.description_spanish,
+            start_time: element.startDateFormat,
+            tourId: this.formImageTour.idTour,
+            id: element.id,
+          };
+          axios
+            .put(this.url + "TourDayDescription", dayDescription)
+            .then((response) => {
+              console.log("PUT");
+              this.getTour();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+          console.log(this.formDayDetail);
+        });
+        this.dialogFormVisible = false;
       }
     },
-    getProviders(queryString, cb) {
-      axios
-        .get(this.url + "Provider")
-        .then((response) => {
-          console.log(response.data);
-          var links = response.data;
-          var results = queryString
-            ? links.filter(this.createFilter(queryString))
-            : links;
-          cb(results);
-        })
-        .catch((error) => {
-          this.status = "error";
-          console.error(error.response);
-        });
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelect(item) {
-      this.formTour.providerName = item.name;
-      this.formTour.idProvider = item.id;
-      this.getCatProv()
-    },
-    handleSelectCity(item) {
-      console.log(item, this.arrayPosition);
-      this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
-      this.formDayDetail[this.arrayPosition].cityId = item.id;
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
-    getCatProv() {
-      axios
-        .get(this.url + "ProviderCategories/GetProviderCategoriesbyIdProvider?id=" + this.formTour.idProvider)
-        .then((response) => {
-          this.formTour.options = response.data;
-        })
-        .catch((error) => {
-          this.status = "error";
-          console.log(error.response);
-        });
-    },
+
     changeStatus(data, status) {
       console.log(status);
       var tour = {
@@ -947,10 +991,26 @@ export default {
         );
       };
     },
-    calculateDays(item) {
-      let dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado","Domingo"];
-      console.log(this.start_date.getDay());
+    handleSelectCity(item) {
+      console.log(item, this.arrayPosition);
+      this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
+      this.formDayDetail[this.arrayPosition].cityId = item.id;
+    },
+    calculateDays() {
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      console.log(this.start_date);
+      const copyStartDate = this.start_date;
       this.formDayDetail = [];
+      var weekDay = 0;
+      var countDays = 0;
       const dateFormat =
         this.start_date.getDate() +
         "/" +
@@ -962,16 +1022,16 @@ export default {
         index < parseInt(this.formTour.duration_in_days);
         index++
       ) {
-        console.log(dateFormat);
+        weekDay = copyStartDate.getDay();
+        console.log(weekDay, copyStartDate, dateFormat);
         if (!this.editTourDayDescription) {
           var day = {
             dayName: "Day " + (index + 1) + " - ",
-            dayName2: dias[this.start_date.getDay() + index],
+            dayName2: days[weekDay],
             startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: this.start_date,
             cityName: "",
             cityId: 0,
-            description_language: "English",
             description_english: "",
             description_spanish: "",
             matchable: false,
@@ -979,22 +1039,40 @@ export default {
           this.formDayDetail.push(day);
         } else {
           /* this.start_date = this.editFormTourDayDescription[index].startTime; */
-          console.log(this.editFormTourDayDescription, index);
+          console.log(
+            this.editFormTourDayDescription,
+            parseInt(this.formTour.duration_in_days)
+          );
           var day = {
             dayName: "Day " + (index + 1) + " - ",
-            dayName2: dias[this.start_date.getDay() + index],
+            dayName2: days[weekDay],
             startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: this.start_date,
-            cityName: this.editFormTourDayDescription[index]["cityName"],
-            cityId: 0,
-            description_language: "English",
+            cityName:
+              this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
+                .length > 0
+                ? this.editFormTourDayDescription[index][
+                    "tourDayDescriptionCities"
+                  ][0].cityName
+                : "",
+            cityId:
+              this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
+                .length > 0
+                ? this.editFormTourDayDescription[index][
+                    "tourDayDescriptionCities"
+                  ][0].cityId
+                : 0,
             description_english:
               this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
-            description_spanish: this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
+            description_spanish:
+              this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
             matchable: this.editFormTourDayDescription[index]["matchable"],
+            id: this.editFormTourDayDescription[index]["id"],
           };
-          this.formDayDetail[index] = day;
+          this.formDayDetail.push(day);
+          console.log(this.formDayDetail);
         }
+        copyStartDate.setDate(copyStartDate.getDate() + 1);
       }
     },
     addDate(d, fecha) {
@@ -1025,6 +1103,22 @@ export default {
           done();
         })
         .catch((_) => {});
+    },
+  },
+  computed: {
+    aTourList() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return (
+            item.name
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.providerName
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) 
+          );
+        });
+      }
     },
   },
 };

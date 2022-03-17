@@ -520,7 +520,7 @@ export default {
 
                 this.formImageClub.idClub = response.data.id;
                 this.getClub();
-                console.log(this.formImageClub.idClub);
+                console.log(this.formImageClub.idClub, response);
               })
               .catch((error) => {
                 console.error(error.response);

@@ -710,9 +710,11 @@ export default {
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
             item.stadiumName.toLowerCase().includes(this.search.toLowerCase())
+            
           );
         });
       }
+      
     },
   },
 };
