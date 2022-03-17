@@ -485,7 +485,7 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       activeNames: [0],
-      start_date: "",
+      start_date: new Date(),
       formImageTour: {
         MediaContentType: 0,
         idTour: 0,
@@ -606,8 +606,8 @@ export default {
             axios
               .post(this.url + "Tour", tour)
               .then((response) => {
-                this.formImageTour.idTour = response.data.id;
-                this.getDayDescription = response.data.tourDayDescriptions;
+                this.formImageTour.idTour = response.data[0].id;
+                this.getDayDescription = response.data[0].tourDayDescriptions;
                 console.log(this.getDayDescription);
                 this.getTour();
                 this.postTourCategory();
@@ -637,9 +637,10 @@ export default {
             });
           console.log(this.formDayDetail);
           setTimeout(() => {
-            this.postTourDayDesCity(
+            this.putTourDayDesCity(
               this.getDayDescription[index].id,
-              this.formDayDetail[index].cityId
+              this.formDayDetail[index].cityId,
+              this.getDayDescription[index].tourDayDescriptionCities[0].id
             );
           }, 500);
         });
@@ -662,13 +663,14 @@ export default {
           });
       });
     },
-    postTourDayDesCity(tourDayDescriptionId, cityId) {
+    putTourDayDesCity(tourDayDescriptionId, cityId, id) {
       var tourDayDesCity = {
         tourDayDescriptionId: tourDayDescriptionId,
         cityId: cityId,
+        id: id,
       };
       axios
-        .post(this.url + "TourDayDescriptionCity", tourDayDesCity)
+        .put(this.url + "TourDayDescriptionCity", tourDayDesCity)
         .then((response) => {
           console.log(response);
           this.dialogFormVisible = false;
@@ -836,12 +838,13 @@ export default {
       this.editFormTourDayDescription = row.tourDayDescriptions;
       this.formImageTour.idTour = row.id;
       this.editTourDayDescription = true;
-      this.start_date = row.tourDayDescriptions[0].startTime;
+      /*       this.start_date = Date.parse(row.tourDayDescriptions[0].startTime); */
+      this.start_date = new Date(row.tourDayDescriptions[0].startTime);
       row.tourCategories.forEach((element, index) => {
         this.formTour.hotel_category[index] = element.providerCategoryId;
       });
       this.getCatProv();
-      console.log(this.formTour, this.start_date);
+      console.log(this.start_date);
     },
     updateData() {
       if (this.active == 0) {
@@ -871,6 +874,7 @@ export default {
               .catch((error) => {
                 console.error(error.response);
               });
+            this.calculateDays();
           }
         });
       } else if (this.active == 1) {
@@ -895,8 +899,16 @@ export default {
               console.error(error.response);
             });
           console.log(this.formDayDetail);
+          setTimeout(() => {
+            this.putTourDayDesCity(
+              this.formDayDetail[index].id,
+              this.formDayDetail[index].cityId,
+              this.formDayDetail[index].tourDayDescriptionCities
+            );
+          }, 500);
         });
         this.dialogFormVisible = false;
+        console.log("esto", this.formDayDetail);
       }
     },
 
@@ -997,6 +1009,7 @@ export default {
       this.formDayDetail[this.arrayPosition].cityId = item.id;
     },
     calculateDays() {
+      console.log("entre a calcular");
       let days = [
         "Sunday",
         "Monday",
@@ -1031,7 +1044,7 @@ export default {
             startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: this.start_date,
             cityName: "",
-            cityId: 0,
+            cityId: 1,
             description_english: "",
             description_spanish: "",
             matchable: false,
@@ -1053,7 +1066,7 @@ export default {
                 .length > 0
                 ? this.editFormTourDayDescription[index][
                     "tourDayDescriptionCities"
-                  ][0].cityName
+                  ][0].cityNameEnglish
                 : "",
             cityId:
               this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
@@ -1061,13 +1074,20 @@ export default {
                 ? this.editFormTourDayDescription[index][
                     "tourDayDescriptionCities"
                   ][0].cityId
-                : 0,
+                : 1,
             description_english:
               this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
             description_spanish:
               this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
             matchable: this.editFormTourDayDescription[index]["matchable"],
             id: this.editFormTourDayDescription[index]["id"],
+            tourDayDescriptionCities:
+              this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
+                .length > 0
+                ? this.editFormTourDayDescription[index][
+                    "tourDayDescriptionCities"
+                  ][0].id
+                : 0,
           };
           this.formDayDetail.push(day);
           console.log(this.formDayDetail);
@@ -1110,12 +1130,8 @@ export default {
       if (this.list) {
         return this.list.filter((item) => {
           return (
-            item.name
-              .toLowerCase()
-              .includes(this.search.toLowerCase()) ||
-            item.providerName
-              .toLowerCase()
-              .includes(this.search.toLowerCase()) 
+            item.name.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.providerName.toLowerCase().includes(this.search.toLowerCase())
           );
         });
       }
