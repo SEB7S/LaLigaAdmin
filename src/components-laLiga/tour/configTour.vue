@@ -1036,7 +1036,6 @@ export default {
         index++
       ) {
         weekDay = copyStartDate.getDay();
-        console.log(weekDay, copyStartDate, dateFormat);
         if (!this.editTourDayDescription) {
           var day = {
             dayName: "Day " + (index + 1) + " - ",

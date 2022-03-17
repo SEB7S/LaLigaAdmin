@@ -216,7 +216,11 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('match.matchName')" prop="stadiumId">
+        <el-form-item
+          :label="
+            $t('match.matchName') + ' - ' + formMatchRate.startMatch"
+          prop="stadiumId"
+        >
           <el-autocomplete
             v-model="formMatchRate.matchName"
             popper-class="my-autocomplete"
@@ -256,8 +260,6 @@
             placeholder="Select date and time"
             :picker-options="pickerOptions"
             :default-value="defaultDate"
-            @change="sss"
-            
           >
           </el-date-picker>
         </el-form-item>
@@ -331,6 +333,7 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
+import moment from "moment";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -412,7 +415,8 @@ export default {
         stadiumCategoryName: "",
         paxTypeIn: "",
         match_price: 0,
-        stadium_id:0
+        stadium_id: 0,
+        startMatch: "",
       },
       rules: {
         name: [
@@ -504,9 +508,9 @@ export default {
         }, 1.5 * 1000);
       });
     },
-    sss(){
-      var esto = new Date()
-      console.log(this.formMatchRate.start_date,esto)
+    sss() {
+      var esto = new Date();
+      console.log(this.formMatchRate.start_date, esto);
     },
     handleFilter() {
       this.listQuery.page = 1;
@@ -543,6 +547,7 @@ export default {
         stadiumCategoryName: "",
         paxTypeIn: "",
         match_price: 0,
+        startMatch: "",
       };
     },
     resetFormContinue() {
@@ -634,7 +639,7 @@ export default {
     },
     getMatchRate() {
       this.listLoading = true;
-      console.log(this.defaultDate)
+      console.log(this.defaultDate);
       axios
         .get(this.url + "MatchRate")
         .then((response) => {
@@ -742,15 +747,11 @@ export default {
         });
     },
     changeStatus(data, status) {
-      this.$confirm(
-        "Do you want to diable this match rate?",
-        "Warning",
-        {
-          confirmButtonText: "Yes",
-          cancelButtonText: "No",
-          type: "warning",
-        }
-      )
+      this.$confirm("Do you want to diable this match rate?", "Warning", {
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        type: "warning",
+      })
         .then(() => {
           this.$message({
             type: "success",
@@ -847,7 +848,11 @@ export default {
     },
     getCategoryStadium(queryString, cb) {
       axios
-        .get(this.url + "Stadium/GetStadiumById?id="+ this.formMatchRate.stadium_id)
+        .get(
+          this.url +
+            "Stadium/GetStadiumById?id=" +
+            this.formMatchRate.stadium_id
+        )
         .then((response) => {
           console.log(response.data);
           var links = response.data[0].stadiumCategories;
@@ -902,7 +907,22 @@ export default {
       console.log(item);
       this.formMatchRate.matchId = item.id;
       this.formMatchRate.matchName = item.clubs;
-      this.formMatchRate.stadium_id = item.stadium_id
+      this.formMatchRate.stadium_id = item.stadium_id;
+      this.formMatchRate.start_date = new Date();
+      this.formMatchRate.final_date = new Date(item.date);
+      this.formMatchRate.startMatch = new Date(item.date);
+      if (
+        this.formMatchRate.final_date.getTime() -
+          this.formMatchRate.start_date.getTime() >=
+        0
+      ) {
+        this.formMatchRate.final_date.setDate(
+          this.formMatchRate.final_date.getDate() - 7
+        );
+      } else {
+
+        this.formMatchRate.final_date = new Date(item.date);
+      }
     },
     handleIconClickMatch(ev) {
       console.log(ev);
@@ -920,6 +940,13 @@ export default {
             item
           );
         });
+      }
+    },
+  },
+  filters: {
+    dateformat: function (value) {
+      if (value) {
+        return moment(String(value)).format("MM/DD/YYYY hh:mm");
       }
     },
   },
