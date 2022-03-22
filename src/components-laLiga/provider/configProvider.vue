@@ -58,14 +58,14 @@
       >
         {{ $t("table.delete") }}
       </el-button>
-      <el-checkbox
+<!--       <el-checkbox
         v-model="showReviewer"
         class="filter-item"
         style="margin-left: 15px"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
     <el-table
       :key="tableKey"
@@ -168,14 +168,14 @@
             icon="el-icon-edit"
           >
           </el-button>
-          <el-button
+<!--           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
             @click="confirmDelete(row)"
             icon="el-icon-delete"
           >
-          </el-button>
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>

@@ -18,13 +18,6 @@ const hotelRouter = {
       name: 'Manage Hotel',
       meta: { title: 'manageHotel' }
     },
-    {
-      path: 'manageRoom',
-      component: () => import('@/views/components-demo/split-pane'),
-      name: 'Manage Room',
-      meta: { title: 'manageRoom' }
-    }
-
   ]
 }
 export default hotelRouter
