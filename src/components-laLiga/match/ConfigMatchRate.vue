@@ -756,13 +756,14 @@ export default {
         }
       )
         .then(() => {
+          console.log(data)
           var matchRate = {
             id: data.id,
-            paxTypeIn: data.paxTypeIn,
+            paxTypeIn: data.paxTypeId,
             stadiumCategoryId: data.stadiumCategoryId,
-            match_price: data.match_price,
-            start_date: data.start_date,
-            final_date: data.final_date,
+            match_price: data.matchPrice,
+            start_date: data.startDate,
+            final_date: data.finalDate,
             available: data.available,
             matchId: data.matchId,
           };
