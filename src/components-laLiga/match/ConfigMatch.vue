@@ -772,6 +772,8 @@ export default {
       console.log(item);
       this.formMatch.clubHomeName = item.name;
       this.formMatch.club_home_id = item.id;
+      this.formMatch.stadium_id = item.stadiumId;
+      this.formMatch.stadiumName = item.stadiumName;
     },
     handleIconClickHome(ev) {
       console.log(ev);
