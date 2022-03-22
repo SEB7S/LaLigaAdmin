@@ -197,13 +197,13 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item v-if="dialogStatus == 'update'">
+        <el-form-item>
           <span class="demo-input-label">{{ $t("city.nameEsCity") }}</span>
           <el-input v-model="formCity.city_nameEs" placeholder="Please input" />
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="formCity.city_name != ''">
           <span style="margin-right: 5px">Duplicar Nombre en Español: </span>
-          <el-switch v-model="duplicateCity"> </el-switch>
+          <el-switch v-model="duplicateCity" @change="duplicatedCity($event)"> </el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -696,7 +696,15 @@ export default {
         })
         .catch((_) => {});
     },
+    duplicatedCity(event){
+      if(event){
+        this.formCity.city_nameEs = this.formCity.city_name
+      }else{
+        this.formCity.city_nameEs = ''
+      }
+    }
   },
+
   computed: {
     city() {
       if (this.list.length > 0) {
@@ -714,6 +722,7 @@ export default {
         });
       }
     },
+    
   },
 };
 </script>
