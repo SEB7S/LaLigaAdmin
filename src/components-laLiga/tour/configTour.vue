@@ -913,28 +913,41 @@ export default {
     },
 
     changeStatus(data, status) {
-      console.log(status);
-      var tour = {
-        id: data.id,
-        name: data.name,
-        duration_in_days: data.duration_in_days,
-        status: status,
-        idProvider: data.idProvider,
-      };
-      axios
-        .put(this.url + "Tour", tour)
-        .then((response) => {
-          this.dialogFormVisible = false;
-          this.$notify({
-            title: "Success",
-            message: "Status changed Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getProvider();
+      this.$confirm(
+        `Do you want to ${status ? "activate " : "inactivate"} this status?`,
+        "Warning",
+        {
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          var tour = {
+            id: data.id,
+            name: data.name,
+            duration_in_days: data.duration_in_days,
+            status: status,
+            idProvider: data.idProvider,
+          };
+          axios
+            .put(this.url + "Tour", tour)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Status changed Successfully",
+                type: "success",
+                duration: 2000,
+              });
+              this.getProvider();
+            })
+            .catch((error) => {
+              console.error(error);
+            });
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(() => {
+          this.getTour();
         });
     },
     next() {

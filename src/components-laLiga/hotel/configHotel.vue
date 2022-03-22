@@ -1042,11 +1042,15 @@ export default {
     handleSelectProvider(item) {
       this.formHotel.providerName = item.name;
       this.formHotel.providerId = item.id;
-      this.formHotel.providerCategoryName = ""
+      this.formHotel.providerCategoryName = "";
     },
     getCatProvider(queryString, cb) {
       axios
-        .get(this.url + "Hotel/GetCategoriesByProviderId?id="+ this.formHotel.providerId)
+        .get(
+          this.url +
+            "Hotel/GetCategoriesByProviderId?id=" +
+            this.formHotel.providerId
+        )
         .then((response) => {
           console.log(response.data.categories);
           var links = response.data[0].categories;
@@ -1070,16 +1074,16 @@ export default {
       this.formHotel.providerCategoryId = item.id;
     },
     changeStatus(data, status) {
-      this.$confirm("Do you want to diable this hotel?", "Warning", {
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-        type: "warning",
-      })
+      this.$confirm(
+        `Do you want to ${status ? "activate " : "inactivate"} this status?`,
+        "Warning",
+        {
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+          type: "warning",
+        }
+      )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Status Changed",
-          });
           var hotel = {
             id: data.id,
             nameEnglish: data.nameEnglish,
@@ -1106,10 +1110,6 @@ export default {
             });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Status canceled",
-          });
           this.getHotel();
         });
     },

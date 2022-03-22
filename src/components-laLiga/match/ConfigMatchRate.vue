@@ -217,8 +217,7 @@
         style="margin-left: 50px"
       >
         <el-form-item
-          :label="
-            $t('match.matchName') + ' - ' + formMatchRate.startMatch"
+          :label="$t('match.matchName') + ' - ' + formMatchRate.startMatch"
           prop="stadiumId"
         >
           <el-autocomplete
@@ -747,16 +746,16 @@ export default {
         });
     },
     changeStatus(data, status) {
-      this.$confirm("Do you want to diable this match rate?", "Warning", {
-        confirmButtonText: "Yes",
-        cancelButtonText: "No",
-        type: "warning",
-      })
+      this.$confirm(
+        `Do you want to ${status ? "activate " : "inactivate"} this status?`,
+        "Warning",
+        {
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+          type: "warning",
+        }
+      )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
           var matchRate = {
             id: data.id,
             paxTypeIn: data.paxTypeIn,
@@ -785,10 +784,6 @@ export default {
             });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
           this.getMatchRate();
         });
     },
@@ -920,7 +915,6 @@ export default {
           this.formMatchRate.final_date.getDate() - 7
         );
       } else {
-
         this.formMatchRate.final_date = new Date(item.date);
       }
     },

@@ -623,20 +623,17 @@ export default {
         });
     },
     changeStatus(data, status) {
+      
       this.$confirm(
-        "This will permanently delete the file. Continue?",
+        `Do you want to ${status ? 'activate ' : 'inactivate'} this status?`,
         "Warning",
         {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
           type: "warning",
         }
       )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
           var provider = {
             id: data.id,
             name: data.name,
@@ -663,10 +660,6 @@ export default {
             });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
           this.getProvider();
         });
     },
