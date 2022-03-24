@@ -468,7 +468,7 @@ export default {
       formTour: {
         name: "",
         duration_in_days: 0,
-        status: true,
+        status: false,
         idProvider: 0,
         providerName: "",
         hotel_category: [],
