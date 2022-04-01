@@ -322,22 +322,11 @@
                         >
                           <el-col :span="10"
                             ><div class="grid-content">
-                              <el-input
-                                placeholder="Please input"
-                                v-model="formDay.tourCities[counter2]"
-                                clearable
-                              >
-                              </el-input></div
-                          ></el-col>
-                          <el-col :span="2"
-                            ><div class="grid-content">
-                              <el-button
-                                type="danger"
-                                icon="el-icon-delete"
-                                circle
-                                @click="deleteTourCities(counter, counter2)"
-                              ></el-button></div
-                          ></el-col>
+                              <el-tag size="medium" closable @close="deleteTourCities(counter, counter2)">
+                                {{ formDay.tourCities[counter2] }}
+                              </el-tag>
+                            </div>
+                          </el-col>
                         </el-row>
                       </el-form-item>
                       <el-form-item label="">
@@ -714,12 +703,15 @@ export default {
     },
     concatenateTitle(index) {
       let result = "";
-      
-      (this.formDayDetail[index].tourCities.length == 2 && this.formDayDetail[index].tourCities[0] === this.formDayDetail[index].tourCities[1]) ? this.formDayDetail[index].tourCities.pop : ''
-        this.formDayDetail[index].tourCities.forEach((element) => {
-          result = result.concat(element) + "/";
-        });
-      
+
+      this.formDayDetail[index].tourCities.length == 2 &&
+      this.formDayDetail[index].tourCities[0] ===
+        this.formDayDetail[index].tourCities[1]
+        ? this.formDayDetail[index].tourCities.pop
+        : "";
+      this.formDayDetail[index].tourCities.forEach((element) => {
+        result = result.concat(element) + "/";
+      });
 
       result = result.concat(this.formDayDetail[index].cityName.split(",")[0]);
       return result;
@@ -1068,9 +1060,9 @@ export default {
         this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
           item.nameEnglish.split(",")[0]
         );
-        
       }
-      this.concatenateTitle(this.arrayPosition)
+      this.formDayDetail[this.arrayPosition].titleTourCities =
+        this.concatenateTitle(this.arrayPosition);
     },
     calculateDays() {
       console.log("entre a calcular");
