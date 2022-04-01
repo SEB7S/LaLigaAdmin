@@ -266,7 +266,12 @@
               <div class="grid-content">
                 <el-collapse-item
                   :title="
-                    formDay.dayName + formDay.startDate + formDay.dayName2
+                    formDay.dayName +
+                    formDay.startDate +
+                    formDay.dayName2 +
+                    ' ( ' +
+                    formDay.titleTourCities +
+                    ' ) '
                   "
                   :name="counter"
                 >
@@ -293,9 +298,47 @@
                             class="el-icon-edit el-input__icon"
                           />
                           <template slot-scope="{ item }">
-                            <div class="value">{{ item.nameEnglish }}</div>
+                            <div v-show="item.hotels.length > 0" class="value">
+                              {{ item.nameEnglish }}
+                            </div>
                           </template>
                         </el-autocomplete>
+                      </el-form-item>
+                      <el-form-item label="Tour Cities">
+                        <el-input
+                          placeholder="Please input"
+                          v-model="sCity"
+                          @keyup.enter.native="addTourCities(counter)"
+                          clearable
+                          :disabled="formDay.tourCities.length == 3"
+                        >
+                        </el-input>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-row
+                          :gutter="20"
+                          v-for="(tourCity, counter2) in formDay.tourCities"
+                          :key="counter2"
+                        >
+                          <el-col :span="10"
+                            ><div class="grid-content">
+                              <el-input
+                                placeholder="Please input"
+                                v-model="formDay.tourCities[counter2]"
+                                clearable
+                              >
+                              </el-input></div
+                          ></el-col>
+                          <el-col :span="2"
+                            ><div class="grid-content">
+                              <el-button
+                                type="danger"
+                                icon="el-icon-delete"
+                                circle
+                                @click="deleteTourCities(counter, counter2)"
+                              ></el-button></div
+                          ></el-col>
+                        </el-row>
                       </el-form-item>
                       <el-form-item label="">
                         <el-switch
@@ -383,13 +426,11 @@ const calendarTypeOptions = [
   { key: "JP", display_name: "Japan" },
   { key: "EU", display_name: "Eurozone" },
 ];
-
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name;
   return acc;
 }, {});
-
 export default {
   name: "ConfigTour",
   components: { Pagination },
@@ -493,10 +534,11 @@ export default {
       editTourDayDescription: false,
       editFormTourDayDescription: [],
       tourList: [],
+      sCity: "",
     };
   },
   created() {
-    /*     this.getList(); */
+    /*this.getList();*/
     this.getTour();
   },
   methods: {
@@ -505,7 +547,6 @@ export default {
       fetchList(this.listQuery).then((response) => {
         this.list = response.data.items;
         this.total = response.data.total;
-
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false;
@@ -606,11 +647,13 @@ export default {
             axios
               .post(this.url + "Tour", tour)
               .then((response) => {
-                this.formImageTour.idTour = response.data[0].id;
-                this.getDayDescription = response.data[0].tourDayDescriptions;
+                this.editTourDayDescription = false;
+                this.formImageTour.idTour = response.data.id;
+                this.getDayDescription = response.data.tourDayDescriptions;
                 console.log(this.getDayDescription);
                 this.getTour();
                 this.postTourCategory();
+                this.calculateDays();
                 this.next();
               })
               .catch((error) => {
@@ -620,30 +663,27 @@ export default {
         });
       } else if (this.active == 1) {
         this.formDayDetail.forEach((element, index) => {
+          console.log(element);
           var dayDescription = {
             dayNumber: index + 1,
+            tourCities: element.titleTourCities,
+            matchable: element.matchable,
+            startTime: element.startDateFormat,
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
-            startTime: element.startDateFormat,
             tourId: this.formImageTour.idTour,
-            id: this.getDayDescription[index].id,
-            matchable: element.matchable,
+            cityId: element.cityId,
           };
-          axios
-            .put(this.url + "TourDayDescription", dayDescription)
-            .then((response) => {})
-            .catch((error) => {
-              console.error(error.response);
-            });
-          console.log(this.formDayDetail);
           setTimeout(() => {
-            this.putTourDayDesCity(
-              this.getDayDescription[index].id,
-              this.formDayDetail[index].cityId,
-              this.getDayDescription[index].tourDayDescriptionCities[0].id
-            );
-          }, 500);
+            axios
+              .post(this.url + "TourDayDescription", dayDescription)
+              .then((response) => {})
+              .catch((error) => {
+                console.error(error.response);
+              });
+          }, 1000);
         });
+        this.dialogFormVisible = false;
       }
     },
     postTourCategory() {
@@ -663,23 +703,30 @@ export default {
           });
       });
     },
-    putTourDayDesCity(tourDayDescriptionId, cityId, id) {
-      var tourDayDesCity = {
-        tourDayDescriptionId: tourDayDescriptionId,
-        cityId: cityId,
-        id: id,
-      };
-      axios
-        .put(this.url + "TourDayDescriptionCity", tourDayDesCity)
-        .then((response) => {
-          console.log(response);
-          this.dialogFormVisible = false;
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
+    addTourCities(index) {
+      this.formDayDetail[index].tourCities.push(this.sCity);
+      this.formDayDetail[index].titleTourCities = this.concatenateTitle(index);
+      this.sCity = "";
     },
+    deleteTourCities(index, element) {
+      this.formDayDetail[index].tourCities.splice(element, 1);
+      this.formDayDetail[index].titleTourCities = this.concatenateTitle(index);
+    },
+    concatenateTitle(index) {
+      let result = "";
+      
+      (this.formDayDetail[index].tourCities.length == 2 && this.formDayDetail[index].tourCities[0] === this.formDayDetail[index].tourCities[1]) ? this.formDayDetail[index].tourCities.pop : ''
+        this.formDayDetail[index].tourCities.forEach((element) => {
+          result = result.concat(element) + "/";
+        });
+      
 
+      result = result.concat(this.formDayDetail[index].cityName.split(",")[0]);
+      return result;
+    },
+    changeArrayPositions(array, x, y) {
+      [array[x], array[y]] = [array[y], array[x]];
+    },
     /* GET */
     getTour() {
       this.listLoading = true;
@@ -713,7 +760,7 @@ export default {
     },
     getProviders(queryString, cb) {
       axios
-        .get(this.url + "Provider")
+        .get(this.url + "Provider/GetProviderWithCategories")
         .then((response) => {
           console.log(response.data);
           var links = response.data;
@@ -805,7 +852,6 @@ export default {
     },
     removeItemFromArr(arr, item) {
       var i = arr.indexOf(item);
-
       if (i !== -1) {
         arr.splice(i, 1);
       }
@@ -820,7 +866,6 @@ export default {
         this.handleDelete(value, true);
       });
     },
-
     /* UPDATE */
     handleUpdate(row) {
       console.log(row);
@@ -911,7 +956,6 @@ export default {
         console.log("esto", this.formDayDetail);
       }
     },
-
     changeStatus(data, status) {
       this.$confirm(
         `Do you want to ${status ? "activate " : "inactivate"} this status?`,
@@ -1017,9 +1061,16 @@ export default {
       };
     },
     handleSelectCity(item) {
-      console.log(item, this.arrayPosition);
+      console.log(item, this.arrayPosition + 1, this.formDayDetail.length);
       this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
       this.formDayDetail[this.arrayPosition].cityId = item.id;
+      if (this.arrayPosition + 1 < this.formDayDetail.length) {
+        this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
+          item.nameEnglish.split(",")[0]
+        );
+        
+      }
+      this.concatenateTitle(this.arrayPosition)
     },
     calculateDays() {
       console.log("entre a calcular");
@@ -1059,6 +1110,8 @@ export default {
             cityId: 1,
             description_english: "",
             description_spanish: "",
+            tourCities: [],
+            titleTourCities: "",
             matchable: false,
           };
           this.formDayDetail.push(day);
@@ -1093,6 +1146,8 @@ export default {
               this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
             matchable: this.editFormTourDayDescription[index]["matchable"],
             id: this.editFormTourDayDescription[index]["id"],
+            tourCities: [],
+            titleTourCities: "",
             tourDayDescriptionCities:
               this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
                 .length > 0
@@ -1163,7 +1218,6 @@ export default {
   color: #619b97;
   border-color: #619b97;
 }
-
 .el-dialog__body {
   padding: 30px 20px;
   color: #619b97;
@@ -1179,7 +1233,6 @@ export default {
   border-color: inherit;
   background-color: #619b97;
 }
-
 @media (max-width: 600px) {
   .el-dialog {
     width: 100% !important;

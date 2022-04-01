@@ -338,7 +338,7 @@ export default {
       /** FormStadium */
       formClub: {
         clubName: "",
-        stadiumId: "",
+        stadiumId: 0,
         stadiumName: "",
       },
       rules: {
