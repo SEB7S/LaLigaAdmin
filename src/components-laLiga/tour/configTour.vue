@@ -322,7 +322,11 @@
                         >
                           <el-col :span="10"
                             ><div class="grid-content">
-                              <el-tag size="medium" closable @close="deleteTourCities(counter, counter2)">
+                              <el-tag
+                                size="medium"
+                                closable
+                                @close="deleteTourCities(counter, counter2)"
+                              >
                                 {{ formDay.tourCities[counter2] }}
                               </el-tag>
                             </div>
@@ -670,7 +674,7 @@ export default {
               .catch((error) => {
                 console.error(error.response);
               });
-          }, 1000);
+          }, 2000);
         });
         this.dialogFormVisible = false;
       }
@@ -918,13 +922,15 @@ export default {
         this.formDayDetail.forEach((element, index) => {
           console.log(element);
           var dayDescription = {
+            id: element.id,
             dayNumber: index + 1,
             matchable: element.matchable,
+            tourCities: element.tourCities,
+            start_time: element.startDateFormat,
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
-            start_time: element.startDateFormat,
             tourId: this.formImageTour.idTour,
-            id: element.id,
+            cityId: element.city.idTour,
           };
           axios
             .put(this.url + "TourDayDescription", dayDescription)
@@ -1118,35 +1124,16 @@ export default {
             dayName2: days[weekDay],
             startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: this.start_date,
-            cityName:
-              this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
-                .length > 0
-                ? this.editFormTourDayDescription[index][
-                    "tourDayDescriptionCities"
-                  ][0].cityNameEnglish
-                : "",
-            cityId:
-              this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
-                .length > 0
-                ? this.editFormTourDayDescription[index][
-                    "tourDayDescriptionCities"
-                  ][0].cityId
-                : 1,
+            cityName: this.editFormTourDayDescription[index]["cityNameEnglish"],
+            cityId: this.editFormTourDayDescription[index]["cityId"],
             description_english:
               this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
             description_spanish:
               this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
             matchable: this.editFormTourDayDescription[index]["matchable"],
             id: this.editFormTourDayDescription[index]["id"],
-            tourCities: [],
-            titleTourCities: "",
-            tourDayDescriptionCities:
-              this.editFormTourDayDescription[index]["tourDayDescriptionCities"]
-                .length > 0
-                ? this.editFormTourDayDescription[index][
-                    "tourDayDescriptionCities"
-                  ][0].id
-                : 0,
+            tourCities: this.editFormTourDayDescription[index]["tourCities"].split('/'),
+            titleTourCities: this.editFormTourDayDescription[index]["tourCities"],
           };
           this.formDayDetail.push(day);
           console.log(this.formDayDetail);
