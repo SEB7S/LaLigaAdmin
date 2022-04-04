@@ -879,7 +879,6 @@ export default {
       this.editFormTourDayDescription = row.tourDayDescriptions;
       this.formImageTour.idTour = row.id;
       this.editTourDayDescription = true;
-      /*       this.start_date = Date.parse(row.tourDayDescriptions[0].startTime); */
       this.start_date = new Date(row.tourDayDescriptions[0].startTime);
       row.tourCategories.forEach((element, index) => {
         this.formTour.hotel_category[index] = element.providerCategoryId;
@@ -925,12 +924,12 @@ export default {
             id: element.id,
             dayNumber: index + 1,
             matchable: element.matchable,
-            tourCities: element.tourCities,
+            tourCities: element.titleTourCities,
             start_time: element.startDateFormat,
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
-            tourId: this.formImageTour.idTour,
-            cityId: element.city.idTour,
+            tourId: element.tourId,
+            cityId: element.cityId,
           };
           axios
             .put(this.url + "TourDayDescription", dayDescription)
@@ -1134,6 +1133,7 @@ export default {
             id: this.editFormTourDayDescription[index]["id"],
             tourCities: this.editFormTourDayDescription[index]["tourCities"].split('/'),
             titleTourCities: this.editFormTourDayDescription[index]["tourCities"],
+            tourId:this.editFormTourDayDescription[index]["tourId"],
           };
           this.formDayDetail.push(day);
           console.log(this.formDayDetail);
