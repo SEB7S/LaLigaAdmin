@@ -670,12 +670,21 @@ export default {
           setTimeout(() => {
             axios
               .post(this.url + "TourDayDescription", dayDescription)
-              .then((response) => {})
+              .then((response) => {
+                this.getTour();
+                this.$notify({
+                  title: "Success",
+                  message: "Successfully",
+                  type: "success",
+                  duration: 1000,
+                });
+              })
               .catch((error) => {
                 console.error(error.response);
               });
-          }, 2000);
+          }, 3000);
         });
+        
         this.dialogFormVisible = false;
       }
     },
@@ -884,7 +893,8 @@ export default {
         this.formTour.hotel_category[index] = element.providerCategoryId;
       });
       this.getCatProv();
-      console.log(this.start_date);
+      this.calculateDays();
+
     },
     updateData() {
       if (this.active == 0) {
