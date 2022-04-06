@@ -452,7 +452,7 @@ export default {
     resetTemp() {
       this.formClub = {
         name: "",
-        stadiumId: "",
+        stadiumId: 0,
         stadiumName: "",
       };
     },
