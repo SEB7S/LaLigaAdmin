@@ -552,6 +552,9 @@ export default {
     resetFormContinue() {
       console.log(this.formMatchRate);
       this.formMatchRate.match_price = "";
+      this.formMatchRate.stadiumCategoryId = 0;
+      this.formMatchRate.stadiumCategoryName = "";
+
       (this.stadiumCategoryId = 1), (this.stadiumCategoryName = "");
     },
     handleFetchPv(pv) {
