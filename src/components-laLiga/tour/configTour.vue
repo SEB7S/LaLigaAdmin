@@ -528,6 +528,7 @@ export default {
       editFormTourDayDescription: [],
       tourList: [],
       sCity: "",
+      aTourCategory: [],
     };
   },
   created() {
@@ -629,32 +630,27 @@ export default {
     /* POST */
     postTour() {
       if (this.active == 0) {
-        this.$refs["dataForm"].validate((valid) => {
-          var tour = {
-            name: this.formTour.name,
-            duration_in_days: this.formTour.duration_in_days,
-            status: this.formTour.status,
-            idProvider: this.formTour.idProvider,
-          };
-          if (valid) {
-            axios
-              .post(this.url + "Tour", tour)
-              .then((response) => {
-                this.editTourDayDescription = false;
-                this.formImageTour.idTour = response.data.id;
-                this.getDayDescription = response.data.tourDayDescriptions;
-                console.log(this.getDayDescription);
-                this.getTour();
-                this.postTourCategory();
-                this.calculateDays();
-                this.next();
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }
-        });
+        this.calculateDays();
+        this.next();
       } else if (this.active == 1) {
+        var tour = {
+          name: this.formTour.name,
+          duration_in_days: this.formTour.duration_in_days,
+          status: this.formTour.status,
+          idProvider: this.formTour.idProvider,
+          tourCategories: [],
+          tourDayDescriptions: [],
+        };
+
+        this.formTour.hotel_category.forEach((option) => {
+          console.log(option);
+          var tourCategory = {
+            tourId: 0,
+            providerCategoryId: option,
+          };
+          tour.tourCategories.push(tourCategory);
+        });
+
         this.formDayDetail.forEach((element, index) => {
           console.log(element);
           var dayDescription = {
@@ -667,24 +663,23 @@ export default {
             tourId: this.formImageTour.idTour,
             cityId: element.cityId,
           };
-          setTimeout(() => {
-            axios
-              .post(this.url + "TourDayDescription", dayDescription)
-              .then((response) => {
-                this.getTour();
-                this.$notify({
-                  title: "Success",
-                  message: "Successfully",
-                  type: "success",
-                  duration: 1000,
-                });
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }, 3000);
+          tour.tourDayDescriptions.push(dayDescription);
         });
-        
+
+        axios
+          .post(this.url + "Tour", tour)
+          .then((response) => {
+            this.getTour();
+            this.$notify({
+              title: "Success",
+              message: "Successfully",
+              type: "success",
+              duration: 1000,
+            });
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
         this.dialogFormVisible = false;
       }
     },
@@ -890,44 +885,29 @@ export default {
       this.editTourDayDescription = true;
       this.start_date = new Date(row.tourDayDescriptions[0].startTime);
       row.tourCategories.forEach((element, index) => {
+        console.log(element)
         this.formTour.hotel_category[index] = element.providerCategoryId;
+        this.aTourCategory[index] = element.id
+        
       });
+      console.log(this.aTourCategory)
       this.getCatProv();
       this.calculateDays();
-
     },
     updateData() {
       if (this.active == 0) {
-        this.$refs["dataForm"].validate((valid) => {
-          var tour = {
-            name: this.formTour.name,
-            duration_in_days: this.formTour.duration_in_days,
-            status: this.formTour.status,
-            idProvider: this.formTour.idProvider,
-            id: this.tourUpdate.id,
-          };
-          if (valid) {
-            axios
-              .put(this.url + "Tour", tour)
-              .then((response) => {
-                console.log("PUT");
-                this.next();
-                this.deleteTourCategory();
-                this.postTourCategory();
-                this.$notify({
-                  title: "Success",
-                  message: "Update Successfully",
-                  type: "success",
-                  duration: 2000,
-                });
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-            this.calculateDays();
-          }
-        });
+        this.next();
+        this.calculateDays();
       } else if (this.active == 1) {
+        var tour = {
+          name: this.formTour.name,
+          duration_in_days: this.formTour.duration_in_days,
+          status: this.formTour.status,
+          idProvider: this.formTour.idProvider,
+          id: this.tourUpdate.id,
+          tourCategories: [],
+          tourDayDescriptions: [],
+        };
         this.formDayDetail.forEach((element, index) => {
           console.log(element);
           var dayDescription = {
@@ -941,24 +921,27 @@ export default {
             tourId: element.tourId,
             cityId: element.cityId,
           };
-          axios
-            .put(this.url + "TourDayDescription", dayDescription)
-            .then((response) => {
-              console.log("PUT");
-              this.getTour();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-          console.log(this.formDayDetail);
-          setTimeout(() => {
-            this.putTourDayDesCity(
-              this.formDayDetail[index].id,
-              this.formDayDetail[index].cityId,
-              this.formDayDetail[index].tourDayDescriptionCities
-            );
-          }, 500);
+          tour.tourDayDescriptions.push(dayDescription);
         });
+        this.formTour.hotel_category.forEach((option,index) => {
+          console.log(option);
+          var tourCategory = {
+            tourId: this.tourUpdate.id,
+            providerCategoryId: option,
+            id: this.aTourCategory[index]
+          };
+          tour.tourCategories.push(tourCategory);
+        });
+        console.log(tour)
+        axios
+          .put(this.url + "Tour", tour)
+          .then((response) => {
+            console.log("PUT");
+            this.getTour();
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
         this.dialogFormVisible = false;
         console.log("esto", this.formDayDetail);
       }
@@ -1126,7 +1109,7 @@ export default {
           /* this.start_date = this.editFormTourDayDescription[index].startTime; */
           console.log(
             this.editFormTourDayDescription,
-            parseInt(this.formTour.duration_in_days)
+            this.editFormTourDayDescription[index]["cityNameEnglish"]
           );
           var day = {
             dayName: "Day " + (index + 1) + " - ",
@@ -1141,9 +1124,11 @@ export default {
               this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
             matchable: this.editFormTourDayDescription[index]["matchable"],
             id: this.editFormTourDayDescription[index]["id"],
-            tourCities: this.editFormTourDayDescription[index]["tourCities"].split('/'),
-            titleTourCities: this.editFormTourDayDescription[index]["tourCities"],
-            tourId:this.editFormTourDayDescription[index]["tourId"],
+            tourCities:
+              this.editFormTourDayDescription[index]["tourCities"].split("/"),
+            titleTourCities:
+              this.editFormTourDayDescription[index]["tourCities"],
+            tourId: this.editFormTourDayDescription[index]["tourId"],
           };
           this.formDayDetail.push(day);
           console.log(this.formDayDetail);
