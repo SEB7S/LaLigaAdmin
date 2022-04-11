@@ -560,18 +560,19 @@ export default {
     },
     postMatch() {
       this.$refs["formMatch"].validate((valid) => {
-        let d = this.formMatch.date.toString()
-        let e = d.split("GMT")
-        let f = e[1].split(" ")
-        let g = parseInt(f[0])
-
-        console.log(g/100)
+        /* Extrayendo GMT de la fecha */
+        let d = this.formMatch.date.toString();
+        let e = d.split("GMT");
+        let f = e[1].split(" ");
+        let g = parseInt(f[0]);
+        console.log(g);
         var match = {
           club_home_id: this.formMatch.club_home_id,
           club_guest_id: this.formMatch.club_guest_id,
           stadium_id: this.formMatch.stadium_id,
-          date: new Date(this.formMatch.date - (this.formMatch.date.getTimezoneOffset())),
+          date: this.formMatch.date,
           tournament_id: this.formMatch.tournament_id,
+          timeZone: g,
         };
         if (valid) {
           axios
@@ -718,6 +719,12 @@ export default {
     updateData() {
       this.$refs["formMatch"].validate((valid) => {
         if (valid) {
+          /* Extrayendo GMT de la fecha */
+          let d = this.formMatch.date.toString();
+          let e = d.split("GMT");
+          let f = e[1].split(" ");
+          let g = parseInt(f[0]);
+          console.log(g);
           var match = {
             id: this.matchUpdate.id,
             club_guest_id: this.formMatch.club_guest_id,
@@ -725,6 +732,7 @@ export default {
             stadium_id: this.formMatch.stadium_id,
             date: this.formMatch.date,
             tournament_id: this.formMatch.tournament_id,
+            timeZone: g,
           };
           axios
             .put(this.url + "Match", match)
@@ -866,7 +874,7 @@ export default {
   filters: {
     dateformat: function (value) {
       if (value) {
-        return moment(String(value)).format("MM/DD/YYYY hh:mm");
+        return moment(String(value)).format("MM/DD/YYYY HH:mm");
       }
     },
   },
