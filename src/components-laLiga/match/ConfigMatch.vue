@@ -560,12 +560,17 @@ export default {
     },
     postMatch() {
       this.$refs["formMatch"].validate((valid) => {
-        console.log(this.formMatch.date)
+        let d = this.formMatch.date.toString()
+        let e = d.split("GMT")
+        let f = e[1].split(" ")
+        let g = parseInt(f[0])
+
+        console.log(g/100)
         var match = {
           club_home_id: this.formMatch.club_home_id,
           club_guest_id: this.formMatch.club_guest_id,
           stadium_id: this.formMatch.stadium_id,
-          date: this.formMatch.date,
+          date: new Date(this.formMatch.date - (this.formMatch.date.getTimezoneOffset())),
           tournament_id: this.formMatch.tournament_id,
         };
         if (valid) {
