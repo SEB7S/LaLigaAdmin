@@ -265,6 +265,7 @@
             <div v-for="(formDay, counter) in formDayDetail" :key="counter">
               <div class="grid-content">
                 <el-collapse-item
+                  @focus="arrayPosition = counter"
                   :title="
                     formDay.dayName +
                     formDay.startDate +
@@ -341,16 +342,26 @@
                         >
                         </el-switch>
                       </el-form-item>
-                      <el-form-item label="Image">
+
+                      <el-form-item
+                        v-if="
+                          (formDay.cityName != '' &&
+                            dialogStatus === 'create') ||
+                          editFormTourDayDescription[counter].cityName != ''
+                        "
+                        label="Image"
+                      >
                         <el-upload
-                          :action="url + 'TourMediaContent/SendTourImage'"
+                          :action="''"
+                          :http-request="uploadFile"
                           list-type="picture-card"
                           :on-preview="handlePictureCardPreview"
                           :on-remove="handleRemove"
+                          :file-list="editFormTourDayDescription[counter].images"
                           name="UploadImage"
                           :data="formImageTour"
                         >
-                          <i class="el-icon-plus" />
+                          <i class="el-icon-plus"></i>
                         </el-upload>
                         <el-dialog :visible.sync="dialogVisible">
                           <img width="100%" :src="dialogImageUrl" alt="" />
@@ -529,6 +540,7 @@ export default {
       tourList: [],
       sCity: "",
       aTourCategory: [],
+      fileUploads: [],
     };
   },
   created() {
@@ -582,6 +594,7 @@ export default {
         hotel_category: [],
         options: [],
       };
+      this.fileUploads = [];
       this.formDayDetail = [];
     },
     handleFetchPv(pv) {
@@ -676,6 +689,8 @@ export default {
               type: "success",
               duration: 1000,
             });
+            console.log(response.data.tourDayDescriptions);
+            this.postImageTour(response.data.tourDayDescriptions);
           })
           .catch((error) => {
             console.error(error.response);
@@ -683,21 +698,27 @@ export default {
         this.dialogFormVisible = false;
       }
     },
-    postTourCategory() {
-      console.log(this.formTour);
-      this.formTour.hotel_category.forEach((option) => {
-        var tourCategory = {
-          tourId: this.formImageTour.idTour,
-          providerCategoryId: option,
-        };
-        axios
-          .post(this.url + "TourCategory", tourCategory)
-          .then((response) => {
-            console.log(this.formTour.options);
-          })
-          .catch((error) => {
-            console.error(error.response);
-          });
+    postImageTour(dayDescription) {
+      this.formDayDetail.forEach((day, index) => {
+        console.log(day);
+        day.images.forEach((img) => {
+          var formData = new FormData();
+          formData.append("UploadImage", img.file);
+          formData.append("MediaContentType", 0);
+          formData.append("IdTourDay", dayDescription[index].id);
+          axios
+            .post(this.url + "TourDayMediaContent/SendTourDay", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            })
+            .then((response) => {
+              console.log(this.formTour.options);
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        });
       });
     },
     addTourCities(index) {
@@ -885,12 +906,14 @@ export default {
       this.editTourDayDescription = true;
       this.start_date = new Date(row.tourDayDescriptions[0].startTime);
       row.tourCategories.forEach((element, index) => {
-        console.log(element)
+        console.log(element);
         this.formTour.hotel_category[index] = element.providerCategoryId;
-        this.aTourCategory[index] = element.id
-        
+        this.aTourCategory[index] = element.id;
       });
-      console.log(this.aTourCategory)
+      this.editFormTourDayDescription.forEach((element, index) => {
+        this.getImageByIdDay(element);
+      });
+      console.log(this.aTourCategory, this.formDayDetail);
       this.getCatProv();
       this.calculateDays();
     },
@@ -923,16 +946,16 @@ export default {
           };
           tour.tourDayDescriptions.push(dayDescription);
         });
-        this.formTour.hotel_category.forEach((option,index) => {
+        this.formTour.hotel_category.forEach((option, index) => {
           console.log(option);
           var tourCategory = {
             tourId: this.tourUpdate.id,
             providerCategoryId: option,
-            id: this.aTourCategory[index]
+            id: this.aTourCategory[index],
           };
           tour.tourCategories.push(tourCategory);
         });
-        console.log(tour)
+        console.log(tour);
         axios
           .put(this.url + "Tour", tour)
           .then((response) => {
@@ -990,21 +1013,36 @@ export default {
     /** Images */
     handleRemove(file, fileList) {
       console.log(file, fileList);
-      var tour = {
-        id: this.formImageTour.idTour,
-      };
-      axios
-        .delete(this.url + "TourMediaImage/DeleteTourMedia", tour)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
+      if (this.dialogStatus == "update") {
+        axios
+          .delete(this.url + "TourDayMediaImage/DeleteTourDayMedia?id=" + file.id)
+          .then((response) => {
+            this.$notify({
+              title: "Success",
+              message: "Delete Successfully",
+              type: "success",
+              duration: 2000,
+            });
+          })
+          .catch((error) => {
+            console.error(error.response);
           });
+      }
+    },
+    uploadFile(file) {
+      console.log(this.formDayDetail);
+      this.formDayDetail[this.arrayPosition].images.push(file);
+    },
+    getImageByIdDay(day) {
+      console.log(day);
+      axios
+        .get(this.url + "TourDayMediaImage/GetAllByTourDay?tourday=" + day.id)
+        .then((response) => {
+          console.log(response.data);
+          day.images = response.data;
         })
         .catch((error) => {
-          console.error(error.response);
+          this.status = "error";
         });
     },
     handlePictureCardPreview(file) {
@@ -1020,6 +1058,7 @@ export default {
       if (!isLt2M) {
         this.$message.error("La imagen excede los 2MB!");
       }
+
       return isJPG && isLt2M;
     },
     handleChange(val) {
@@ -1103,6 +1142,7 @@ export default {
             tourCities: [],
             titleTourCities: "",
             matchable: false,
+            images: [],
           };
           this.formDayDetail.push(day);
         } else {
@@ -1129,6 +1169,7 @@ export default {
             titleTourCities:
               this.editFormTourDayDescription[index]["tourCities"],
             tourId: this.editFormTourDayDescription[index]["tourId"],
+            images: [],
           };
           this.formDayDetail.push(day);
           console.log(this.formDayDetail);
