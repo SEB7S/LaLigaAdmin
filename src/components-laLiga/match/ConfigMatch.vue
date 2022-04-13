@@ -719,7 +719,7 @@ export default {
     updateData() {
       this.$refs["formMatch"].validate((valid) => {
         if (valid) {
-          console.log(this.formMatch.date)
+          console.log(this.formMatch.date);
           /* Extrayendo GMT de la fecha */
           let d = this.formMatch.date.toString();
           let e = d.split("GMT");
@@ -862,11 +862,10 @@ export default {
       if (this.list.length > 0) {
         return this.list.filter((item) => {
           return (
-            /*          item.name.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.document.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.phone.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.email.toLowerCase().includes(this.search.toLowerCase()) || */
-            item
+            item.clubGuest.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.clubHome.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.tournamentName.toLowerCase().includes(this.search.toLowerCase()) ||
+            item.stadiumName.toLowerCase().includes(this.search.toLowerCase()) 
           );
         });
       }
