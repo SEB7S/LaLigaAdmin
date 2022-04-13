@@ -714,11 +714,12 @@ export default {
       this.formMatch.stadiumName = row.stadiumName;
       this.formMatch.tournamentName = row.tournamentName;
       this.formMatch.tournament_id = row.tournament_id;
-      this.formMatch.date = row.date;
+      this.formMatch.date = new Date(row.date);
     },
     updateData() {
       this.$refs["formMatch"].validate((valid) => {
         if (valid) {
+          console.log(this.formMatch.date)
           /* Extrayendo GMT de la fecha */
           let d = this.formMatch.date.toString();
           let e = d.split("GMT");
