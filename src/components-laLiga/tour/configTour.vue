@@ -346,8 +346,8 @@
                       <el-form-item
                         v-if="
                           (formDay.cityName != '' &&
-                            dialogStatus === 'create') ||
-                          editFormTourDayDescription[counter].cityName != ''
+                            dialogStatus === 'create') 
+                          || (editFormTourDayDescription.length > 0 && editFormTourDayDescription[counter].cityName != '')
                         "
                         label="Image"
                       >
@@ -357,7 +357,7 @@
                           list-type="picture-card"
                           :on-preview="handlePictureCardPreview"
                           :on-remove="handleRemove"
-                          :file-list="editFormTourDayDescription[counter].images"
+                          :file-list="editFormTourDayDescription.length > 0 ? editFormTourDayDescription[counter].images : []"
                           name="UploadImage"
                           :data="formImageTour"
                         >

@@ -17,6 +17,11 @@ const hotelRouter = {
       component: () => import('@/components-laLiga/hotel/configHotel'),
       name: 'Manage Hotel',
       meta: { title: 'manageHotel' }
+    }, {
+      path: 'manageRoom',
+      component: () => import('@/components-laLiga/hotel/roomType'),
+      name: 'Manage RoomType',
+      meta: { title: 'manageRoom' }
     },
   ]
 }

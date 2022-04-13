@@ -77,7 +77,7 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
-      empty-text="sss"
+
     >
       <el-table-column
         v-if="showReviewer"
