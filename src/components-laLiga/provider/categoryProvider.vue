@@ -437,7 +437,7 @@ export default {
             id: this.categoryUpdate.id,
             providerCategoryName: this.formCategory.categoryName,
             providerId: this.formCategory.providerId,
-            happyTourCategoryId: this.formCategory.happyTourCategoryId
+            happyTourCategoryId: this.formCategory.HTCategoryId
           };
           axios
             .put(this.url + "ProviderCategories", category)

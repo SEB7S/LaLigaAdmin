@@ -346,8 +346,9 @@
                       <el-form-item
                         v-if="
                           (formDay.cityName != '' &&
-                            dialogStatus === 'create') 
-                          || (editFormTourDayDescription.length > 0 && editFormTourDayDescription[counter].cityName != '')
+                            dialogStatus === 'create') ||
+                          (editFormTourDayDescription.length > 0 &&
+                            editFormTourDayDescription[counter].cityName != '')
                         "
                         label="Image"
                       >
@@ -357,7 +358,11 @@
                           list-type="picture-card"
                           :on-preview="handlePictureCardPreview"
                           :on-remove="handleRemove"
-                          :file-list="editFormTourDayDescription.length > 0 ? editFormTourDayDescription[counter].images : []"
+                          :file-list="
+                            editFormTourDayDescription.length > 0
+                              ? editFormTourDayDescription[counter].images
+                              : []
+                          "
                           name="UploadImage"
                           :data="formImageTour"
                         >
@@ -670,7 +675,7 @@ export default {
             dayNumber: index + 1,
             tourCities: element.titleTourCities,
             matchable: element.matchable,
-            startTime: element.startDateFormat,
+            startTime: new Date(element.startDateFormat),
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
             tourId: this.formImageTour.idTour,
@@ -678,7 +683,7 @@ export default {
           };
           tour.tourDayDescriptions.push(dayDescription);
         });
-
+        console.log(tour);
         axios
           .post(this.url + "Tour", tour)
           .then((response) => {
@@ -938,7 +943,7 @@ export default {
             dayNumber: index + 1,
             matchable: element.matchable,
             tourCities: element.titleTourCities,
-            start_time: element.startDateFormat,
+            startTime: new Date(this.start_date),
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
             tourId: element.tourId,
@@ -1015,7 +1020,9 @@ export default {
       console.log(file, fileList);
       if (this.dialogStatus == "update") {
         axios
-          .delete(this.url + "TourDayMediaImage/DeleteTourDayMedia?id=" + file.id)
+          .delete(
+            this.url + "TourDayMediaImage/DeleteTourDayMedia?id=" + file.id
+          )
           .then((response) => {
             this.$notify({
               title: "Success",
@@ -1113,7 +1120,7 @@ export default {
         "Saturday",
       ];
       console.log(this.start_date);
-      const copyStartDate = this.start_date;
+      const copyStartDate = new Date(this.start_date);
       this.formDayDetail = [];
       var weekDay = 0;
       var countDays = 0;
@@ -1134,7 +1141,7 @@ export default {
             dayName: "Day " + (index + 1) + " - ",
             dayName2: days[weekDay],
             startDate: this.addDate(index, dateFormat) + " - ",
-            startDateFormat: this.start_date,
+            startDateFormat: new Date(this.start_date),
             cityName: "",
             cityId: 1,
             description_english: "",
@@ -1155,7 +1162,7 @@ export default {
             dayName: "Day " + (index + 1) + " - ",
             dayName2: days[weekDay],
             startDate: this.addDate(index, dateFormat) + " - ",
-            startDateFormat: this.start_date,
+            startDateFormat: new Date(this.start_date),
             cityName: this.editFormTourDayDescription[index]["cityNameEnglish"],
             cityId: this.editFormTourDayDescription[index]["cityId"],
             description_english:
