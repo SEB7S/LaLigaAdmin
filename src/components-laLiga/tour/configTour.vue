@@ -361,7 +361,7 @@
                           :file-list="
                             editFormTourDayDescription.length > 0
                               ? editFormTourDayDescription[counter].images
-                              : []
+                              : formDay.images
                           "
                           name="UploadImage"
                           :data="formImageTour"
