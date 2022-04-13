@@ -552,10 +552,11 @@ export default {
       console.log(ev);
     },
     postCity() {
+      console.log(this.formCity, this.formCity.city_nameEs === '')
       this.$refs["formCity"].validate((valid) => {
         var city = {
           cityNameEnglish: this.cities.city + ", " + this.cities.country,
-          cityNameEspanish: "sin definir",
+          cityNameEspanish: this.formCity.city_nameEs === '' ? "sin definir" : this.formCity.city_nameEs,
           latitude: this.cities.latitude.toString(),
           longitude: this.cities.longitude.toString(),
         };
