@@ -409,55 +409,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.formCategory = {
-        categoryName: "",
-        providerId: 0,
-        providerName: "",
-        HTCategoryName: "",
-        HTCategoryId: 0
-      };
-    },
-    handleUpdate(row) {
-      console.log(row);
-      this.categoryUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formCategory.categoryName = row.name;
-      this.formCategory.providerName = row.providerName;
-      this.formCategory.providerId = row.providerId;
-      this.formCategory.HTCategoryName = row.happyTourCategoryName;
-      this.formCategory.HTCategoryId = row.happyTourCategoryId;
-
-    },
-    updateData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          var category = {
-            id: this.categoryUpdate.id,
-            providerCategoryName: this.formCategory.categoryName,
-            providerId: this.formCategory.providerId,
-            happyTourCategoryId: this.formCategory.HTCategoryId
-          };
-          axios
-            .put(this.url + "ProviderCategories", category)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getCategory();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -494,6 +445,16 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    /* CATEGORY PROVIDERS */
+    resetTemp() {
+      this.formCategory = {
+        categoryName: "",
+        providerId: 0,
+        providerName: "",
+        HTCategoryName: "",
+        HTCategoryId: 0,
+      };
+    },
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
@@ -504,9 +465,22 @@ export default {
         var category = {
           providerCategoryName: this.formCategory.categoryName,
           providerId: this.formCategory.providerId,
-          happyTourCategoryId: this.formCategory.HTCategoryId
+          happyTourCategoryId: this.formCategory.HTCategoryId,
         };
-        if (valid) {
+/*         let duplicate = function () {
+          this.list.forEach((element) => {
+            if (
+              element.happyTourCategoryId == category.happyTourCategoryId &&
+              element.providerId == category.providerId
+            ) {
+              console.log("cumple");
+              return true;
+            }
+          });
+        }; */
+        let duplicate = this.list.findIndex(function (element) { return element.happyTourCategoryId == category.happyTourCategoryId && element.providerId == category.providerId })
+        console.log(duplicate)
+        if (valid && duplicate == -1) {
           axios
             .post(this.url + "ProviderCategories", category)
             .then((response) => {
@@ -522,6 +496,13 @@ export default {
             .catch((error) => {
               console.error(error.response);
             });
+        } else {
+          this.$notify({
+            title: "Success",
+            message: "provider duplicate",
+            type: "error",
+            duration: 2000,
+          });
         }
       });
     },
@@ -538,6 +519,58 @@ export default {
           this.status = "error";
         });
     },
+    handleUpdate(row) {
+      console.log(row);
+      this.categoryUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formCategory.categoryName = row.name;
+      this.formCategory.providerName = row.providerName;
+      this.formCategory.providerId = row.providerId;
+      this.formCategory.HTCategoryName = row.happyTourCategoryName;
+      this.formCategory.HTCategoryId = row.happyTourCategoryId;
+    },
+    updateData() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          var category = {
+            id: this.categoryUpdate.id,
+            providerCategoryName: this.formCategory.categoryName,
+            providerId: this.formCategory.providerId,
+            happyTourCategoryId: this.formCategory.HTCategoryId,
+          };
+          axios
+            .put(this.url + "ProviderCategories", category)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
+
+              this.getCategory();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    validateDuplicateProv(providerId, happyTourCategoryId) {
+      console.log(providerId, happyTourCategoryId);
+      this.list.forEach((element) => {
+        if (
+          element.happyTourCategoryId == happyTourCategoryId &&
+          element.providerId == providerId
+        ) {
+          console.log("cumple");
+          return true;
+        }
+      });
+    },
+    /* DELETE */
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -633,6 +666,7 @@ export default {
           });
         });
     },
+    /* CITY */
     getCities(queryString, cb) {
       axios
         .get(this.url + "City")
@@ -671,6 +705,7 @@ export default {
         })
         .catch((_) => {});
     },
+    /* PROVIDERS */
     getProviders(queryString, cb) {
       axios
         .get(this.url + "Provider")
@@ -696,6 +731,7 @@ export default {
       this.formCategory.providerName = item.name;
       this.formCategory.providerId = item.id;
     },
+    /*  CATEGORY PROVIDER */
     getHTCategory(queryString, cb) {
       axios
         .get(this.url + "HappyTourCategories")
@@ -714,7 +750,10 @@ export default {
     },
     createFilterHTCategory(queryString) {
       return (link) => {
-        return link.categoryName.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return (
+          link.categoryName.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
       };
     },
     handleSelectHTCategory(item) {
@@ -722,14 +761,13 @@ export default {
       this.formCategory.HTCategoryId = item.id;
     },
   },
+  /* FILTER */
   computed: {
     providerList() {
       if (this.list) {
         return this.list.filter((item) => {
           return (
-            item.name
-              .toLowerCase()
-              .includes(this.search.toLowerCase()) ||
+            item.name.toLowerCase().includes(this.search.toLowerCase()) ||
             item.happyTourCategoryName
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
