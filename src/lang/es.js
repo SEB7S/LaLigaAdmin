@@ -144,7 +144,8 @@ export default {
     nameEnglish: 'Nombre en Inglés',
     nameEspanish: "Nombre en Español",
     priority: 'Prioridad',
-    stadiumId: 'Estadio'
+    stadiumId: 'Estadio',
+    categoryStadium: 'Categoría'
   },
   user: {
     nameUser: 'Usuario',

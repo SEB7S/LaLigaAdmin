@@ -77,7 +77,6 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
-
     >
       <el-table-column
         v-if="showReviewer"
@@ -221,9 +220,9 @@
       :before-close="handleClose"
     >
       <el-steps :active="active" align-center finish-status="success">
-        <el-step title="General Data"></el-step>
+        <el-step title="General Data"></el-step
+        ><el-step title="Room Type"></el-step>
         <el-step title="Image / Description"></el-step>
-        <el-step title="Room Type"></el-step>
       </el-steps>
       <div v-if="active == 0">
         <el-form
@@ -280,7 +279,7 @@
               :fetch-suggestions="getCities"
               placeholder="Please input"
               style="width: 100%"
-              @select="handleSelect"
+              @select="handleSelectCity"
             >
               <i
                 slot="suffix"
@@ -295,6 +294,78 @@
         </el-form>
       </div>
       <div v-if="active == 1">
+        <el-form
+          ref="formRoomType"
+          :rules="rules"
+          style="margin-top: 30px; display: flex; justify-content: center"
+          label-position="top"
+        >
+          <div>
+            <el-row
+              :gutter="20"
+              v-for="(room, counter) in formRoomType"
+              v-bind:key="counter"
+            >
+              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
+                ><div class="grid-content">
+                  <el-form-item>
+                    <el-autocomplete
+                      v-model="room.nameEnglish"
+                      popper-class="my-autocomplete"
+                      :fetch-suggestions="getRoomType"
+                      placeholder="Name En"
+                      style="width: 100%"
+                      @select="handleSelect"
+                      @focus="arrayPosition = counter"
+                    >
+                      <i
+                        slot="suffix"
+                        class="el-icon-edit el-input__icon"
+                        @click="handleIconClick"
+                      />
+                      <template slot-scope="{ item }">
+                        <div class="value">{{ item.nameEnglish }}</div>
+                      </template>
+                    </el-autocomplete>
+                  </el-form-item>
+                </div></el-col
+              >
+              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
+                ><div class="grid-content">
+                  <el-form-item>
+                    <el-input
+                      v-model="room.nameEspanish"
+                      placeholder="Name Es"
+                      disabled
+                    />
+                  </el-form-item></div
+              ></el-col>
+              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
+                ><div class="grid-content">
+                  <el-form-item>
+                    <el-input
+                      v-model="room.maxPax"
+                      disabled
+                      placeholder="Max Pax"
+                    />
+                  </el-form-item></div
+              ></el-col>
+              <el-col :span="6" :xs="24" :sm="24" :md="3" :lg="3" :xl="3"
+                ><div class="grid-content bg-purple">
+                  <el-form-item>
+                    <el-button
+                      type="danger"
+                      @click="deleteRoom(counter)"
+                      icon="el-icon-delete"
+                    ></el-button>
+                  </el-form-item></div
+              ></el-col>
+            </el-row>
+          </div>
+        </el-form>
+        <el-button type="primary" @click="addRoom">+</el-button>
+      </div>
+      <div v-if="active == 2">
         <el-form
           ref="formHotel"
           label-position="top"
@@ -332,58 +403,7 @@
           <img width="100%" :src="dialogImageUrl" alt="" />
         </el-dialog>
       </div>
-      <div v-if="active == 2">
-        <el-form
-          ref="formRoomType"
-          :rules="rules"
-          style="margin-top: 30px; display: flex; justify-content: center"
-          label-position="top"
-        >
-          <div>
-            <el-row
-              :gutter="20"
-              v-for="(room, counter) in formRoomType"
-              v-bind:key="counter"
-            >
-              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
-                ><div class="grid-content">
-                  <el-form-item>
-                    <el-input
-                      v-model="room.nameEnglish"
-                      placeholder="Name En"
-                    />
-                  </el-form-item></div
-              ></el-col>
-              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
-                ><div class="grid-content">
-                  <el-form-item>
-                    <el-input
-                      v-model="room.nameEspanish"
-                      placeholder="Name Es"
-                    />
-                  </el-form-item></div
-              ></el-col>
-              <el-col :span="6" :xs="24" :sm="24" :md="7" :lg="7" :xl="7"
-                ><div class="grid-content">
-                  <el-form-item>
-                    <el-input v-model="room.maxPax" placeholder="Max Pax" />
-                  </el-form-item></div
-              ></el-col>
-              <el-col :span="6" :xs="24" :sm="24" :md="3" :lg="3" :xl="3"
-                ><div class="grid-content bg-purple">
-                  <el-form-item>
-                    <el-button
-                      type="danger"
-                      @click="deleteRoom(counter)"
-                      icon="el-icon-delete"
-                    ></el-button>
-                  </el-form-item></div
-              ></el-col>
-            </el-row>
-          </div>
-        </el-form>
-        <el-button type="primary" @click="addRoom">+</el-button>
-      </div>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
@@ -608,10 +628,13 @@ export default {
       roomType: {},
       fileList: [],
       hotelList: [],
+      arrayPosition: 0,
+      roomTypeDefault:[]
     };
   },
   created() {
     this.getHotel();
+    this.getRoomType();
   },
   methods: {
     getList() {
@@ -665,12 +688,13 @@ export default {
       };
       this.city_name = "";
       this.fileList = [];
+      console.log(this.roomTypeDefault)
       this.formRoomType = [
         {
-          id: "",
-          nameEspanish: "",
-          nameEnglish: "",
-          maxPax: 0,
+          id: this.roomTypeDefault[0].id,
+          nameEspanish: this.roomTypeDefault[0].nameEnglish,
+          nameEnglish: this.roomTypeDefault[0].nameEspanish,
+          maxPax: this.roomTypeDefault[0].maxPax,
         },
       ];
       this.active = 0;
@@ -678,7 +702,6 @@ export default {
     handleUpdate(row) {
       this.resetTemp();
       this.getImageByIdHotel(row);
-      this.getRoomTypeById(row);
       this.hotelUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
@@ -692,83 +715,68 @@ export default {
       this.formHotel.providerCategoryName = row.providerCategoryName;
       this.formHotel.providerCategoryId = row.providerCategoryId;
       this.formImageHotel.idHotel = row.id;
+      this.getRoomTypeById();
+      console.log(this.formRoomType);
     },
     updateData() {
       if (this.active == 0) {
         this.$refs["formHotel"].validate((valid) => {
-          if (valid) {
-            console.log(this.formHotel);
-            var hotel = {
-              id: this.hotelUpdate.id,
-              cityId: this.formHotel.cityId,
-              nameEnglish: this.formHotel.nameEnglish,
-              nameSpanish: this.formHotel.nameSpanish,
-              categoryId: this.formHotel.categoryId,
-              providerId: this.formHotel.providerId,
-              providerCategoryId: this.formHotel.providerCategoryId,
-              statusActive: this.formHotel.statusActive,
-            };
-            axios
-              .put(this.url + "Hotel", hotel)
-              .then((response) => {
-                this.next();
-                this.$notify({
-                  title: "Success",
-                  message: "Update Successfully",
-                  type: "success",
-                  duration: 2000,
-                });
-
-                this.getHotel();
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }
+          this.next();
         });
       } else if (this.active == 1) {
-        this.next();
-        console.log(this.active);
-      } else if (this.active == 2) {
+        var hotel = {
+          id: this.hotelUpdate.id,
+          cityId: this.formHotel.cityId,
+          nameEnglish: this.formHotel.nameEnglish,
+          nameSpanish: this.formHotel.nameSpanish,
+          categoryId: this.formHotel.categoryId,
+          providerId: this.formHotel.providerId,
+          providerCategoryId: this.formHotel.providerCategoryId,
+          statusActive: this.formHotel.statusActive,
+          hotelRoomTypes: [],
+        };
+        console.log(this.formRoomType);
         this.formRoomType.forEach((element, index) => {
           var roomType = {
-            id: element.id,
-            nameEspanish: element.nameEspanish,
-            nameEnglish: element.nameEnglish,
-            maxPax: element.maxPax,
-            hotelId: element.hotelId,
+            id: element.oldId,
+            hotelId: 0,
+            roomTypeId: element.id,
           };
-          axios
-            .put(this.url + "RoomType", roomType)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.next();
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getHotel();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
+          hotel.hotelRoomTypes.push(roomType);
           console.log(this.formRoomType);
         });
+        axios
+          .put(this.url + "Hotel", hotel)
+          .then((response) => {
+            this.$notify({
+              title: "Success",
+              message: "Update Successfully",
+              type: "success",
+              duration: 2000,
+            });
+
+            this.getHotel();
+            this.next();
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+        console.log(this.active);
+      } else if (this.active == 2) {
       }
     },
-    getRoomTypeById(hotel) {
-      axios
-        .get(this.url + "Hotel/GetHotelById?id=" + hotel.id)
-        .then((response) => {
-          console.log(response.data[0].hotelRoomTypes);
-          this.formRoomType = response.data[0].hotelRoomTypes;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
+    getRoomTypeById() {
+      this.formRoomType = [];
+      this.hotelUpdate.hotelRoomTypes.forEach((element) => {
+        var room = {
+          id: element.id,
+          nameEspanish: element.roomtypeEnglish,
+          nameEnglish: element.roomtypeSpanish,
+          maxPax: element.maxPax,
+          oldId: element.roomTypeId,
+        };
+        this.formRoomType.push(room);
+      });
     },
     getImageByIdHotel(hotel) {
       axios
@@ -826,65 +834,45 @@ export default {
     postHotel() {
       if (this.active == 0) {
         this.$refs["formHotel"].validate((valid) => {
-          var hotel = {
-            nameEnglish: this.formHotel.nameEnglish,
-            nameSpanish: this.formHotel.nameSpanish,
-            cityId: this.formHotel.cityId,
-            providerCategoryId: this.formHotel.providerCategoryId,
-            statusActive: this.formHotel.statusActive,
-          };
-          if (valid) {
-            axios
-              .post(this.url + "Hotel", hotel)
-              .then((response) => {
-                this.formImageHotel.idHotel = response.data.id;
-                console.log(response);
-
-                this.next();
-                this.$notify({
-                  title: "Success",
-                  message: "Hotel Agregado con éxito",
-                  type: "success",
-                  duration: 2000,
-                });
-                this.getHotel();
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }
+          this.next();
         });
       } else if (this.active == 1) {
-        this.next();
-      } else if (this.active == 2) {
+        var hotel = {
+          nameEnglish: this.formHotel.nameEnglish,
+          nameSpanish: this.formHotel.nameSpanish,
+          cityId: this.formHotel.cityId,
+          providerCategoryId: this.formHotel.providerCategoryId,
+          statusActive: this.formHotel.statusActive,
+          hotelRoomTypes: [],
+        };
         this.formRoomType.forEach((element, index) => {
           var roomType = {
-            nameEnglish: element.nameEnglish,
-            nameEspanish: element.nameEspanish,
-            maxPax: parseInt(element.maxPax),
-            /* hotelId: this.formImageHotel.idHotel, */
-            hotelId: this.formImageHotel.idHotel,
+            hotelId: 0,
+            roomTypeId: element.id,
           };
-          axios
-            .post(this.url + "RoomType", roomType)
-            .then((response) => {
-              console.log(response);
-              element.id = response.data.id;
-              this.active = 0;
-              this.dialogFormVisible = false;
-              /*    this.dialogFormVisible = false; */
-              this.$notify({
-                title: "Success",
-                message: "Room Agregado con éxito",
-                type: "success",
-                duration: 2000,
-              });
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-          console.log(this.formRoomType);
+          hotel.hotelRoomTypes.push(roomType);
+          console.log(hotel);
         });
+
+        axios
+          .post(this.url + "Hotel", hotel)
+          .then((response) => {
+            this.formImageHotel.idHotel = response.data.id;
+            console.log(response);
+
+            this.$notify({
+              title: "Success",
+              message: "Hotel Agregado con éxito",
+              type: "success",
+              duration: 2000,
+            });
+            this.getHotel();
+            this.next();
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+      } else if (this.active == 2) {
       }
     },
     getHotel() {
@@ -1010,7 +998,7 @@ export default {
           this.status = "error";
         });
     },
-    handleSelect(item) {
+    handleSelectCity(item) {
       console.log(item);
       this.formHotel.city_name = item.nameEnglish;
       this.formHotel.cityId = item.id;
@@ -1157,6 +1145,38 @@ export default {
           done();
         })
         .catch((_) => {});
+    },
+    /* ROOMTYPES */
+    getRoomType(queryString, cb) {
+      axios
+        .get(this.url + "RoomType")
+        .then((response) => {
+          console.log(response.data);
+          response.data.forEach(element => {
+            if(element.maxPax == 2){
+              console.log(element, element.maxPax == 2)
+              this.roomTypeDefault[0] = element
+            }
+          });
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    handleSelect(item) {
+      console.log(item);
+      this.formRoomType[this.arrayPosition].nameEnglish = item.nameEnglish;
+      this.formRoomType[this.arrayPosition].id = item.id;
+      this.formRoomType[this.arrayPosition].nameEspanish = item.nameEspanish;
+      this.formRoomType[this.arrayPosition].maxPax = item.maxPax;
+    },
+    handleIconClick(ev) {
+      console.log(ev);
     },
   },
   computed: {

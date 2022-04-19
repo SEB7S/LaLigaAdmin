@@ -1119,6 +1119,7 @@ export default {
         "Friday",
         "Saturday",
       ];
+
       console.log(this.start_date);
       const copyStartDate = new Date(this.start_date);
       this.formDayDetail = [];
@@ -1185,6 +1186,20 @@ export default {
       }
     },
     addDate(d, fecha) {
+      var months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
       var Fecha = new Date();
       var sFecha =
         fecha ||
@@ -1199,11 +1214,12 @@ export default {
       fecha = new Date(fecha);
       fecha.setDate(fecha.getDate() + parseInt(d));
       var anno = fecha.getFullYear();
-      var mes = fecha.getMonth() + 1;
+      var mes = months[fecha.getMonth()];
       var dia = fecha.getDate();
       mes = mes < 10 ? "0" + mes : mes;
       dia = dia < 10 ? "0" + dia : dia;
       var fechaFinal = dia + sep + mes + sep + anno;
+      console.log(fechaFinal)
       return fechaFinal;
     },
     handleClose(done) {

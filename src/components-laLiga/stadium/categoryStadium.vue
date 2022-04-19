@@ -137,7 +137,7 @@
           <span>{{ row.priorityOrder }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column
+<!--       <el-table-column
         :label="$t('stadium.stadiumId')"
         min-width="100px"
         align="center"
@@ -145,7 +145,7 @@
         <template slot-scope="{ row }">
           <span>{{ row.stadiumName }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         :label="$t('table.actions')"
         align="center"
@@ -200,7 +200,7 @@
         <!--         <el-form-item :label="$t('stadium.priority')">
           <el-input v-model="formCategory.priorityOrder" type="number" />
         </el-form-item> -->
-        <el-form-item :label="$t('stadium.stadiumId')" prop="stadiumId">
+<!--         <el-form-item :label="$t('stadium.stadiumId')" prop="stadiumId">
           <el-autocomplete
             v-model="formCategory.stadiumName"
             popper-class="my-autocomplete"
@@ -218,7 +218,7 @@
               <div class="value">{{ item.name }}</div>
             </template>
           </el-autocomplete>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -362,8 +362,7 @@ export default {
       formCategory: {
         nameEnglish: "",
         nameEspanish: "",
-        priorityOrder: 0,
-        stadiumId: "",
+        stadiumId: 0,
         stadiumName: "",
       },
       hotelUpdate: [],
@@ -417,8 +416,7 @@ export default {
       this.formCategory = {
         nameEnglish: "",
         nameEspanish: "",
-        priorityOrder: 0,
-        stadiumId: "",
+        stadiumId: 0,
         stadiumName: "",
       }
     },
@@ -508,7 +506,6 @@ export default {
         var category = {
           nameEnglish: this.formCategory.nameEnglish,
           nameEspanish: this.formCategory.nameEspanish,
-          priority: this.formCategory.priorityOrder,
           stadiumId: this.formCategory.stadiumId,
         };
         if (valid) {

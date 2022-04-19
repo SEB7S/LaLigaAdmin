@@ -223,6 +223,22 @@
               </template>
             </el-autocomplete>
           </el-form-item>
+          <el-form-item :label="$t('stadium.categoryStadium')">
+            <el-select
+              v-model="formStadium.categoryStadium"
+              multiple
+              placeholder="Select"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="item in formStadium.options"
+                :key="item.id"
+                :label="item.nameEnglish"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-form>
       </div>
       <div v-if="active == 1">
@@ -383,8 +399,12 @@ export default {
         longitude: "",
         cityId: "",
         city_name: "",
+        categoryStadium: [],
+        options: [],
       },
       stadiumUpdate: [],
+      /* for update form */
+      categoryStadiumUpdate: [],
       search: "",
       active: 0,
       formImageStadium: {
@@ -494,64 +514,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      (this.formStadium = {
-        name: "",
-        latitude: "",
-        longitude: "",
-        cityId: "",
-        city_name: "",
-      }),
-        (this.city_name = "");
-      this.fileList = [];
-    },
-    handleUpdate(row) {
-      this.getImageByIdStadium(row);
-      console.log(row);
-      this.active = 0;
-      this.stadiumUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formStadium.name = row.name;
-      this.formStadium.latitude = row.latitude;
-      this.formStadium.longitude = row.longitude;
-      this.formStadium.city_name = row.cityName;
-      this.formStadium.cityId = row.cityId;
-      this.formImageStadium.idStadium = row.id;
-    },
-    updateData() {
-      if (this.active == 0) {
-        this.$refs["formStadium"].validate((valid) => {
-          if (valid) {
-            var stadium = {
-              id: this.stadiumUpdate.id,
-              cityId: this.formStadium.cityId,
-              name: this.formStadium.name,
-              latitude: this.formStadium.latitude,
-              longitude: this.formStadium.longitude,
-            };
-            axios
-              .put(this.url + "Stadium", stadium)
-              .then((response) => {
-                this.next();
-                this.$notify({
-                  title: "Success",
-                  message: "Update Successfully",
-                  type: "success",
-                  duration: 2000,
-                });
-
-                this.getStadium();
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }
-        });
-      } else if (this.active == 1) {
-        this.dialogFormVisible = false;
-      }
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -594,6 +556,24 @@ export default {
       this.dialogFormVisible = true;
       this.active = 0;
     },
+    resetTemp() {
+      (this.formStadium = {
+        name: "",
+        latitude: "",
+        longitude: "",
+        cityId: "",
+        city_name: "",
+        categoryStadium: [],
+        options: [],
+      }),
+        (this.city_name = "");
+      this.fileList = [];
+      this.categoryStadiumUpdate = [];
+      this.getCategoryStadium();
+    },
+    /* STADIUM */
+
+    /* POST */
     postStadium() {
       if (this.active == 0) {
         this.$refs["formStadium"].validate((valid) => {
@@ -602,7 +582,15 @@ export default {
             latitude: this.formStadium.latitude,
             longitude: this.formStadium.longitude,
             cityId: this.formStadium.cityId,
+            stadiumStadiumCategories: [],
           };
+          this.formStadium.categoryStadium.forEach((element) => {
+            console.log(element);
+            stadium.stadiumStadiumCategories.push({
+              stadiumId: 0,
+              stadiumCategoryId: element,
+            });
+          });
           if (valid) {
             axios
               .post(this.url + "Stadium", stadium)
@@ -626,6 +614,7 @@ export default {
         this.dialogFormVisible = false;
       }
     },
+    /* GET */
     getStadium() {
       this.listLoading = true;
       axios
@@ -640,6 +629,18 @@ export default {
           this.status = "error";
         });
     },
+    getCategoryStadium() {
+      axios
+        .get(this.url + "StadiumCategory")
+        .then((response) => {
+          this.formStadium.options = response.data;
+          console.log(this.formStadium);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    /* DELETE */
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -683,7 +684,6 @@ export default {
           });
         });
     },
-
     isSelected(arr, select) {
       console.log(select);
       if (select) {
@@ -736,6 +736,80 @@ export default {
           });
         });
     },
+    /* UPDATE */
+    handleUpdate(row) {
+      this.resetTemp();
+      this.getImageByIdStadium(row);
+      console.log(row);
+      this.active = 0;
+      this.stadiumUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formStadium.name = row.name;
+      this.formStadium.latitude = row.latitude;
+      this.formStadium.longitude = row.longitude;
+      this.formStadium.city_name = row.cityName;
+      this.formStadium.cityId = row.cityId;
+      this.formImageStadium.idStadium = row.id;
+      this.formStadium.options = row.stadiumCategories;
+      row.stadiumCategories.forEach((element) => {
+        this.formStadium.categoryStadium.push(element.id);
+      });
+      
+    },
+    updateData() {
+      if (this.active == 0) {
+        this.$refs["formStadium"].validate((valid) => {
+          if (valid) {
+            var stadium = {
+              id: this.stadiumUpdate.id,
+              cityId: this.formStadium.cityId,
+              name: this.formStadium.name,
+              latitude: this.formStadium.latitude,
+              longitude: this.formStadium.longitude,
+              stadiumStadiumCategories: [],
+            };
+            if (this.categoryStadiumUpdate.length == 0) {
+              this.formStadium.categoryStadium.forEach((element) => {
+                console.log(element);
+                stadium.stadiumStadiumCategories.push({
+                  stadiumId: 0,
+                  stadiumCategoryId: element,
+                });
+              });
+            } else {
+              this.categoryStadiumUpdate.forEach((element) => {
+                console.log(element);
+                stadium.stadiumStadiumCategories.push({
+                  stadiumId: 0,
+                  stadiumCategoryId: element,
+                });
+              });
+            }
+
+            axios
+              .put(this.url + "Stadium", stadium)
+              .then((response) => {
+                this.next();
+                this.$notify({
+                  title: "Success",
+                  message: "Update Successfully",
+                  type: "success",
+                  duration: 2000,
+                });
+
+                this.getStadium();
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+          }
+        });
+      } else if (this.active == 1) {
+        this.dialogFormVisible = false;
+      }
+    },
+    /* CITIES */
     getCities(queryString, cb) {
       axios
         .get(this.url + "City")
@@ -767,9 +841,9 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
-    next() {
-      if (this.active++ > 1) this.active = 0;
-    },
+    /* CATEGORY STADIUM */
+
+    /* IMAGES */
     handleRemove(file, fileList) {
       console.log(file, fileList);
       axios
@@ -814,6 +888,11 @@ export default {
         .catch((error) => {
           this.status = "error";
         });
+    },
+    /* OTHER */
+    next() {
+      /* Change step in form */
+      if (this.active++ > 1) this.active = 0;
     },
   },
   computed: {

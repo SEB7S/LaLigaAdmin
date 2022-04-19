@@ -128,22 +128,13 @@
           <span>{{ row.nameEspanish }}</span>
         </template>
       </el-table-column>
-      <!--       <el-table-column
-        :label="$t('stadium.priority')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.priorityOrder }}</span>
-        </template>
-      </el-table-column> -->
       <el-table-column
         :label="$t('hotel.max_pax')"
         min-width="100px"
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.stadiumName }}</span>
+          <span>{{ row.maxPax }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -192,32 +183,13 @@
         style="margin-left: 50px"
       >
         <el-form-item :label="$t('hotel.nameEnHotel')">
-          <el-input v-model="formCategory.nameEnglish" />
+          <el-input v-model="formRoomType.nameEnglish" />
         </el-form-item>
         <el-form-item :label="$t('hotel.nameEsHotel')">
-          <el-input v-model="formCategory.nameEspanish" />
+          <el-input v-model="formRoomType.nameEspanish" />
         </el-form-item>
-        <!--         <el-form-item :label="$t('stadium.priority')">
-          <el-input v-model="formCategory.priorityOrder" type="number" />
-        </el-form-item> -->
-        <el-form-item :label="$t('hotel.max_pax')" prop="stadiumId">
-          <el-autocomplete
-            v-model="formCategory.stadiumName"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getStadium"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
-          >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.name }}</div>
-            </template>
-          </el-autocomplete>
+        <el-form-item :label="$t('hotel.max_pax')">
+          <el-input v-model="formRoomType.maxPax" type="number" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -226,7 +198,7 @@
         </el-button>
         <el-button
           type="primary"
-          @click="dialogStatus === 'create' ? postCategory() : updateData()"
+          @click="dialogStatus === 'create' ? postRoomType() : updateData()"
         >
           {{ $t("table.confirm") }}
         </el-button>
@@ -359,10 +331,10 @@ export default {
       city_nameEs: "",
       cities: [],
       /** FormStadium */
-      formCategory: {
+      formRoomType: {
         nameEnglish: "",
         nameEspanish: "",
-        priorityOrder: 0,
+        maxPax: 0,
         stadiumId: "",
         stadiumName: "",
       },
@@ -373,7 +345,7 @@ export default {
     };
   },
   created() {
-    this.getCategory();
+    this.getRoomType();
   },
   methods: {
     getList() {
@@ -390,7 +362,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1;
-      this.getCategory();
+      this.getRoomType();
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -414,36 +386,35 @@ export default {
       this.handleFilter();
     },
     resetTemp() {
-      this.formCategory = {
+      this.formRoomType = {
         nameEnglish: "",
         nameEspanish: "",
-        priorityOrder: 0,
+        maxPax: 0,
         stadiumId: "",
         stadiumName: "",
-      }
+      };
     },
     handleUpdate(row) {
       console.log(row);
       this.hotelUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.formCategory.nameEnglish = row.nameEnglish;
-      this.formCategory.nameEspanish = row.nameEspanish;
-      this.formCategory.priorityOrder = row.priorityOrder;
-      this.formCategory.stadiumId = row.stadiumId;
+      this.formRoomType.nameEnglish = row.nameEnglish;
+      this.formRoomType.nameEspanish = row.nameEspanish;
+      this.formRoomType.maxPax = row.maxPax;
+      this.formRoomType.stadiumId = row.stadiumId;
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
-          var category = {
+          var roomType = {
             id: this.hotelUpdate.id,
-            nameEnglish: this.formCategory.nameEnglish,
-            nameEspanish: this.formCategory.nameEspanish,
-            priorityOrder: this.formCategory.priorityOrder,
-            stadiumId: this.formCategory.stadiumId,
+            nameEnglish: this.formRoomType.nameEnglish,
+            nameEspanish: this.formRoomType.nameEspanish,
+            maxPax: this.formRoomType.maxPax,
           };
           axios
-            .put(this.url + "StadiumCategory", category)
+            .put(this.url + "RoomType", roomType)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -453,7 +424,7 @@ export default {
                 duration: 2000,
               });
 
-              this.getCategory();
+              this.getRoomType();
             })
             .catch((error) => {
               console.error(error.response);
@@ -503,17 +474,16 @@ export default {
       this.dialogFormVisible = true;
       this.city_name = "";
     },
-    postCategory() {
+    postRoomType() {
       this.$refs["dataForm"].validate((valid) => {
-        var category = {
-          nameEnglish: this.formCategory.nameEnglish,
-          nameEspanish: this.formCategory.nameEspanish,
-          priority: this.formCategory.priorityOrder,
-          stadiumId: this.formCategory.stadiumId,
+        var roomType = {
+          nameEnglish: this.formRoomType.nameEnglish,
+          nameEspanish: this.formRoomType.nameEspanish,
+          maxPax: this.formRoomType.maxPax,
         };
         if (valid) {
           axios
-            .post(this.url + "StadiumCategory", category)
+            .post(this.url + "RoomType", roomType)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
@@ -522,7 +492,7 @@ export default {
                 type: "success",
                 duration: 2000,
               });
-              this.getCategory();
+              this.getRoomType();
             })
             .catch((error) => {
               console.error(error.response);
@@ -530,23 +500,10 @@ export default {
         }
       });
     },
-    getCategory() {
+    getRoomType() {
       this.listLoading = true;
       axios
-        .get(this.url + "StadiumCategory")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    getCategory() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "StadiumCategory")
+        .get(this.url + "RoomType")
         .then((response) => {
           console.log(response.data);
           this.list = response.data;
@@ -559,7 +516,7 @@ export default {
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
-        .delete(this.url + "StadiumCategory/" + id)
+        .delete(this.url + "RoomType/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -567,7 +524,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getCategory();
+          this.getRoomType();
           this.showReviewer = false;
           this.categoryStadiumList = [];
         })
@@ -651,43 +608,6 @@ export default {
           });
         });
     },
-    getStadium(queryString, cb) {
-      axios
-        .get(this.url + "Stadium")
-        .then((response) => {
-          console.log(response.data);
-          var links = response.data;
-          var results = queryString
-            ? links.filter(this.createFilter(queryString))
-            : links;
-          cb(results);
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelect(item) {
-      console.log(item);
-      this.formCategory.stadiumName = item.name;
-      this.formCategory.stadiumId = item.id;
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelectProvider(item) {
-      this.formCategory.providerName = item.name;
-      this.formCategory.providerId = item.id;
-    },
     handleClose(done) {
       this.$confirm("Are you sure to close this form?")
         .then((_) => {
@@ -704,15 +624,10 @@ export default {
             item.nameEnglish
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
-            item.nameEspanish
-              .toLowerCase()
-              .includes(this.search.toLowerCase()) ||
-            item.stadiumName.toLowerCase().includes(this.search.toLowerCase())
-            
+            item.nameEspanish.toLowerCase().includes(this.search.toLowerCase())
           );
         });
       }
-      
     },
   },
 };
