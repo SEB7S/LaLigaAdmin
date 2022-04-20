@@ -737,6 +737,7 @@ export default {
         };
         console.log(this.formRoomType);
         this.formRoomType.forEach((element, index) => {
+          console.log("room", element)
           var roomType = {
             hotelId: this.formImageHotel.idHotel,
             roomTypeId: element.id,
@@ -768,12 +769,12 @@ export default {
     getRoomTypeById() {
       this.formRoomType = [];
       this.hotelUpdate.hotelRoomTypes.forEach((element) => {
+
         var room = {
-          id: element.id,
-          nameEspanish: element.roomtypeEnglish,
-          nameEnglish: element.roomtypeSpanish,
+          id: element.roomTypeId,
+          nameEspanish: element.roomtypeSpanish,
+          nameEnglish: element.roomtypeEnglish,
           maxPax: element.maxPax,
-          oldId: element.roomTypeId,
         };
         this.formRoomType.push(room);
       });
