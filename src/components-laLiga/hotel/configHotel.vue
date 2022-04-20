@@ -738,9 +738,9 @@ export default {
         console.log(this.formRoomType);
         this.formRoomType.forEach((element, index) => {
           var roomType = {
-            id: element.oldId,
-            hotelId: 0,
-            roomTypeId: element.id,
+            id: element.id,
+            hotelId: this.formImageHotel.idHotel,
+            roomTypeId: element.oldId,
           };
           hotel.hotelRoomTypes.push(roomType);
           console.log(this.formRoomType);
