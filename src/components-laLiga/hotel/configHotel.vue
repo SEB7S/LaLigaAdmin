@@ -743,7 +743,7 @@ export default {
             roomTypeId: element.id,
           };
           hotel.hotelRoomTypes.push(roomType);
-          console.log(this.formRoomType);
+          console.log(hotel);
         });
         axios
           .put(this.url + "Hotel", hotel)
@@ -769,7 +769,7 @@ export default {
     getRoomTypeById() {
       this.formRoomType = [];
       this.hotelUpdate.hotelRoomTypes.forEach((element) => {
-
+        console.log("roomtype",element)
         var room = {
           id: element.roomTypeId,
           nameEspanish: element.roomtypeSpanish,
