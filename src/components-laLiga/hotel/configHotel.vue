@@ -763,6 +763,7 @@ export default {
           });
         console.log(this.active);
       } else if (this.active == 2) {
+        this.dialogFormVisible = false;
       }
     },
     getRoomTypeById() {
