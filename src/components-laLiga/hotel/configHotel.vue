@@ -738,9 +738,8 @@ export default {
         console.log(this.formRoomType);
         this.formRoomType.forEach((element, index) => {
           var roomType = {
-            id: element.id,
             hotelId: this.formImageHotel.idHotel,
-            roomTypeId: element.oldId,
+            roomTypeId: element.id,
           };
           hotel.hotelRoomTypes.push(roomType);
           console.log(this.formRoomType);
@@ -1172,9 +1171,9 @@ export default {
     },
     handleSelect(item) {
       console.log(item);
-      this.formRoomType[this.arrayPosition].nameEnglish = item.nameEnglish;
+      this.formRoomType[this.arrayPosition].nameEnglish = item.roomtypeEnglish;
       this.formRoomType[this.arrayPosition].id = item.id;
-      this.formRoomType[this.arrayPosition].nameEspanish = item.nameEspanish;
+      this.formRoomType[this.arrayPosition].nameEspanish = item.roomtypeSpanish;
       this.formRoomType[this.arrayPosition].maxPax = item.maxPax;
     },
     handleIconClick(ev) {
