@@ -610,8 +610,8 @@ export default {
       },
       formImageHotel: {
         MediaContentType: 0,
-        idHotel: null,
-        id: null,
+        idHotel: 0,
+        id: 0,
       },
       formRoomType: [
         {
@@ -692,8 +692,8 @@ export default {
       this.formRoomType = [
         {
           id: this.roomTypeDefault[0].id,
-          nameEspanish: this.roomTypeDefault[0].nameEnglish,
-          nameEnglish: this.roomTypeDefault[0].nameEspanish,
+          nameEspanish: this.roomTypeDefault[0].nameEspanish,
+          nameEnglish: this.roomTypeDefault[0].nameEnglish,
           maxPax: this.roomTypeDefault[0].maxPax,
         },
       ];
@@ -857,8 +857,8 @@ export default {
         axios
           .post(this.url + "Hotel", hotel)
           .then((response) => {
-            this.formImageHotel.idHotel = response.data.id;
-            console.log(response);
+            this.formImageHotel.idHotel = response.data[0].id;
+            console.log(response, response.data[0].id);
 
             this.$notify({
               title: "Success",
