@@ -873,6 +873,7 @@ export default {
             console.error(error.response);
           });
       } else if (this.active == 2) {
+        this.dialogFormVisible = false
       }
     },
     getHotel() {
