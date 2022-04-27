@@ -223,10 +223,14 @@
               </template>
             </el-autocomplete>
           </el-form-item>
-          <el-form-item :label="$t('stadium.categoryStadium')">
+          <el-form-item
+            :label="$t('stadium.categoryStadium')"
+            prop="categoryStadium"
+          >
             <el-select
               v-model="formStadium.categoryStadium"
               multiple
+              filterable
               placeholder="Select"
               style="width: 100%"
             >
@@ -464,6 +468,13 @@ export default {
             trigger: "change",
           },
         ],
+        categoryStadium: [
+          {
+            required: true,
+            message: "Please input category",
+            trigger: "change",
+          },
+        ],
       },
       /* Images */
       dialogImageUrl: "",
@@ -520,21 +531,6 @@ export default {
         this.dialogPvVisible = true;
       });
     },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Stadiums" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
@@ -549,6 +545,23 @@ export default {
     getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+
+    /* STADIUM */
+    handleDownload() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "cityName", "longitude", "latitude"];
+        const filterVal = ["id", "name", "cityName", "longitude", "latitude"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "Stadiums" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     handleCreate() {
       this.resetTemp();
@@ -571,8 +584,6 @@ export default {
       this.categoryStadiumUpdate = [];
       this.getCategoryStadium();
     },
-    /* STADIUM */
-
     /* POST */
     postStadium() {
       if (this.active == 0) {
@@ -755,7 +766,6 @@ export default {
       row.stadiumCategories.forEach((element) => {
         this.formStadium.categoryStadium.push(element.id);
       });
-      
     },
     updateData() {
       if (this.active == 0) {

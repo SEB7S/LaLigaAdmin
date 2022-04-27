@@ -197,13 +197,14 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="city_nameEs">
           <span class="demo-input-label">{{ $t("city.nameEsCity") }}</span>
           <el-input v-model="formCity.city_nameEs" placeholder="Please input" />
         </el-form-item>
         <el-form-item v-if="formCity.city_name != ''">
           <span style="margin-right: 5px">Duplicar Nombre en Español: </span>
-          <el-switch v-model="duplicateCity" @change="duplicatedCity($event)"> </el-switch>
+          <el-switch v-model="duplicateCity" @change="duplicatedCity($event)">
+          </el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -337,6 +338,13 @@ export default {
       search: "",
       rules: {
         city_name: [
+          {
+            required: true,
+            message: "Please input city",
+            trigger: "change",
+          },
+        ],
+        city_nameEs: [
           {
             required: true,
             message: "Please input city",
@@ -552,11 +560,14 @@ export default {
       console.log(ev);
     },
     postCity() {
-      console.log(this.formCity, this.formCity.city_nameEs === '')
+      console.log(this.formCity, this.formCity.city_nameEs === "");
       this.$refs["formCity"].validate((valid) => {
         var city = {
           cityNameEnglish: this.cities.city + ", " + this.cities.country,
-          cityNameEspanish: this.formCity.city_nameEs === '' ? "sin definir" : this.formCity.city_nameEs,
+          cityNameEspanish:
+            this.formCity.city_nameEs === ""
+              ? "sin definir"
+              : this.formCity.city_nameEs,
           latitude: this.cities.latitude.toString(),
           longitude: this.cities.longitude.toString(),
         };
@@ -697,13 +708,13 @@ export default {
         })
         .catch((_) => {});
     },
-    duplicatedCity(event){
-      if(event){
-        this.formCity.city_nameEs = this.formCity.city_name
-      }else{
-        this.formCity.city_nameEs = ''
+    duplicatedCity(event) {
+      if (event) {
+        this.formCity.city_nameEs = this.formCity.city_name;
+      } else {
+        this.formCity.city_nameEs = "";
       }
-    }
+    },
   },
 
   computed: {
@@ -723,7 +734,6 @@ export default {
         });
       }
     },
-    
   },
 };
 </script>

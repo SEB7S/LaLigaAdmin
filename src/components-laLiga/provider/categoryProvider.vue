@@ -182,10 +182,10 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('provider.categoryProvider')">
+        <el-form-item :label="$t('provider.categoryProvider')" prop="categoryName">
           <el-input v-model="formCategory.categoryName" />
         </el-form-item>
-        <el-form-item :label="$t('provider.categories')" prop="providerName">
+        <el-form-item :label="$t('provider.categories')" prop="HTCategoryName">
           <el-autocomplete
             v-model="formCategory.HTCategoryName"
             popper-class="my-autocomplete"
@@ -334,19 +334,26 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" },
-        ],
-        timestamp: [
+        categoryName: [
           {
-            type: "date",
             required: true,
-            message: "timestamp is required",
+            message: "Please input category",
             trigger: "change",
           },
         ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
+        providerName: [
+          {
+            required: true,
+            message: "Please input provider",
+            trigger: "change",
+          },
+        ],
+        HTCategoryName: [
+          {
+            required: true,
+            message: "Please input HT Category",
+            trigger: "change",
+          },
         ],
       },
       downloadLoading: false,
@@ -467,7 +474,7 @@ export default {
           providerId: this.formCategory.providerId,
           happyTourCategoryId: this.formCategory.HTCategoryId,
         };
-/*         let duplicate = function () {
+        /*         let duplicate = function () {
           this.list.forEach((element) => {
             if (
               element.happyTourCategoryId == category.happyTourCategoryId &&
@@ -478,8 +485,13 @@ export default {
             }
           });
         }; */
-        let duplicate = this.list.findIndex(function (element) { return element.happyTourCategoryId == category.happyTourCategoryId && element.providerId == category.providerId })
-        console.log(duplicate)
+        let duplicate = this.list.findIndex(function (element) {
+          return (
+            element.happyTourCategoryId == category.happyTourCategoryId &&
+            element.providerId == category.providerId
+          );
+        });
+        console.log(duplicate);
         if (valid && duplicate == -1) {
           axios
             .post(this.url + "ProviderCategories", category)

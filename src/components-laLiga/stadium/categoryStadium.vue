@@ -1,21 +1,6 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <!--       <el-input
-        placeholder="Nombre En"
-        style="width: 200px"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >
-        Search
-      </el-button> -->
       <el-input
         placeholder="Search"
         style="width: 200px"
@@ -128,24 +113,7 @@
           <span>{{ row.nameEspanish }}</span>
         </template>
       </el-table-column>
-      <!--       <el-table-column
-        :label="$t('stadium.priority')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.priorityOrder }}</span>
-        </template>
-      </el-table-column> -->
-<!--       <el-table-column
-        :label="$t('stadium.stadiumId')"
-        min-width="100px"
-        align="center"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.stadiumName }}</span>
-        </template>
-      </el-table-column> -->
+
       <el-table-column
         :label="$t('table.actions')"
         align="center"
@@ -191,34 +159,12 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('stadium.nameEnglish')">
+        <el-form-item :label="$t('stadium.nameEnglish')" prop="nameEnglish">
           <el-input v-model="formCategory.nameEnglish" />
         </el-form-item>
-        <el-form-item :label="$t('stadium.nameEspanish')">
+        <el-form-item :label="$t('stadium.nameEspanish')" prop="nameEspanish">
           <el-input v-model="formCategory.nameEspanish" />
         </el-form-item>
-        <!--         <el-form-item :label="$t('stadium.priority')">
-          <el-input v-model="formCategory.priorityOrder" type="number" />
-        </el-form-item> -->
-<!--         <el-form-item :label="$t('stadium.stadiumId')" prop="stadiumId">
-          <el-autocomplete
-            v-model="formCategory.stadiumName"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getStadium"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
-          >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.name }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -338,32 +284,27 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" },
-        ],
-        timestamp: [
+        nameEnglish: [
           {
-            type: "date",
             required: true,
-            message: "timestamp is required",
+            message: "Please input city",
             trigger: "change",
           },
         ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
+        nameEspanish: [
+          {
+            required: true,
+            message: "Please input city",
+            trigger: "change",
+          },
         ],
       },
       downloadLoading: false,
-      /** FormCity  */
-      city_name: "",
-      city_nameEs: "",
       cities: [],
       /** FormStadium */
       formCategory: {
         nameEnglish: "",
         nameEspanish: "",
-        stadiumId: 0,
-        stadiumName: "",
       },
       hotelUpdate: [],
       categoryStadiumList: [],
@@ -416,9 +357,7 @@ export default {
       this.formCategory = {
         nameEnglish: "",
         nameEspanish: "",
-        stadiumId: 0,
-        stadiumName: "",
-      }
+      };
     },
     handleUpdate(row) {
       console.log(row);
@@ -428,7 +367,6 @@ export default {
       this.formCategory.nameEnglish = row.nameEnglish;
       this.formCategory.nameEspanish = row.nameEspanish;
       this.formCategory.priorityOrder = row.priorityOrder;
-      this.formCategory.stadiumId = row.stadiumId;
     },
     updateData() {
       this.$refs["dataForm"].validate((valid) => {
@@ -438,7 +376,6 @@ export default {
             nameEnglish: this.formCategory.nameEnglish,
             nameEspanish: this.formCategory.nameEspanish,
             priorityOrder: this.formCategory.priorityOrder,
-            stadiumId: this.formCategory.stadiumId,
           };
           axios
             .put(this.url + "StadiumCategory", category)
@@ -468,14 +405,14 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const tHeader = ["id", "nameEnglish", "nameEspanish"];
+        const filterVal = ["id", "name", "nameEspanish"];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Stadiums" + date,
+          filename: "RoomType" + date,
         });
         this.downloadLoading = false;
       });
@@ -499,14 +436,12 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.city_name = "";
     },
     postCategory() {
       this.$refs["dataForm"].validate((valid) => {
         var category = {
           nameEnglish: this.formCategory.nameEnglish,
           nameEspanish: this.formCategory.nameEspanish,
-          stadiumId: this.formCategory.stadiumId,
         };
         if (valid) {
           axios
@@ -670,8 +605,6 @@ export default {
     },
     handleSelect(item) {
       console.log(item);
-      this.formCategory.stadiumName = item.name;
-      this.formCategory.stadiumId = item.id;
     },
     handleIconClick(ev) {
       console.log(ev);
@@ -703,13 +636,10 @@ export default {
               .includes(this.search.toLowerCase()) ||
             item.nameEspanish
               .toLowerCase()
-              .includes(this.search.toLowerCase()) ||
-            item.stadiumName.toLowerCase().includes(this.search.toLowerCase())
-            
+              .includes(this.search.toLowerCase())
           );
         });
       }
-      
     },
   },
 };

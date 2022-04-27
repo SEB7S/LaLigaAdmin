@@ -605,7 +605,7 @@ export default {
           start_date: this.formMatchRate.start_date,
           final_date: this.formMatchRate.final_date,
           available: true,
-          stadiumCategoryId: this.formMatchRate.stadiumCategoryId,
+          stadiumStadiumCategoryId: this.formMatchRate.stadiumCategoryId,
           matchId: this.formMatchRate.matchId,
           paxTypeIn: parseInt(this.formMatchRate.paxTypeIn),
           match_price: this.formMatchRate.match_price,
@@ -763,7 +763,7 @@ export default {
           var matchRate = {
             id: data.id,
             paxTypeIn: data.paxTypeId,
-            stadiumCategoryId: data.stadiumCategoryId,
+            stadiumStadiumCategoryId: data.stadiumCategoryId,
             match_price: data.matchPrice,
             start_date: data.startDate,
             final_date: data.finalDate,
@@ -812,7 +812,7 @@ export default {
           var matchRate = {
             id: this.matchRateUpdate.id,
             paxTypeIn: this.formMatchRate.paxTypeIn,
-            stadiumCategoryId: this.formMatchRate.stadiumCategoryId,
+            stadiumStadiumCategoryId: this.formMatchRate.stadiumCategoryId,
             match_price: this.formMatchRate.match_price,
             start_date: this.formMatchRate.start_date,
             final_date: this.formMatchRate.final_date,

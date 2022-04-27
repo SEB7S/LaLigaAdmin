@@ -182,13 +182,13 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('hotel.nameEnHotel')">
+        <el-form-item :label="$t('hotel.nameEnHotel')" prop="nameEnglish">
           <el-input v-model="formRoomType.nameEnglish" />
         </el-form-item>
-        <el-form-item :label="$t('hotel.nameEsHotel')">
+        <el-form-item :label="$t('hotel.nameEsHotel')" prop="nameEspanish">
           <el-input v-model="formRoomType.nameEspanish" />
         </el-form-item>
-        <el-form-item :label="$t('hotel.max_pax')">
+        <el-form-item :label="$t('hotel.max_pax')" prop="maxPax">
           <el-input v-model="formRoomType.maxPax" type="number" />
         </el-form-item>
       </el-form>
@@ -310,19 +310,26 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" },
-        ],
-        timestamp: [
+        nameEnglish: [
           {
-            type: "date",
             required: true,
-            message: "timestamp is required",
+            message: "Please input name",
             trigger: "change",
           },
         ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
+        nameEspanish: [
+          {
+            required: true,
+            message: "Please input name",
+            trigger: "change",
+          },
+        ],
+        maxPax: [
+          {
+            required: true,
+            message: "Please input max pax",
+            trigger: "change",
+          },
         ],
       },
       downloadLoading: false,

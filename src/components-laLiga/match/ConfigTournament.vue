@@ -158,7 +158,7 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('match.tournamentName')" prop="tournamentName">
+        <el-form-item :label="$t('match.tournamentName')" prop="tounamentName">
           <el-input v-model="formTournament.tounamentName" />
         </el-form-item>
       </el-form>
@@ -279,52 +279,11 @@ export default {
         tounamentName: "",
       },
       rules: {
-        name: [
+        tounamentName: [
           {
             required: true,
-            message: "Please input name",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
-        document: [
-          {
-            required: true,
-            message: "Please input document",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: "Please input longitude",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
-        email: [
-          {
-            required: true,
-            message: "Please input city",
-            trigger: "blur",
-          },
-          {
-            type: "email",
-            message: "Please input correct email address",
-            trigger: ["blur", "change"],
+            message: "Please input tournament",
+            trigger: "change",
           },
         ],
       },
@@ -719,9 +678,7 @@ export default {
     provider() {
       if (this.list.length > 0) {
         return this.list.filter((item) => {
-          return (
-            item.name.toLowerCase().includes(this.search.toLowerCase())
-          );
+          return item.name.toLowerCase().includes(this.search.toLowerCase());
         });
       }
     },

@@ -178,7 +178,7 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('provider.categories')">
+        <el-form-item :label="$t('provider.categories')" prop="categoryName">
           <el-input v-model="formCategory.categoryName" />
         </el-form-item>
       </el-form>
@@ -213,6 +213,11 @@ const calendarTypeOptions = [
   { key: "JP", display_name: "Japan" },
   { key: "EU", display_name: "Eurozone" },
 ];
+const axiosInstance = axios.create({
+  headers: {
+    "Access-Control-Allow-Origin": "*"
+  }
+});
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
@@ -282,20 +287,14 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [
-          { required: true, message: "type is required", trigger: "change" },
-        ],
-        timestamp: [
+/*         categoryName: [
           {
-            type: "date",
             required: true,
-            message: "timestamp is required",
+            message: "Please input category",
             trigger: "change",
           },
-        ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
-        ],
+        ], */
+
       },
       downloadLoading: false,
       /** FormCity  */
@@ -401,14 +400,14 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const tHeader = ["id", "categoryName"];
+        const filterVal = ["id", "categoryName"];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Stadiums" + date,
+          filename: "CategoryHT" + date,
         });
         this.downloadLoading = false;
       });

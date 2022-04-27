@@ -176,7 +176,7 @@
           <el-form-item :label="$t('match.nameClub')" prop="clubName">
             <el-input v-model="formClub.clubName" />
           </el-form-item>
-          <el-form-item :label="$t('match.stadiumClub')" prop="cityClub">
+          <el-form-item :label="$t('match.stadiumClub')" prop="stadiumName">
             <el-autocomplete
               v-model="formClub.stadiumName"
               popper-class="my-autocomplete"
@@ -342,10 +342,10 @@ export default {
         stadiumName: "",
       },
       rules: {
-        name: [
+        clubName: [
           {
             required: true,
-            message: "Please input name",
+            message: "Please input club",
             trigger: "blur",
           },
           {
@@ -354,40 +354,16 @@ export default {
             trigger: "blur",
           },
         ],
-        document: [
+        stadiumName: [
           {
             required: true,
-            message: "Please input document",
+            message: "Please input stadium",
             trigger: "blur",
           },
           {
             min: 3,
             message: "Length should be 3",
             trigger: "blur",
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: "Please input longitude",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
-        email: [
-          {
-            required: true,
-            message: "Please input city",
-            trigger: "blur",
-          },
-          {
-            type: "email",
-            message: "Please input correct email address",
-            trigger: ["blur", "change"],
           },
         ],
       },
@@ -756,9 +732,7 @@ export default {
     },
     createFilter(queryString) {
       return (link) => {
-        return (
-          link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        );
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
       };
     },
     handleSelect(item) {

@@ -403,7 +403,6 @@
           <img width="100%" :src="dialogImageUrl" alt="" />
         </el-dialog>
       </div>
-
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           {{ $t("table.cancel") }}
@@ -629,7 +628,7 @@ export default {
       fileList: [],
       hotelList: [],
       arrayPosition: 0,
-      roomTypeDefault:[]
+      roomTypeDefault: [],
     };
   },
   created() {
@@ -688,8 +687,9 @@ export default {
       };
       this.city_name = "";
       this.fileList = [];
-      console.log(this.roomTypeDefault)
-      this.formRoomType = [
+      console.log(this.roomTypeDefault);
+      if(this.dialogStatus === 'create'){
+              this.formRoomType = [
         {
           id: this.roomTypeDefault[0].id,
           nameEspanish: this.roomTypeDefault[0].nameEspanish,
@@ -697,6 +697,7 @@ export default {
           maxPax: this.roomTypeDefault[0].maxPax,
         },
       ];
+      }
       this.active = 0;
     },
     handleUpdate(row) {
@@ -737,7 +738,7 @@ export default {
         };
         console.log(this.formRoomType);
         this.formRoomType.forEach((element, index) => {
-          console.log("room", element)
+          console.log("room", element);
           var roomType = {
             hotelId: this.formImageHotel.idHotel,
             roomTypeId: element.id,
@@ -769,7 +770,7 @@ export default {
     getRoomTypeById() {
       this.formRoomType = [];
       this.hotelUpdate.hotelRoomTypes.forEach((element) => {
-        console.log("roomtype",element)
+        console.log("roomtype", element);
         var room = {
           id: element.roomTypeId,
           nameEspanish: element.roomtypeSpanish,
@@ -799,14 +800,14 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const tHeader = ["id", "nameEnglish", "nameSpanish", "cityName", "providerCategoryName"];
+        const filterVal = ["id", "nameEnglish", "nameSpanish", "cityName", "providerCategoryName"];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Stadiums" + date,
+          filename: "Hotels" + date,
         });
         this.downloadLoading = false;
       });
@@ -874,7 +875,7 @@ export default {
             console.error(error.response);
           });
       } else if (this.active == 2) {
-        this.dialogFormVisible = false
+        this.dialogFormVisible = false;
       }
     },
     getHotel() {
@@ -1154,10 +1155,10 @@ export default {
         .get(this.url + "RoomType")
         .then((response) => {
           console.log(response.data);
-          response.data.forEach(element => {
-            if(element.maxPax == 2){
-              console.log(element, element.maxPax == 2)
-              this.roomTypeDefault[0] = element
+          response.data.forEach((element) => {
+            if (element.maxPax == 2) {
+              console.log(element, element.maxPax == 2);
+              this.roomTypeDefault[0] = element;
             }
           });
           var links = response.data;

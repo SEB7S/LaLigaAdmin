@@ -230,6 +230,7 @@
               <el-select
                 v-model="formTour.hotel_category"
                 multiple
+                filterable
                 placeholder="Select"
               >
                 <el-option
@@ -1159,26 +1160,45 @@ export default {
             this.editFormTourDayDescription,
             this.editFormTourDayDescription[index]["cityNameEnglish"]
           );
-          var day = {
-            dayName: "Day " + (index + 1) + " - ",
-            dayName2: days[weekDay],
-            startDate: this.addDate(index, dateFormat) + " - ",
-            startDateFormat: new Date(this.start_date),
-            cityName: this.editFormTourDayDescription[index]["cityNameEnglish"],
-            cityId: this.editFormTourDayDescription[index]["cityId"],
-            description_english:
-              this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
-            description_spanish:
-              this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
-            matchable: this.editFormTourDayDescription[index]["matchable"],
-            id: this.editFormTourDayDescription[index]["id"],
-            tourCities:
-              this.editFormTourDayDescription[index]["tourCities"].split("/"),
-            titleTourCities:
-              this.editFormTourDayDescription[index]["tourCities"],
-            tourId: this.editFormTourDayDescription[index]["tourId"],
-            images: [],
-          };
+          if (index <= this.editFormTourDayDescription.length) {
+            var day = {
+              dayName: "Day " + (index + 1) + " - ",
+              dayName2: days[weekDay],
+              startDate: this.addDate(index, dateFormat) + " - ",
+              startDateFormat: new Date(this.start_date),
+              cityName:
+                this.editFormTourDayDescription[index]["cityNameEnglish"],
+              cityId: this.editFormTourDayDescription[index]["cityId"],
+              description_english:
+                this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
+              description_spanish:
+                this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
+              matchable: this.editFormTourDayDescription[index]["matchable"],
+              id: this.editFormTourDayDescription[index]["id"],
+              tourCities:
+                this.editFormTourDayDescription[index]["tourCities"].split("/"),
+              titleTourCities:
+                this.editFormTourDayDescription[index]["tourCities"],
+              tourId: this.editFormTourDayDescription[index]["tourId"],
+              images: [],
+            };
+          } else {
+            var day = {
+              dayName: "Day " + (index + 1) + " - ",
+              dayName2: days[weekDay],
+              startDate: this.addDate(index, dateFormat) + " - ",
+              startDateFormat: new Date(this.start_date),
+              cityName: "",
+              cityId: 1,
+              description_english: "",
+              description_spanish: "",
+              tourCities: [],
+              titleTourCities: "",
+              matchable: false,
+              images: [],
+            };
+          }
+
           this.formDayDetail.push(day);
           console.log(this.formDayDetail);
         }
@@ -1219,7 +1239,7 @@ export default {
       mes = mes < 10 ? "0" + mes : mes;
       dia = dia < 10 ? "0" + dia : dia;
       var fechaFinal = dia + sep + mes + sep + anno;
-      console.log(fechaFinal)
+      console.log(fechaFinal);
       return fechaFinal;
     },
     handleClose(done) {
