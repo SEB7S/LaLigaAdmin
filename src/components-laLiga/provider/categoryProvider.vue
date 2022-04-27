@@ -334,7 +334,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        categoryName: [
+/*         categoryName: [
           {
             required: true,
             message: "Please input category",
@@ -354,7 +354,7 @@ export default {
             message: "Please input HT Category",
             trigger: "change",
           },
-        ],
+        ], */
       },
       downloadLoading: false,
       /** FormCity  */
