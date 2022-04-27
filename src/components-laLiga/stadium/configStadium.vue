@@ -668,7 +668,13 @@ export default {
           this.stadiumList = [];
         })
         .catch((error) => {
-          console.error(error.response);
+          console.error(error.response.data);
+          this.$notify({
+            title: "Error",
+            message: "No es posible eliminar por que se está usando en otros módulos",
+            type: "error",
+            duration: 3000,
+          });
         });
     },
     confirmDelete(row) {
@@ -682,10 +688,6 @@ export default {
         }
       )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
           this.handleDelete(row, false);
         })
         .catch(() => {
@@ -732,10 +734,6 @@ export default {
         }
       )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
           this.list.forEach((value) => {
             this.handleDelete(value, false);
           });
@@ -779,10 +777,9 @@ export default {
               longitude: this.formStadium.longitude,
               stadiumStadiumCategories: [],
             };
-             console.log(this.formStadium.categoryStadium);
+            console.log(this.formStadium.categoryStadium);
             if (this.categoryStadiumUpdate.length == 0) {
               this.formStadium.categoryStadium.forEach((element) => {
-               
                 stadium.stadiumStadiumCategories.push({
                   stadiumId: 0,
                   stadiumCategoryId: element,
@@ -790,7 +787,7 @@ export default {
               });
             } else {
               this.categoryStadiumUpdate.forEach((element) => {
-                console.log("sss",element);
+                console.log("sss", element);
                 stadium.stadiumStadiumCategories.push({
                   stadiumId: 0,
                   stadiumCategoryId: element,
