@@ -764,7 +764,7 @@ export default {
       this.formImageStadium.idStadium = row.id;
       this.formStadium.options = row.stadiumCategories;
       row.stadiumCategories.forEach((element) => {
-        this.formStadium.categoryStadium.push(element.id);
+        this.formStadium.categoryStadium.push(element.stadiumCategoryId);
       });
     },
     updateData() {
@@ -779,9 +779,10 @@ export default {
               longitude: this.formStadium.longitude,
               stadiumStadiumCategories: [],
             };
+             console.log(this.formStadium.categoryStadium);
             if (this.categoryStadiumUpdate.length == 0) {
               this.formStadium.categoryStadium.forEach((element) => {
-                console.log(element);
+               
                 stadium.stadiumStadiumCategories.push({
                   stadiumId: 0,
                   stadiumCategoryId: element,
@@ -789,7 +790,7 @@ export default {
               });
             } else {
               this.categoryStadiumUpdate.forEach((element) => {
-                console.log(element);
+                console.log("sss",element);
                 stadium.stadiumStadiumCategories.push({
                   stadiumId: 0,
                   stadiumCategoryId: element,

@@ -344,7 +344,35 @@
                         </el-switch>
                       </el-form-item>
 
-
+<!--                       <el-form-item
+                        v-if="
+                          (formDay.cityName != '' &&
+                            dialogStatus === 'create') ||
+                          (editFormTourDayDescription.length > 0 &&
+                            editFormTourDayDescription[counter].cityName != '')
+                        "
+                        label="Image"
+                      >
+                        <el-upload
+                          :action="''"
+                          :http-request="uploadFile"
+                          list-type="picture-card"
+                          :on-preview="handlePictureCardPreview"
+                          :on-remove="handleRemove"
+                          :file-list="
+                            editFormTourDayDescription.length > 0 && editFormTourDayDescription[counter].images
+                              ? editFormTourDayDescription[counter].images
+                              : formDay.images
+                          "
+                          name="UploadImage"
+                          :data="formImageTour"
+                        >
+                          <i class="el-icon-plus"></i>
+                        </el-upload>
+                        <el-dialog :visible.sync="dialogVisible">
+                          <img width="100%" :src="dialogImageUrl" alt="" />
+                        </el-dialog>
+                      </el-form-item> -->
                       <el-form-item label="Description English">
                         <el-input
                           v-model="formDay.description_english"
