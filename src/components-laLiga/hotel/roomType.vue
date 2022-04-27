@@ -310,7 +310,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        nameEnglish: [
+/*         nameEnglish: [
           {
             required: true,
             message: "Please input name",
@@ -330,7 +330,7 @@ export default {
             message: "Please input max pax",
             trigger: "change",
           },
-        ],
+        ], */
       },
       downloadLoading: false,
       /** FormCity  */
