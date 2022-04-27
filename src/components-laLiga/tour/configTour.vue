@@ -1157,7 +1157,7 @@ export default {
         } else {
           /* this.start_date = this.editFormTourDayDescription[index].startTime; */
           console.log(
-            this.editFormTourDayDescription,
+            "esto",index <= this.editFormTourDayDescription.length,
             this.editFormTourDayDescription.length
           );
           if (index <= this.editFormTourDayDescription.length) {
