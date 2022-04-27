@@ -1160,7 +1160,7 @@ export default {
             "esto",index <= this.editFormTourDayDescription.length,
             this.editFormTourDayDescription.length, index
           );
-          if (index <= this.editFormTourDayDescription.length) {
+          if ((index+1) <= this.editFormTourDayDescription.length) {
             var day = {
               dayName: "Day " + (index + 1) + " - ",
               dayName2: days[weekDay],
