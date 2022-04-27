@@ -206,8 +206,6 @@
 import {
   fetchList,
   fetchPv,
-  createArticle,
-  updateArticle,
 } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
@@ -284,7 +282,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        nameEnglish: [
+/*         nameEnglish: [
           {
             required: true,
             message: "Please input city",
@@ -297,7 +295,7 @@ export default {
             message: "Please input city",
             trigger: "change",
           },
-        ],
+        ], */
       },
       downloadLoading: false,
       cities: [],

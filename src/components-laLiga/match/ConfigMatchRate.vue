@@ -797,6 +797,7 @@ export default {
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.formMatchRate.matchId = row.matchId;
+      
       /* this.formMatchRate.matchName = row.matchName; */
       this.formMatchRate.start_date = row.startDate;
       this.formMatchRate.final_date = row.finalDate;
@@ -805,6 +806,7 @@ export default {
       this.formMatchRate.paxTypeIn = row.paxTypeId;
       this.formMatchRate.matchName = row.matchName;
       this.formMatchRate.match_price = row.matchPrice;
+      this.formMatchRate.stadium_id = row.stadioId
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {

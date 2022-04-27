@@ -213,11 +213,7 @@ const calendarTypeOptions = [
   { key: "JP", display_name: "Japan" },
   { key: "EU", display_name: "Eurozone" },
 ];
-const axiosInstance = axios.create({
-  headers: {
-    "Access-Control-Allow-Origin": "*"
-  }
-});
+
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
