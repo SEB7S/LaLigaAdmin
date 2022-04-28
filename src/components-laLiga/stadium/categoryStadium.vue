@@ -296,16 +296,16 @@ export default {
         ], */
       },
       downloadLoading: false,
-      cities: [],
       /** FormStadium */
       formCategory: {
         nameEnglish: "",
         nameEspanish: "",
       },
-      hotelUpdate: [],
+
       categoryStadiumList: [],
       /* EndPoint */
       url: this.$store.getters.url,
+      multipleSelection: []
     };
   },
   created() {
@@ -349,12 +349,91 @@ export default {
       }
       this.handleFilter();
     },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
+    },
+    getSortClass: function (key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    /* Category */
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    handleDownload() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "nameEnglish", "nameEspanish"];
+        const filterVal = ["id", "name", "nameEspanish"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "RoomType" + date,
+        });
+        this.downloadLoading = false;
+      });
+    },
     resetTemp() {
       this.formCategory = {
         nameEnglish: "",
         nameEspanish: "",
       };
     },
+    /* POST */
+    handleCreate() {
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+    },
+    postCategory() {
+      this.$refs["dataForm"].validate((valid) => {
+        var category = {
+          nameEnglish: this.formCategory.nameEnglish,
+          nameEspanish: this.formCategory.nameEspanish,
+        };
+        if (valid) {
+          axios
+            .post(this.url + "StadiumCategory", category)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Categoría Agregado con éxito",
+                type: "success",
+                duration: 2000,
+              });
+              this.getCategory();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    /* UPDATE */
     handleUpdate(row) {
       console.log(row);
       this.hotelUpdate = row;
@@ -392,72 +471,8 @@ export default {
         }
       });
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "nameEnglish", "nameEspanish"];
-        const filterVal = ["id", "name", "nameEspanish"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "RoomType" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
-          }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-    },
-    postCategory() {
-      this.$refs["dataForm"].validate((valid) => {
-        var category = {
-          nameEnglish: this.formCategory.nameEnglish,
-          nameEspanish: this.formCategory.nameEspanish,
-        };
-        if (valid) {
-          axios
-            .post(this.url + "StadiumCategory", category)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Categoría Agregado con éxito",
-                type: "success",
-                duration: 2000,
-              });
-              this.getCategory();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
+
+    /* GET */
     getCategory() {
       this.listLoading = true;
       axios
@@ -471,19 +486,7 @@ export default {
           this.status = "error";
         });
     },
-    getCategory() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "StadiumCategory")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
+    /* DELETE */
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -579,49 +582,8 @@ export default {
           });
         });
     },
-    getStadium(queryString, cb) {
-      axios
-        .get(this.url + "Stadium")
-        .then((response) => {
-          console.log(response.data);
-          var links = response.data;
-          var results = queryString
-            ? links.filter(this.createFilter(queryString))
-            : links;
-          cb(results);
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelect(item) {
-      console.log(item);
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelectProvider(item) {
-      this.formCategory.providerName = item.name;
-      this.formCategory.providerId = item.id;
-    },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
   },
+  /* INPUT SEARCH */
   computed: {
     stadiumCat() {
       if (this.list) {
