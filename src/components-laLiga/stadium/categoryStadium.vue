@@ -67,11 +67,12 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
         <template slot-scope="{ row }">
@@ -203,10 +204,7 @@
   </div>
 </template>
 <script>
-import {
-  fetchList,
-  fetchPv,
-} from "@/api/article";
+import { fetchList, fetchPv } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
@@ -282,7 +280,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-/*         nameEnglish: [
+        /*         nameEnglish: [
           {
             required: true,
             message: "Please input city",
@@ -632,9 +630,7 @@ export default {
             item.nameEnglish
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
-            item.nameEspanish
-              .toLowerCase()
-              .includes(this.search.toLowerCase())
+            item.nameEspanish.toLowerCase().includes(this.search.toLowerCase())
           );
         });
       }

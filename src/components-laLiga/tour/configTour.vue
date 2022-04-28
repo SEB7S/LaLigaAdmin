@@ -74,8 +74,8 @@
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
         <template slot-scope="{ row }">
@@ -344,7 +344,7 @@
                         </el-switch>
                       </el-form-item>
 
-<!--                       <el-form-item
+                      <!--                       <el-form-item
                         v-if="
                           (formDay.cityName != '' &&
                             dialogStatus === 'create') ||
@@ -1157,10 +1157,12 @@ export default {
         } else {
           /* this.start_date = this.editFormTourDayDescription[index].startTime; */
           console.log(
-            "esto",index <= this.editFormTourDayDescription.length,
-            this.editFormTourDayDescription.length, index
+            "esto",
+            index <= this.editFormTourDayDescription.length,
+            this.editFormTourDayDescription.length,
+            index
           );
-          if ((index+1) <= this.editFormTourDayDescription.length) {
+          if (index + 1 <= this.editFormTourDayDescription.length) {
             var day = {
               dayName: "Day " + (index + 1) + " - ",
               dayName2: days[weekDay],
