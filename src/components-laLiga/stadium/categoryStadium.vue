@@ -305,13 +305,14 @@ export default {
       categoryStadiumList: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      multipleSelection: []
+      multipleSelection: [],
     };
   },
   created() {
     this.getCategory();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
