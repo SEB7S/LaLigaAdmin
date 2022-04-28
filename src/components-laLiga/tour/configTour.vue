@@ -544,6 +544,7 @@ export default {
   },
   created() {
     /*this.getList();*/
+    /*  */
     this.getTour();
   },
   methods: {
