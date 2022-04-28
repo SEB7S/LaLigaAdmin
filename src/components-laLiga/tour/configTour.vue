@@ -71,6 +71,7 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
@@ -78,14 +79,6 @@
         width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -590,19 +583,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.formTour = {
-        name: "",
-        duration_in_days: 0,
-        status: true,
-        idProvider: "",
-        providerName: "",
-        hotel_category: [],
-        options: [],
-      };
-      this.fileUploads = [];
-      this.formDayDetail = [];
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -639,6 +619,82 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+
+    /* TOUR */
+    resetTemp() {
+      this.formTour = {
+        name: "",
+        duration_in_days: 0,
+        status: true,
+        idProvider: "",
+        providerName: "",
+        hotel_category: [],
+        options: [],
+      };
+      this.fileUploads = [];
+      this.formDayDetail = [];
+    },
+    /* GET */
+    getTour() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "Tour")
+        .then((response) => {
+          console.log("sss", response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.log(error.response);
+        });
+    },
+    getCatProv() {
+      axios
+        .get(
+          this.url +
+            "ProviderCategories/GetProviderCategoriesbyIdProvider?id=" +
+            this.formTour.idProvider
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.formTour.options = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.log(error.response);
+        });
+    },
+    getProviders(queryString, cb) {
+      axios
+        .get(this.url + "Provider/GetProviderWithCategories")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilter(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelect(item) {
+      this.formTour.providerName = item.name;
+      this.formTour.idProvider = item.id;
+      this.getCatProv();
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
+    /* POST */
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
@@ -646,7 +702,6 @@ export default {
       this.active = 0;
       this.editTourDayDescription = false;
     },
-    /* POST */
     postTour() {
       if (this.active == 0) {
         this.calculateDays();
@@ -754,67 +809,11 @@ export default {
     changeArrayPositions(array, x, y) {
       [array[x], array[y]] = [array[y], array[x]];
     },
-    /* GET */
-    getTour() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Tour")
-        .then((response) => {
-          console.log("sss", response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-          console.log(error.response);
-        });
-    },
-    getCatProv() {
-      axios
-        .get(
-          this.url +
-            "ProviderCategories/GetProviderCategoriesbyIdProvider?id=" +
-            this.formTour.idProvider
-        )
-        .then((response) => {
-          console.log(response.data);
-          this.formTour.options = response.data;
-        })
-        .catch((error) => {
-          this.status = "error";
-          console.log(error.response);
-        });
-    },
-    getProviders(queryString, cb) {
-      axios
-        .get(this.url + "Provider/GetProviderWithCategories")
-        .then((response) => {
-          console.log(response.data);
-          var links = response.data;
-          var results = queryString
-            ? links.filter(this.createFilter(queryString))
-            : links;
-          cb(results);
-        })
-        .catch((error) => {
-          this.status = "error";
-          console.error(error.response);
-        });
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelect(item) {
-      this.formTour.providerName = item.name;
-      this.formTour.idProvider = item.id;
-      this.getCatProv();
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
+
     /* DELETE */
+    handleSelectionChange(val) {
+      this.tourList = val;
+    },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -858,40 +857,32 @@ export default {
           });
         });
     },
-    deleteTourCategory() {
-      this.tourUpdate.tourCategories.forEach((option) => {
-        axios
-          .delete(this.url + "TourCategory/" + option.id)
-          .then((response) => {})
-          .catch((error) => {
-            console.error(error.response);
-          });
-      });
-    },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.tourList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.tourList, arr.id);
-      }
-      console.log(this.tourList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.tourList);
-      const clearList = [...new Set(this.tourList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.tourList.forEach((value) => {
+            console.log(value);
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
     /* UPDATE */
     handleUpdate(row) {
@@ -1016,7 +1007,7 @@ export default {
     next() {
       if (this.active++ > 2) this.active = 0;
     },
-    /** Images */
+    /* IMAGE */
     handleRemove(file, fileList) {
       console.log(file, fileList);
       if (this.dialogStatus == "update") {
@@ -1072,7 +1063,7 @@ export default {
     handleChange(val) {
       console.log(val);
     },
-    /** City */
+    /* CITY */
     getCities(queryString, cb) {
       axios
         .get(this.url + "City")
@@ -1252,6 +1243,7 @@ export default {
         .catch((_) => {});
     },
   },
+  /* INPUT SEARCH */
   computed: {
     aTourList() {
       if (this.list) {

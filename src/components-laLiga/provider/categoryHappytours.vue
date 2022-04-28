@@ -43,17 +43,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.categoryProviderList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -82,21 +71,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -214,7 +196,6 @@ const calendarTypeOptions = [
   { key: "EU", display_name: "Eurozone" },
 ];
 
-
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name;
@@ -283,14 +264,13 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-/*         categoryName: [
+        /*         categoryName: [
           {
             required: true,
             message: "Please input category",
             trigger: "change",
           },
         ], */
-
       },
       downloadLoading: false,
       /** FormCity  */
@@ -311,6 +291,7 @@ export default {
     this.getCategoryHappyTour();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -348,45 +329,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      /** FormStadium */
-      this.formCategory = {
-        categoryName: "",
-      };
-    },
-    handleUpdate(row) {
-      console.log(row);
-      this.hotelUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formCategory.categoryName = row.categoryName;
-    },
-    updateData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          var category = {
-            id: this.hotelUpdate.id,
-            categoryName: this.formCategory.categoryName,
-          };
-          axios
-            .put(this.url + "HappyTourCategories", category)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getCategoryHappyTour();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -423,6 +365,28 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    /* HT CATEGORY */
+    resetTemp() {
+      /** FormStadium */
+      this.formCategory = {
+        categoryName: "",
+      };
+    },
+    /* GET */
+    getCategoryHappyTour() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "HappyTourCategories")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
@@ -453,18 +417,43 @@ export default {
         }
       });
     },
-    getCategoryHappyTour() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "HappyTourCategories")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
+    /* UPDATE */
+    handleUpdate(row) {
+      console.log(row);
+      this.hotelUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formCategory.categoryName = row.categoryName;
+    },
+    updateData() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          var category = {
+            id: this.hotelUpdate.id,
+            categoryName: this.formCategory.categoryName,
+          };
+          axios
+            .put(this.url + "HappyTourCategories", category)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
+
+              this.getCategoryHappyTour();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.categoryProviderList = val;
     },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
@@ -506,33 +495,7 @@ export default {
           });
         });
     },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.categoryProviderList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.categoryProviderList, arr.id);
-      }
-      console.log(this.categoryProviderList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.categoryProviderList);
-      const clearList = [...new Set(this.categoryProviderList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -547,7 +510,8 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.list.forEach((value) => {
+          this.categoryProviderList.forEach((value) => {
+            console.log(value);
             this.handleDelete(value, false);
           });
         })
@@ -558,6 +522,8 @@ export default {
           });
         });
     },
+    /* CITY */
+    /* GET */
     getCities(queryString, cb) {
       axios
         .get(this.url + "City")
@@ -589,6 +555,8 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
+    /* PROVIDER */
+    /* GET */
     getProviders(queryString, cb) {
       axios
         .get(this.url + "Provider")
@@ -622,6 +590,7 @@ export default {
         .catch((_) => {});
     },
   },
+  /* INPUT SEARCH */
   computed: {
     categoryHT() {
       if (this.list) {

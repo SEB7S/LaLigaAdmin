@@ -13,16 +13,16 @@ const matchRouter = {
   },
   children: [
     {
-      path: 'configMatch',
-      component: () => import('@/components-laLiga/match/ConfigMatch'),
-      name: 'Config Match',
-      meta: { title: 'manageMatch' }
-    },
-    {
       path: 'configMatchRate',
       component: () => import('@/components-laLiga/match/ConfigMatchRate'),
       name: 'Match Rates',
       meta: { title: 'manageRates' }
+    },
+    {
+      path: 'configMatch',
+      component: () => import('@/components-laLiga/match/ConfigMatch'),
+      name: 'Config Match',
+      meta: { title: 'manageMatch' }
     },
     {
       path: 'configClub',

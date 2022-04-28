@@ -38,17 +38,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.stadiumList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -77,21 +66,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -652,6 +634,9 @@ export default {
         });
     },
     /* DELETE */
+    handleSelectionChange(val) {
+      this.stadiumList = val;
+    },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -671,7 +656,8 @@ export default {
           console.error(error.response.data);
           this.$notify({
             title: "Error",
-            message: "No es posible eliminar por que se está usando en otros módulos",
+            message:
+              "No es posible eliminar por que se está usando en otros módulos",
             type: "error",
             duration: 3000,
           });
@@ -697,33 +683,7 @@ export default {
           });
         });
     },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.stadiumList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.stadiumList, arr.id);
-      }
-      console.log(this.stadiumList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.stadiumList);
-      const clearList = [...new Set(this.stadiumList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -734,7 +694,12 @@ export default {
         }
       )
         .then(() => {
-          this.list.forEach((value) => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.stadiumList.forEach((value) => {
+            console.log(value);
             this.handleDelete(value, false);
           });
         })
@@ -745,6 +710,7 @@ export default {
           });
         });
     },
+
     /* UPDATE */
     handleUpdate(row) {
       this.resetTemp();
@@ -903,6 +869,7 @@ export default {
       if (this.active++ > 1) this.active = 0;
     },
   },
+  /* Input Search */
   computed: {
     stadium() {
       if (this.list.length > 0) {

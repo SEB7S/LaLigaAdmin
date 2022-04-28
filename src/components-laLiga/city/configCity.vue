@@ -38,17 +38,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.cityList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -77,21 +66,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -360,6 +342,7 @@ export default {
     this.getCity();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -397,19 +380,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.formCity = {
-        city_name: "",
-        city_nameEs: "",
-      };
-      this.duplicateCity = false;
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.formCity.city_name = "";
-    },
     createData() {
       this.$refs["dataForm"].validate((valid) => {
         if (valid) {
@@ -425,52 +395,6 @@ export default {
               duration: 2000,
             });
           });
-        }
-      });
-    },
-    handleUpdate(row) {
-      console.log(row);
-      this.cityUpdate = row;
-      this.formCity.city_name = row.nameEnglish;
-      this.formCity.city_nameEs = row.nameEspanish;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.cities = [];
-      this.duplicateCity = false;
-    },
-    updateData() {
-      this.$refs["formCity"].validate((valid) => {
-        if (valid) {
-          var city = {
-            id: this.cityUpdate.id,
-            nameEnglish:
-              this.cities == []
-                ? this.cities.city + ", " + this.cities.country
-                : this.formCity.city_name,
-            nameEspanish: this.duplicateCity
-              ? this.cities == []
-                ? this.cities.city + ", " + this.cities.country
-                : this.formCity.city_name
-              : this.formCity.city_nameEs,
-            latitude: this.cityUpdate.latitude,
-            longitude: this.cityUpdate.longitude,
-          };
-          axios
-            .put(this.url + "City", city)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getCity();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
         }
       });
     },
@@ -522,6 +446,35 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    /* CITY */
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    duplicatedCity(event) {
+      if (event) {
+        this.formCity.city_nameEs = this.formCity.city_name;
+      } else {
+        this.formCity.city_nameEs = "";
+      }
+    },
+    /* GET */
+    getCity() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "City")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
     getCities(queryString, cb) {
       var config = {
         headers: {
@@ -559,6 +512,20 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
+    /* POST */
+    resetTemp() {
+      this.formCity = {
+        city_name: "",
+        city_nameEs: "",
+      };
+      this.duplicateCity = false;
+    },
+    handleCreate() {
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.formCity.city_name = "";
+    },
     postCity() {
       console.log(this.formCity, this.formCity.city_nameEs === "");
       this.$refs["formCity"].validate((valid) => {
@@ -593,18 +560,56 @@ export default {
         }
       });
     },
-    getCity() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "City")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
+    /* UPDATE */
+    handleUpdate(row) {
+      console.log(row);
+      this.cityUpdate = row;
+      this.formCity.city_name = row.nameEnglish;
+      this.formCity.city_nameEs = row.nameEspanish;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.cities = [];
+      this.duplicateCity = false;
+    },
+    updateData() {
+      this.$refs["formCity"].validate((valid) => {
+        if (valid) {
+          var city = {
+            id: this.cityUpdate.id,
+            nameEnglish:
+              this.cities == []
+                ? this.cities.city + ", " + this.cities.country
+                : this.formCity.city_name,
+            nameEspanish: this.duplicateCity
+              ? this.cities == []
+                ? this.cities.city + ", " + this.cities.country
+                : this.formCity.city_name
+              : this.formCity.city_nameEs,
+            latitude: this.cityUpdate.latitude,
+            longitude: this.cityUpdate.longitude,
+          };
+          axios
+            .put(this.url + "City", city)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
+
+              this.getCity();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.cityList = val;
     },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
@@ -649,33 +654,7 @@ export default {
           });
         });
     },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.cityList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.cityList, arr.id);
-      }
-      console.log(this.cityList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.cityList);
-      const clearList = [...new Set(this.cityList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -690,7 +669,8 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.list.forEach((value) => {
+          this.cityList.forEach((value) => {
+            console.log(value);
             this.handleDelete(value, false);
           });
         })
@@ -701,22 +681,8 @@ export default {
           });
         });
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    duplicatedCity(event) {
-      if (event) {
-        this.formCity.city_nameEs = this.formCity.city_name;
-      } else {
-        this.formCity.city_nameEs = "";
-      }
-    },
   },
-
+  /* INPUT SEARCH */
   computed: {
     city() {
       if (this.list.length > 0) {

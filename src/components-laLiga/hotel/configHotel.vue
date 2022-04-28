@@ -37,17 +37,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.hotelList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -77,21 +66,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -636,6 +618,7 @@ export default {
     this.getRoomType();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -673,6 +656,62 @@ export default {
       }
       this.handleFilter();
     },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
+    },
+    handleDownload() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = [
+          "id",
+          "nameEnglish",
+          "nameSpanish",
+          "cityName",
+          "providerCategoryName",
+        ];
+        const filterVal = [
+          "id",
+          "nameEnglish",
+          "nameSpanish",
+          "cityName",
+          "providerCategoryName",
+        ];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "Hotels" + date,
+        });
+        this.downloadLoading = false;
+      });
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
+    },
+    getSortClass: function (key) {
+      const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending";
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    /* HOTEL */
     resetTemp() {
       this.formHotel = {
         nameEnglish: "",
@@ -688,18 +727,85 @@ export default {
       this.city_name = "";
       this.fileList = [];
       console.log(this.roomTypeDefault);
-      if(this.dialogStatus === 'create'){
-              this.formRoomType = [
-        {
-          id: this.roomTypeDefault[0].id,
-          nameEspanish: this.roomTypeDefault[0].nameEspanish,
-          nameEnglish: this.roomTypeDefault[0].nameEnglish,
-          maxPax: this.roomTypeDefault[0].maxPax,
-        },
-      ];
+      if (this.dialogStatus === "create" && this.roomTypeDefault.length > 0) {
+        this.formRoomType = [
+          {
+            id: this.roomTypeDefault[0].id,
+            nameEspanish: this.roomTypeDefault[0].nameEspanish,
+            nameEnglish: this.roomTypeDefault[0].nameEnglish,
+            maxPax: this.roomTypeDefault[0].maxPax,
+          },
+        ];
       }
       this.active = 0;
     },
+    /* GET */
+    getHotel() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "Hotel")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
+    handleCreate() {
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.active = 0;
+    },
+    postHotel() {
+      if (this.active == 0) {
+        this.$refs["formHotel"].validate((valid) => {
+          this.next();
+        });
+      } else if (this.active == 1) {
+        var hotel = {
+          nameEnglish: this.formHotel.nameEnglish,
+          nameSpanish: this.formHotel.nameSpanish,
+          cityId: this.formHotel.cityId,
+          providerCategoryId: this.formHotel.providerCategoryId,
+          statusActive: this.formHotel.statusActive,
+          hotelRoomTypes: [],
+        };
+        this.formRoomType.forEach((element, index) => {
+          var roomType = {
+            hotelId: 0,
+            roomTypeId: element.id,
+          };
+          hotel.hotelRoomTypes.push(roomType);
+          console.log(hotel);
+        });
+
+        axios
+          .post(this.url + "Hotel", hotel)
+          .then((response) => {
+            this.formImageHotel.idHotel = response.data[0].id;
+            console.log(response, response.data[0].id);
+
+            this.$notify({
+              title: "Success",
+              message: "Hotel Agregado con éxito",
+              type: "success",
+              duration: 2000,
+            });
+            this.getHotel();
+            this.next();
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+      } else if (this.active == 2) {
+        this.dialogFormVisible = false;
+      }
+    },
+    /* UPDATE */
     handleUpdate(row) {
       this.resetTemp();
       this.getImageByIdHotel(row);
@@ -767,129 +873,9 @@ export default {
         this.dialogFormVisible = false;
       }
     },
-    getRoomTypeById() {
-      this.formRoomType = [];
-      this.hotelUpdate.hotelRoomTypes.forEach((element) => {
-        console.log("roomtype", element);
-        var room = {
-          id: element.roomTypeId,
-          nameEspanish: element.roomtypeSpanish,
-          nameEnglish: element.roomtypeEnglish,
-          maxPax: element.maxPax,
-        };
-        this.formRoomType.push(room);
-      });
-    },
-    getImageByIdHotel(hotel) {
-      axios
-        .get(this.url + "HotelMediaImage/GetAllByHotel?idhotel=" + hotel.id)
-        .then((response) => {
-          console.log(response.data);
-          this.fileList = response.data;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "nameEnglish", "nameSpanish", "cityName", "providerCategoryName"];
-        const filterVal = ["id", "nameEnglish", "nameSpanish", "cityName", "providerCategoryName"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Hotels" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
-          }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.active = 0;
-    },
-    postHotel() {
-      if (this.active == 0) {
-        this.$refs["formHotel"].validate((valid) => {
-          this.next();
-        });
-      } else if (this.active == 1) {
-        var hotel = {
-          nameEnglish: this.formHotel.nameEnglish,
-          nameSpanish: this.formHotel.nameSpanish,
-          cityId: this.formHotel.cityId,
-          providerCategoryId: this.formHotel.providerCategoryId,
-          statusActive: this.formHotel.statusActive,
-          hotelRoomTypes: [],
-        };
-        this.formRoomType.forEach((element, index) => {
-          var roomType = {
-            hotelId: 0,
-            roomTypeId: element.id,
-          };
-          hotel.hotelRoomTypes.push(roomType);
-          console.log(hotel);
-        });
-
-        axios
-          .post(this.url + "Hotel", hotel)
-          .then((response) => {
-            this.formImageHotel.idHotel = response.data[0].id;
-            console.log(response, response.data[0].id);
-
-            this.$notify({
-              title: "Success",
-              message: "Hotel Agregado con éxito",
-              type: "success",
-              duration: 2000,
-            });
-            this.getHotel();
-            this.next();
-          })
-          .catch((error) => {
-            console.error(error.response);
-          });
-      } else if (this.active == 2) {
-        this.dialogFormVisible = false;
-      }
-    },
-    getHotel() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Hotel")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.hotelList = val;
     },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
@@ -934,33 +920,7 @@ export default {
           });
         });
     },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.hotelList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.hotelList, arr.id);
-      }
-      console.log(this.hotelList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.hotelList);
-      const clearList = [...new Set(this.hotelList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -975,7 +935,8 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.list.forEach((value) => {
+          this.hotelList.forEach((value) => {
+            console.log(value);
             this.handleDelete(value, false);
           });
         })
@@ -986,6 +947,7 @@ export default {
           });
         });
     },
+    /* CITY */
     getCities(queryString, cb) {
       axios
         .get(this.url + "City")
@@ -1009,6 +971,7 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
+    /* PROVIDER */
     getProviders(queryString, cb) {
       axios
         .get(this.url + "Provider")
@@ -1035,6 +998,7 @@ export default {
       this.formHotel.providerId = item.id;
       this.formHotel.providerCategoryName = "";
     },
+    /* PROVIDER CATEGORY */
     getCatProvider(queryString, cb) {
       axios
         .get(
@@ -1104,8 +1068,21 @@ export default {
           this.getHotel();
         });
     },
+
     next() {
       if (this.active++ > 2) this.active = 0;
+    },
+    /* IMAGES */
+    getImageByIdHotel(hotel) {
+      axios
+        .get(this.url + "HotelMediaImage/GetAllByHotel?idhotel=" + hotel.id)
+        .then((response) => {
+          console.log(response.data);
+          this.fileList = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
@@ -1131,25 +1108,20 @@ export default {
     handleSuccess(response, file, fileList) {
       this.formImageHotel.id = response.id;
     },
-    addRoom() {
-      this.formRoomType.push({
-        id: "",
-        nameEspanish: "",
-        nameEnglish: "",
-        maxPax: 0,
+    /* ROOMTYPES */
+    getRoomTypeById() {
+      this.formRoomType = [];
+      this.hotelUpdate.hotelRoomTypes.forEach((element) => {
+        console.log("roomtype", element);
+        var room = {
+          id: element.roomTypeId,
+          nameEspanish: element.roomtypeSpanish,
+          nameEnglish: element.roomtypeEnglish,
+          maxPax: element.maxPax,
+        };
+        this.formRoomType.push(room);
       });
     },
-    deleteRoom(counter) {
-      this.formRoomType.splice(counter, 1);
-    },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    /* ROOMTYPES */
     getRoomType(queryString, cb) {
       axios
         .get(this.url + "RoomType")
@@ -1181,7 +1153,19 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
+    addRoom() {
+      this.formRoomType.push({
+        id: "",
+        nameEspanish: "",
+        nameEnglish: "",
+        maxPax: 0,
+      });
+    },
+    deleteRoom(counter) {
+      this.formRoomType.splice(counter, 1);
+    },
   },
+  /* INPUT SEARCH */
   computed: {
     hotel() {
       if (this.list) {

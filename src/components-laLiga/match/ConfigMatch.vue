@@ -37,17 +37,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.matchList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -76,21 +65,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -466,6 +448,7 @@ export default {
     this.getMatch();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -503,19 +486,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.formMatch = {
-        club_guest_id: 0,
-        clubGuestName: "",
-        club_home_id: 0,
-        clubHomeName: "",
-        stadium_id: 0,
-        stadiumName: "",
-        date: "",
-        tournamentName: "",
-        tournament_id: 0,
-      };
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -552,12 +522,48 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    /* MATCH */
+    resetTemp() {
+      this.formMatch = {
+        club_guest_id: 0,
+        clubGuestName: "",
+        club_home_id: 0,
+        clubHomeName: "",
+        stadium_id: 0,
+        stadiumName: "",
+        date: "",
+        tournamentName: "",
+        tournament_id: 0,
+      };
+    },
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
       this.city_name = "";
     },
+    /* GET */
+    getMatch() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "Match")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
     postMatch() {
       this.$refs["formMatch"].validate((valid) => {
         /* Extrayendo GMT de la fecha */
@@ -593,114 +599,7 @@ export default {
         }
       });
     },
-    getMatch() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Match")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "Match/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getMatch();
-          this.showReviewer = false;
-          this.matchList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.matchList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.matchList, arr.id);
-      }
-      console.log(this.matchList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
-    handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.matchList);
-      const clearList = [...new Set(this.matchList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.list.forEach((value) => {
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+    /* UPDATE */
     handleUpdate(row) {
       console.log(row);
       this.matchUpdate = row;
@@ -754,14 +653,81 @@ export default {
         }
       });
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.matchList = val;
     },
-    /* Clubs Autocomplete */
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
+      axios
+        .delete(this.url + "Match/" + id)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getMatch();
+          this.showReviewer = false;
+          this.matchList = [];
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row, false);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.matchList.forEach((value) => {
+            console.log(value);
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+    /* CLUB */
     getClub(queryString, cb) {
       axios
         .get(this.url + "Club")
@@ -800,6 +766,7 @@ export default {
     handleIconClickGuest(ev) {
       console.log(ev);
     },
+    /* STADIUM */
     getStadium(queryString, cb) {
       axios
         .get(this.url + "Stadium")
@@ -828,6 +795,7 @@ export default {
     handleIconClickStadium(ev) {
       console.log(ev);
     },
+    /* TOURNAMENT */
     getTournament(queryString, cb) {
       axios
         .get(this.url + "Tournament")
@@ -857,6 +825,7 @@ export default {
       console.log(ev);
     },
   },
+  /* INPUR SEARCH */
   computed: {
     provider() {
       if (this.list.length > 0) {
@@ -864,8 +833,10 @@ export default {
           return (
             item.clubGuest.toLowerCase().includes(this.search.toLowerCase()) ||
             item.clubHome.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.tournamentName.toLowerCase().includes(this.search.toLowerCase()) ||
-            item.stadiumName.toLowerCase().includes(this.search.toLowerCase()) 
+            item.tournamentName
+              .toLowerCase()
+              .includes(this.search.toLowerCase()) ||
+            item.stadiumName.toLowerCase().includes(this.search.toLowerCase())
           );
         });
       }

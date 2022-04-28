@@ -37,18 +37,7 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
-        v-if="showReviewer && this.stadiumList.length > 0"
+        v-if="showReviewer && this.matchRateList.length > 0"
         v-waves
         :loading="downloadLoading"
         class="filter-item"
@@ -76,21 +65,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -471,7 +453,7 @@ export default {
       /* EndPoint */
       url: this.$store.getters.url,
       search: "",
-      stadiumList: [],
+      matchRateList: [],
       defaultDate: new Date(),
       paxTypeInOption: [
         {
@@ -495,6 +477,7 @@ export default {
     this.getMatchRate();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -506,10 +489,6 @@ export default {
           this.listLoading = false;
         }, 1.5 * 1000);
       });
-    },
-    sss() {
-      var esto = new Date();
-      console.log(this.formMatchRate.start_date, esto);
     },
     handleFilter() {
       this.listQuery.page = 1;
@@ -535,27 +514,6 @@ export default {
         this.listQuery.sort = "-id";
       }
       this.handleFilter();
-    },
-    resetTemp() {
-      this.formMatchRate = {
-        matchId: "",
-        matchName: "",
-        start_date: "",
-        final_date: "",
-        stadiumCategoryId: 1,
-        stadiumCategoryName: "",
-        paxTypeIn: "",
-        match_price: 0,
-        startMatch: "",
-      };
-    },
-    resetFormContinue() {
-      console.log(this.formMatchRate);
-      this.formMatchRate.match_price = "";
-      this.formMatchRate.stadiumCategoryId = 0;
-      this.formMatchRate.stadiumCategoryName = "";
-
-      (this.stadiumCategoryId = 1), (this.stadiumCategoryName = "");
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
@@ -593,6 +551,51 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    /* MATCH RATE */
+    resetTemp() {
+      this.formMatchRate = {
+        matchId: "",
+        matchName: "",
+        start_date: "",
+        final_date: "",
+        stadiumCategoryId: 1,
+        stadiumCategoryName: "",
+        paxTypeIn: "",
+        match_price: 0,
+        startMatch: "",
+      };
+    },
+    resetFormContinue() {
+      console.log(this.formMatchRate);
+      this.formMatchRate.match_price = "";
+      this.formMatchRate.stadiumCategoryId = 0;
+      this.formMatchRate.stadiumCategoryName = "";
+
+      (this.stadiumCategoryId = 1), (this.stadiumCategoryName = "");
+    },
+    /* GET */
+    getMatchRate() {
+      this.listLoading = true;
+      console.log(this.defaultDate);
+      axios
+        .get(this.url + "MatchRate")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
     handleCreate() {
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
@@ -639,115 +642,7 @@ export default {
         }
       });
     },
-    getMatchRate() {
-      this.listLoading = true;
-      console.log(this.defaultDate);
-      axios
-        .get(this.url + "MatchRate")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "MatchRate/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getMatchRate();
-          this.showReviewer = false;
-          this.stadiumList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.stadiumList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.stadiumList, arr.id);
-      }
-      console.log(this.stadiumList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
-    handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.stadiumList);
-      const clearList = [...new Set(this.stadiumList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.list.forEach((value) => {
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+    /* UPDATE */
     changeStatus(data, status) {
       this.$confirm(
         `Do you want to ${status ? "activate " : "inactivate"} this status?`,
@@ -759,7 +654,7 @@ export default {
         }
       )
         .then(() => {
-          console.log(data)
+          console.log(data);
           var matchRate = {
             id: data.id,
             paxTypeIn: data.paxTypeId,
@@ -797,7 +692,7 @@ export default {
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.formMatchRate.matchId = row.matchId;
-      
+
       /* this.formMatchRate.matchName = row.matchName; */
       this.formMatchRate.start_date = row.startDate;
       this.formMatchRate.final_date = row.finalDate;
@@ -806,7 +701,7 @@ export default {
       this.formMatchRate.paxTypeIn = row.paxTypeId;
       this.formMatchRate.matchName = row.matchName;
       this.formMatchRate.match_price = row.matchPrice;
-      this.formMatchRate.stadium_id = row.stadioId
+      this.formMatchRate.stadium_id = row.stadioId;
     },
     updateData() {
       this.$refs["formMatchRate"].validate((valid) => {
@@ -840,13 +735,82 @@ export default {
         }
       });
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.matchRateList = val;
     },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
+      axios
+        .delete(this.url + "MatchRate/" + id)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getMatchRate();
+          this.showReviewer = false;
+          this.matchRateList = [];
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row, false);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.matchRateList.forEach((value) => {
+            console.log(value);
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+
+    /* CATEGORY STADIUM */
     getCategoryStadium(queryString, cb) {
       axios
         .get(
@@ -882,6 +846,7 @@ export default {
     handleIconClickCatStad(ev) {
       console.log(ev);
     },
+    /* MATCH */
     getMatch(queryString, cb) {
       axios
         .get(this.url + "Match")
@@ -928,6 +893,7 @@ export default {
       console.log(ev);
     },
   },
+  /* INPUT SEARCH */
   computed: {
     provider() {
       if (this.list.length > 0) {

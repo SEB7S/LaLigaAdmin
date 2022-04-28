@@ -43,17 +43,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.categoryProviderList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -82,21 +71,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -182,7 +164,10 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('provider.categoryProvider')" prop="categoryName">
+        <el-form-item
+          :label="$t('provider.categoryProvider')"
+          prop="categoryName"
+        >
           <el-input v-model="formCategory.categoryName" />
         </el-form-item>
         <el-form-item :label="$t('provider.categories')" prop="HTCategoryName">
@@ -334,7 +319,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-/*         categoryName: [
+        /*         categoryName: [
           {
             required: true,
             message: "Please input category",
@@ -379,6 +364,7 @@ export default {
     this.getCategory();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -462,6 +448,33 @@ export default {
         HTCategoryId: 0,
       };
     },
+    validateDuplicateProv(providerId, happyTourCategoryId) {
+      console.log(providerId, happyTourCategoryId);
+      this.list.forEach((element) => {
+        if (
+          element.happyTourCategoryId == happyTourCategoryId &&
+          element.providerId == providerId
+        ) {
+          console.log("cumple");
+          return true;
+        }
+      });
+    },
+    /* GET */
+    getCategory() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "ProviderCategories")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
@@ -518,19 +531,7 @@ export default {
         }
       });
     },
-    getCategory() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "ProviderCategories")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
+    /* UPDATE */
     handleUpdate(row) {
       console.log(row);
       this.categoryUpdate = row;
@@ -570,19 +571,10 @@ export default {
         }
       });
     },
-    validateDuplicateProv(providerId, happyTourCategoryId) {
-      console.log(providerId, happyTourCategoryId);
-      this.list.forEach((element) => {
-        if (
-          element.happyTourCategoryId == happyTourCategoryId &&
-          element.providerId == providerId
-        ) {
-          console.log("cumple");
-          return true;
-        }
-      });
-    },
     /* DELETE */
+    handleSelectionChange(val) {
+      this.categoryProviderList = val;
+    },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -626,33 +618,7 @@ export default {
           });
         });
     },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.categoryProviderList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.categoryProviderList, arr.id);
-      }
-      console.log(this.categoryProviderList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.categoryProviderList);
-      const clearList = [...new Set(this.categoryProviderList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -667,7 +633,8 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.list.forEach((value) => {
+          this.categoryProviderList.forEach((value) => {
+            console.log(value);
             this.handleDelete(value, false);
           });
         })
@@ -773,7 +740,7 @@ export default {
       this.formCategory.HTCategoryId = item.id;
     },
   },
-  /* FILTER */
+  /* INPUT SEARCH */
   computed: {
     providerList() {
       if (this.list) {

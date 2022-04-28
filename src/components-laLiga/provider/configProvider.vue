@@ -37,17 +37,6 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
         v-if="showReviewer && this.providerList.length > 0"
         v-waves
         :loading="downloadLoading"
@@ -58,14 +47,14 @@
       >
         {{ $t("table.delete") }}
       </el-button>
-<!--       <el-checkbox
+      <el-checkbox
         v-model="showReviewer"
         class="filter-item"
         style="margin-left: 15px"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
-      </el-checkbox> -->
+      </el-checkbox>
     </div>
     <el-table
       :key="tableKey"
@@ -76,21 +65,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -168,7 +150,7 @@
             icon="el-icon-edit"
           >
           </el-button>
-<!--           <el-button
+          <!--           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
@@ -397,6 +379,7 @@ export default {
     this.getProvider();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -434,34 +417,10 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.formProvider = {
-        name: "",
-        document: "",
-        status: true,
-        phone: "",
-        email: "",
-      };
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
         this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Providers" + date,
-        });
-        this.downloadLoading = false;
       });
     },
     formatJson(filterVal) {
@@ -479,6 +438,56 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    handleDownload() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "document", "phone", "email"];
+        const filterVal = ["id", "name", "document", "phone", "email"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "Providers" + date,
+        });
+        this.downloadLoading = false;
+      });
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    handleNodeClick(data) {
+      console.log(data);
+    },
+    /* PROVIDER */
+    resetTemp() {
+      this.formProvider = {
+        name: "",
+        document: "",
+        status: true,
+        phone: "",
+        email: "",
+      };
+    },
+    /* GET */
+    getProvider() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "Provider")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
@@ -513,119 +522,10 @@ export default {
         }
       });
     },
-    getProvider() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Provider")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "Provider/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getProvider();
-          this.showReviewer = false;
-          this.providerList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.providerList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.providerList, arr.id);
-      }
-      console.log(this.providerList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
-    handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.providerList);
-      const clearList = [...new Set(this.providerList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.list.forEach((value) => {
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+    /* UPDATE */
     changeStatus(data, status) {
-      
       this.$confirm(
-        `Do you want to ${status ? 'activate ' : 'inactivate'} this status?`,
+        `Do you want to ${status ? "activate " : "inactivate"} this status?`,
         "Warning",
         {
           confirmButtonText: "Yes",
@@ -704,17 +604,82 @@ export default {
         }
       });
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.providerList = val;
     },
-    handleNodeClick(data) {
-      console.log(data);
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
+      axios
+        .delete(this.url + "Provider/" + id)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.getProvider();
+          this.showReviewer = false;
+          this.providerList = [];
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row, false);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.providerList.forEach((value) => {
+            console.log(value);
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
   },
+  /* INPUT SEARCH */
   computed: {
     provider() {
       if (this.list.length > 0) {

@@ -37,18 +37,7 @@
         {{ $t("table.export") }}
       </el-button>
       <el-button
-        v-if="showReviewer"
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="danger"
-        icon="el-icon-trash"
-        @click="deleteAll"
-      >
-        {{ $t("table.deleteAll") }}
-      </el-button>
-      <el-button
-        v-if="showReviewer && this.clubList.length > 0"
+        v-if="showReviewer && this.tournamentList.length > 0"
         v-waves
         :loading="downloadLoading"
         class="filter-item"
@@ -76,21 +65,14 @@
       highlight-current-row
       style="width: 100%"
       @sort-change="sortChange"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
         v-if="showReviewer"
-        :label="$t('table.select')"
-        width="110px"
+        type="selection"
+        width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -291,7 +273,7 @@ export default {
       /* EndPoint */
       url: this.$store.getters.url,
       search: "",
-      clubList: [],
+      tournamentList: [],
       active: 0,
       dialogImageUrl: "",
       dialogVisible: false,
@@ -308,6 +290,7 @@ export default {
     this.getTournament();
   },
   methods: {
+    /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
@@ -345,11 +328,6 @@ export default {
       }
       this.handleFilter();
     },
-    resetTemp() {
-      this.formTournament = {
-        tounamentName: "",
-      };
-    },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
         this.pvData = response.data.pvData;
@@ -386,6 +364,37 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
+    next() {
+      if (this.active++ > 1) this.active = 0;
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    /* TOURNAMENT */
+    resetTemp() {
+      this.formTournament = {
+        tounamentName: "",
+      };
+    },
+    /* GET */
+    getTournament() {
+      this.listLoading = true;
+      axios
+        .get(this.url + "Tournament")
+        .then((response) => {
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* POST */
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
@@ -417,117 +426,7 @@ export default {
         }
       });
     },
-    next() {
-      if (this.active++ > 1) this.active = 0;
-    },
-    getTournament() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Tournament")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "Tournament/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getTournament();
-          this.showReviewer = false;
-          this.clubList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.clubList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.clubList, arr.id);
-      }
-      console.log(this.clubList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
-    handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.clubList);
-      const clearList = [...new Set(this.clubList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.list.forEach((value) => {
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+    /* UPDATE */
     changeStatus(data, status) {
       this.$confirm(
         "This will permanently delete the file. Continue?",
@@ -610,48 +509,14 @@ export default {
         }
       });
     },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.tournamentList = val;
     },
-    getCities(queryString, cb) {
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
       axios
-        .get(this.url + "City")
-        .then((response) => {
-          console.log(response.data);
-          var links = response.data;
-          var results = queryString
-            ? links.filter(this.createFilter(queryString))
-            : links;
-          cb(results);
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return (
-          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
-        );
-      };
-    },
-    handleSelect(item) {
-      console.log(item);
-      this.formTournament.cityName = item.nameEnglish;
-      this.formTournament.cityId = item.id;
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-      axios
-        .delete(this.url + "ClubMediaImage/DeleteClubMedia?id=" + file.id)
+        .delete(this.url + "Tournament/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -659,21 +524,67 @@ export default {
             type: "success",
             duration: 2000,
           });
+          this.getTournament();
+          this.showReviewer = false;
+          this.tournamentList = [];
         })
         .catch((error) => {
           console.error(error.response);
         });
     },
-    handleSuccess(response, file, fileList) {
-      this.formImageClub.id = response.id;
-      console.log(this.formImageClub.id, response);
+    confirmDelete(row) {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row, false);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
-    handlePictureCardPreview(file) {
-      console.log(file);
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
+    handleDeleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.tournamentList.forEach((value) => {
+            console.log(value);
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
     },
   },
+  /* INPUT SEARCH */
   computed: {
     provider() {
       if (this.list.length > 0) {

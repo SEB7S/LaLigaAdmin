@@ -27,7 +27,7 @@
       >
         {{ $t("table.export") }}
       </el-button>
-      <el-button
+      <!--       <el-button
         v-if="showReviewer"
         v-waves
         :loading="downloadLoading"
@@ -37,7 +37,7 @@
         @click="deleteAll"
       >
         {{ $t("table.deleteAll") }}
-      </el-button>
+      </el-button> -->
       <el-button
         v-if="showReviewer && this.categoryStadiumList.length > 0"
         v-waves
@@ -75,14 +75,6 @@
         width="55"
         align="center"
       >
-        <template slot-scope="{ row }">
-          <el-checkbox
-            class="filter-item"
-            style="margin-left: 15px"
-            @change="isSelected(row, $event)"
-          >
-          </el-checkbox>
-        </template>
       </el-table-column>
       <el-table-column
         label="ID"
@@ -371,9 +363,6 @@ export default {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
     /* Category */
     handleClose(done) {
       this.$confirm("Are you sure to close this form?")
@@ -488,6 +477,9 @@ export default {
         });
     },
     /* DELETE */
+    handleSelectionChange(val) {
+      this.categoryStadiumList = val;
+    },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
@@ -531,33 +523,7 @@ export default {
           });
         });
     },
-    isSelected(arr, select) {
-      console.log(select);
-      if (select) {
-        this.categoryStadiumList.push(arr.id);
-      } else {
-        this.removeItemFromArr(this.categoryStadiumList, arr.id);
-      }
-      console.log(this.categoryStadiumList);
-    },
-    removeItemFromArr(arr, item) {
-      var i = arr.indexOf(item);
-
-      if (i !== -1) {
-        arr.splice(i, 1);
-      }
-    },
     handleDeleteAll() {
-      /* delet duplicated id's */
-      console.log(this.categoryStadiumList);
-      const clearList = [...new Set(this.categoryStadiumList)];
-      console.log(clearList);
-      clearList.forEach((value) => {
-        console.log(value);
-        this.handleDelete(value, true);
-      });
-    },
-    deleteAll() {
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -572,7 +538,8 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.list.forEach((value) => {
+          this.categoryStadiumList.forEach((value) => {
+            console.log(value);
             this.handleDelete(value, false);
           });
         })
