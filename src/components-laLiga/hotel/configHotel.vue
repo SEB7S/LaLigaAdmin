@@ -1247,6 +1247,7 @@ export default {
 </script>
 <style lang="scss">
 @media (max-width: 600px) {
+  /*  */
   .el-dialog {
     width: 100% !important;
   }
