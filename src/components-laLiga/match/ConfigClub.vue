@@ -336,18 +336,7 @@ export default {
             trigger: "blur",
           },
         ],
-        stadiumName: [
-          {
-            required: true,
-            message: "Please input stadium",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
+
       },
       clubUpdate: [],
       /* EndPoint */

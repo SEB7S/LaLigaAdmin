@@ -6,7 +6,7 @@ const providerRouter = {
   path: '/provider',
   component: Layout,
   redirect: 'noRedirect',
-  name: 'ComponentDemo',
+  name: 'Provider',
   alwaysShow: true,
   meta: {
     title: 'provider',
@@ -28,7 +28,7 @@ const providerRouter = {
     {
       path: 'manageCategoryHappyTour',
       component: () => import('@/components-laLiga/provider/categoryHappytours'),
-      name: 'Provider Category',
+      name: 'Provider HappyTour',
       meta: { title: 'happyTourCategory' }
     },
   ]

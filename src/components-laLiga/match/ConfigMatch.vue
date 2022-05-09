@@ -177,7 +177,7 @@
         label-width="120px"
         style="margin-left: 50px"
       >
-        <el-form-item :label="$t('match.clubHome')" prop="match">
+        <el-form-item :label="$t('match.clubHome')" prop="clubHomeName">
           <el-autocomplete
             v-model="formMatch.clubHomeName"
             popper-class="my-autocomplete"
@@ -196,7 +196,7 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item :label="$t('match.clubGuest')" prop="match">
+        <el-form-item :label="$t('match.clubGuest')" prop="clubGuestName">
           <el-autocomplete
             v-model="formMatch.clubGuestName"
             popper-class="my-autocomplete"
@@ -215,7 +215,7 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item :label="$t('match.stadium')" prop="stadiumId">
+        <el-form-item :label="$t('match.stadium')" prop="stadiumName">
           <el-autocomplete
             v-model="formMatch.stadiumName"
             popper-class="my-autocomplete"
@@ -234,7 +234,7 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item :label="$t('match.tournamentName')" prop="stadiumId">
+        <el-form-item :label="$t('match.tournamentName')" prop="tournamentName">
           <el-autocomplete
             v-model="formMatch.tournamentName"
             popper-class="my-autocomplete"
@@ -253,7 +253,7 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item :label="$t('match.date')" prop="stadiumId">
+        <el-form-item :label="$t('match.date')" prop="date">
           <el-date-picker
             v-model="formMatch.date"
             type="datetime"
@@ -387,52 +387,39 @@ export default {
         tournament_id: 0,
       },
       rules: {
-        name: [
+        clubGuestName: [
           {
             required: true,
-            message: "Please input name",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
+            message: "Please input text",
             trigger: "blur",
           },
         ],
-        document: [
+        clubHomeName: [
           {
             required: true,
-            message: "Please input document",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
+            message: "Please input text",
             trigger: "blur",
           },
         ],
-        phone: [
+        stadiumName: [
           {
             required: true,
-            message: "Please input longitude",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
+            message: "Please input text",
             trigger: "blur",
           },
         ],
-        email: [
+        date: [
           {
             required: true,
-            message: "Please input city",
+            message: "Please input text",
             trigger: "blur",
           },
+        ],
+        tournamentName: [
           {
-            type: "email",
-            message: "Please input correct email address",
-            trigger: ["blur", "change"],
+            required: true,
+            message: "Please input text",
+            trigger: "blur",
           },
         ],
       },

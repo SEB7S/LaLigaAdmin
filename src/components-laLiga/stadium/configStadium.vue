@@ -100,6 +100,14 @@
         :label="$t('stadium.cityStadium')"
         min-width="100px"
         align="center"
+        prop="cityName"
+        column-key="cityName"
+        :filters="[
+          { text: 'Barcelona, Spain', value: 'Barcelona, Spain' },
+          { text: 'Madrid, Spain', value: 'Madrid, Spain' },
+          { text: 'Sevilla, Spain', value: 'Sevilla, Spain' },
+        ]"
+        :filter-method="filterHandler"
       >
         <template slot-scope="{ row }">
           <span>{{ row.cityName }}</span>
@@ -463,6 +471,8 @@ export default {
       dialogVisible: false,
       fileList: [],
       stadiumList: [],
+      /* Filter column */
+      aFilterCityStadium:[]
     };
   },
   created() {
@@ -527,6 +537,11 @@ export default {
     getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    filterHandler(value, row, column) {
+      console.log(value, row, column);
+      const property = column["columnKey"];
+      return row[property] === value;
     },
 
     /* STADIUM */

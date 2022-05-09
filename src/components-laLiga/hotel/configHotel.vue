@@ -108,6 +108,10 @@
         :label="$t('hotel.cityHotel')"
         min-width="100px"
         align="center"
+        prop="cityName"
+        column-key="cityName"
+        :filters="aFilters['cityName']"
+        :filter-method="filterHandler"
       >
         <template slot-scope="{ row }">
           <span>{{ row.cityName }}</span>
@@ -117,7 +121,10 @@
         :label="$t('provider.categories')"
         min-width="100px"
         align="center"
-        empty-text="ssdsd"
+        prop="happyTourCategoryName"
+        column-key="happyTourCategoryName"
+        :filters="aFilters['happyTourCategoryName']"
+        :filter-method="filterHandler"
       >
         <template slot-scope="{ row }">
           <span>{{ row.happyTourCategoryName }}</span>
@@ -127,6 +134,10 @@
         :label="$t('provider.categoryProvider')"
         min-width="100px"
         align="center"
+        prop="providerCategoryName"
+        column-key="providerCategoryName"
+        :filters="aFilters['providerCategoryName']"
+        :filter-method="filterHandler"
       >
         <template slot-scope="{ row }">
           <span>{{ row.providerCategoryName }}</span>
@@ -136,6 +147,10 @@
         :label="$t('hotel.providerHotel')"
         min-width="100px"
         align="center"
+        prop="providerName"
+        column-key="providerName"
+        :filters="aFilters['providerName']"
+        :filter-method="filterHandler"
       >
         <template slot-scope="{ row }">
           <span>{{ row.providerName }}</span>
@@ -611,6 +626,7 @@ export default {
       hotelList: [],
       arrayPosition: 0,
       roomTypeDefault: [],
+      aFilters: [],
     };
   },
   created() {
@@ -711,6 +727,34 @@ export default {
         })
         .catch((_) => {});
     },
+    filterHandler(value, row, column) {
+      console.log(value, row, column);
+      const property = column["columnKey"];
+      return row[property] === value;
+    },
+    createFilters(data, filter) {
+      filter.forEach((element) => {
+        let aFilter = [];
+        data.forEach((element2) => {
+          aFilter.push({
+            text: element2[element],
+            value: element2[element],
+          });
+        });
+        this.removeDuplicates(aFilter, element);
+      });
+    },
+    removeDuplicates(array, key) {
+      const seen = new Set();
+      const filteredArr = array.filter((el) => {
+        const duplicate = seen.has(el.text);
+        seen.add(el.text);
+        return !duplicate;
+      });
+      
+      this.aFilters[key] = filteredArr
+      console.log(this.aFilters)
+    },
     /* HOTEL */
     resetTemp() {
       this.formHotel = {
@@ -748,6 +792,14 @@ export default {
           console.log(response.data);
           this.list = response.data;
           this.listLoading = false;
+          /* Creando Filtros en columnas */
+          let filter = [
+            "cityName",
+            "happyTourCategoryName",
+            "providerCategoryName",
+            "providerName",
+          ];
+          this.createFilters(this.list, filter);
         })
         .catch((error) => {
           this.status = "error";
@@ -1068,7 +1120,6 @@ export default {
           this.getHotel();
         });
     },
-
     next() {
       if (this.active++ > 2) this.active = 0;
     },

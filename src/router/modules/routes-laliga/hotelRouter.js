@@ -6,7 +6,7 @@ const hotelRouter = {
   path: '/hotel',
   component: Layout,
   redirect: 'hotel',
-  name: 'ComponentDemo',
+  name: 'Hotel',
   meta: {
     title: 'hotel',
     icon: 'star'

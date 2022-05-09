@@ -157,9 +157,9 @@
       :before-close="handleClose"
     >
       <el-form
-        ref="dataForm"
+        ref="formCategory"
         :rules="rules"
-        :model="temp"
+        :model="formCategory"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
@@ -319,27 +319,27 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        /*         categoryName: [
+        categoryName: [
           {
             required: true,
             message: "Please input category",
-            trigger: "change",
+            trigger: "blur",
           },
         ],
         providerName: [
           {
             required: true,
             message: "Please input provider",
-            trigger: "change",
+            trigger: "blur",
           },
         ],
         HTCategoryName: [
           {
             required: true,
             message: "Please input HT Category",
-            trigger: "change",
+            trigger: "blur",
           },
-        ], */
+        ],
       },
       downloadLoading: false,
       /** FormCity  */
@@ -447,6 +447,7 @@ export default {
         HTCategoryName: "",
         HTCategoryId: 0,
       };
+      
     },
     validateDuplicateProv(providerId, happyTourCategoryId) {
       console.log(providerId, happyTourCategoryId);
@@ -481,31 +482,24 @@ export default {
       this.dialogFormVisible = true;
     },
     postCategory() {
-      this.$refs["dataForm"].validate((valid) => {
-        var category = {
-          providerCategoryName: this.formCategory.categoryName,
-          providerId: this.formCategory.providerId,
-          happyTourCategoryId: this.formCategory.HTCategoryId,
-        };
-        /*         let duplicate = function () {
-          this.list.forEach((element) => {
-            if (
+      this.$refs["formCategory"].validate((valid) => {
+        let duplicate 
+        if (valid) {
+          var category = {
+            providerCategoryName: this.formCategory.categoryName,
+            providerId: this.formCategory.providerId,
+            happyTourCategoryId: this.formCategory.HTCategoryId,
+          };
+          duplicate = this.list.findIndex(function (element) {
+            return (
               element.happyTourCategoryId == category.happyTourCategoryId &&
               element.providerId == category.providerId
-            ) {
-              console.log("cumple");
-              return true;
-            }
+            );
           });
-        }; */
-        let duplicate = this.list.findIndex(function (element) {
-          return (
-            element.happyTourCategoryId == category.happyTourCategoryId &&
-            element.providerId == category.providerId
-          );
-        });
+        }
+
         console.log(duplicate);
-        if (valid && duplicate == -1) {
+        if (duplicate == -1) {
           axios
             .post(this.url + "ProviderCategories", category)
             .then((response) => {
@@ -544,7 +538,7 @@ export default {
       this.formCategory.HTCategoryId = row.happyTourCategoryId;
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formCategory"].validate((valid) => {
         if (valid) {
           var category = {
             id: this.categoryUpdate.id,

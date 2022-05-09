@@ -6,7 +6,7 @@ const stadiumRouter = {
   path: '/stadium',
   component: Layout,
   redirect: '/stadium/manageStadium',
-  name: 'ComponentDemo',
+  name: 'Stadium',
   alwaysShow: true,
   meta: {
     title: 'stadium',

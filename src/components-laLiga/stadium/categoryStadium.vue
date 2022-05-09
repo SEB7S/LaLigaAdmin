@@ -145,9 +145,9 @@
       :before-close="handleClose"
     >
       <el-form
-        ref="dataForm"
+        ref="formCategory"
         :rules="rules"
-        :model="temp"
+        :model="formCategory"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
@@ -272,20 +272,20 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        /*         nameEnglish: [
+        nameEnglish: [
           {
             required: true,
-            message: "Please input city",
-            trigger: "change",
+            message: "Please input text",
+            trigger: "blur",
           },
         ],
         nameEspanish: [
           {
             required: true,
-            message: "Please input city",
-            trigger: "change",
+            message: "Please input text",
+            trigger: "blur",
           },
-        ], */
+        ],
       },
       downloadLoading: false,
       /** FormStadium */
@@ -399,7 +399,7 @@ export default {
       this.dialogFormVisible = true;
     },
     postCategory() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formCategory"].validate((valid) => {
         var category = {
           nameEnglish: this.formCategory.nameEnglish,
           nameEspanish: this.formCategory.nameEspanish,
@@ -434,7 +434,7 @@ export default {
       this.formCategory.priorityOrder = row.priorityOrder;
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formCategory"].validate((valid) => {
         if (valid) {
           var category = {
             id: this.hotelUpdate.id,

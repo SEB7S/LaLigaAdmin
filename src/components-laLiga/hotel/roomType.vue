@@ -157,9 +157,9 @@
       :before-close="handleClose"
     >
       <el-form
-        ref="dataForm"
+        ref="formRoomType"
         :rules="rules"
-        :model="temp"
+        :model="formRoomType"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
@@ -171,7 +171,11 @@
           <el-input v-model="formRoomType.nameEspanish" />
         </el-form-item>
         <el-form-item :label="$t('hotel.max_pax')" prop="maxPax">
-          <el-input v-model="formRoomType.maxPax" type="number" />
+          <el-input-number
+            v-model="formRoomType.maxPax"
+            :min="1"
+            :max="5"
+          ></el-input-number>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -292,27 +296,27 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        /*         nameEnglish: [
+        nameEnglish: [
           {
             required: true,
             message: "Please input name",
-            trigger: "change",
+            trigger: "blur",
           },
         ],
         nameEspanish: [
           {
             required: true,
             message: "Please input name",
-            trigger: "change",
+            trigger: "blur",
           },
         ],
         maxPax: [
           {
             required: true,
             message: "Please input max pax",
-            trigger: "change",
+            trigger: "blur",
           },
-        ], */
+        ],
       },
       downloadLoading: false,
       /** FormCity  */
@@ -323,7 +327,7 @@ export default {
       formRoomType: {
         nameEnglish: "",
         nameEspanish: "",
-        maxPax: 0,
+        maxPax: 1,
         stadiumId: "",
         stadiumName: "",
       },
@@ -423,7 +427,7 @@ export default {
       this.formRoomType = {
         nameEnglish: "",
         nameEspanish: "",
-        maxPax: 0,
+        maxPax: 1,
         stadiumId: "",
         stadiumName: "",
       };
@@ -450,7 +454,7 @@ export default {
       this.city_name = "";
     },
     postRoomType() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formRoomType"].validate((valid) => {
         var roomType = {
           nameEnglish: this.formRoomType.nameEnglish,
           nameEspanish: this.formRoomType.nameEspanish,
@@ -487,7 +491,7 @@ export default {
       this.formRoomType.stadiumId = row.stadiumId;
     },
     updateData() {
-      this.$refs["dataForm"].validate((valid) => {
+      this.$refs["formRoomType"].validate((valid) => {
         if (valid) {
           var roomType = {
             id: this.hotelUpdate.id,

@@ -188,23 +188,29 @@
       <div style="margin-top: 60px; padding: 25px">
         <div v-if="active == 0">
           <el-form
-            ref="dataForm"
+            ref="formTour"
             :rules="rules"
-            :model="temp"
+            :model="formTour"
             label-position="top"
             label-width="120px"
           >
-            <el-form-item :label="$t('tour.nameTour')">
+            <el-form-item :label="$t('tour.nameTour')" prop="name">
               <el-input v-model="formTour.name" />
             </el-form-item>
-            <el-form-item :label="$t('tour.durationTour')">
+            <el-form-item
+              :label="$t('tour.durationTour')"
+              prop="duration_in_days"
+            >
               <el-input-number
                 v-model="formTour.duration_in_days"
                 :min="1"
                 :max="35"
               />
             </el-form-item>
-            <el-form-item :label="$t('provider.nameProvider')">
+            <el-form-item
+              :label="$t('provider.nameProvider')"
+              prop="providerName"
+            >
               <el-autocomplete
                 v-model="formTour.providerName"
                 popper-class="my-autocomplete"
@@ -219,7 +225,10 @@
                 </template>
               </el-autocomplete>
             </el-form-item>
-            <el-form-item :label="$t('provider.categoryProvider')">
+            <el-form-item
+              :label="$t('provider.categoryProvider')"
+              prop="hotel_category"
+            >
               <el-select
                 v-model="formTour.hotel_category"
                 multiple
@@ -239,7 +248,7 @@
         </div>
         <div v-else-if="active == 1">
           <el-form
-            ref="dataForm2"
+            ref="formTour2"
             :rules="rules"
             :model="temp"
             label-position="top"
@@ -256,10 +265,13 @@
             </el-form-item>
           </el-form>
           <el-collapse v-model="activeNames" accordion>
-            <div v-for="(formDay, counter) in formDayDetail" :key="counter">
+            <div
+              v-for="(formDay, counter) in formDayDetail"
+              :key="counter"
+              @click="arrayPosition = counter"
+            >
               <div class="grid-content">
                 <el-collapse-item
-                  @focus="arrayPosition = counter"
                   :title="
                     formDay.dayName +
                     formDay.startDate +
@@ -271,7 +283,7 @@
                   :name="counter"
                 >
                   <el-form
-                    ref="dataForm"
+                    ref="formTour"
                     :rules="rules"
                     :model="temp"
                     label-position="top"
@@ -337,12 +349,12 @@
                         </el-switch>
                       </el-form-item>
 
-                      <!--                       <el-form-item
+                      <el-form-item
                         v-if="
                           (formDay.cityName != '' &&
                             dialogStatus === 'create') ||
-                          (editFormTourDayDescription.length > 0 &&
-                            editFormTourDayDescription[counter].cityName != '')
+                          (formDayDetail.length > 0 &&
+                            formDayDetail[counter].cityName != '')
                         "
                         label="Image"
                       >
@@ -353,8 +365,9 @@
                           :on-preview="handlePictureCardPreview"
                           :on-remove="handleRemove"
                           :file-list="
-                            editFormTourDayDescription.length > 0 && editFormTourDayDescription[counter].images
-                              ? editFormTourDayDescription[counter].images
+                            formDayDetail.length > 0 &&
+                            formDayDetail[counter].images
+                              ? formDayDetail[counter].images
                               : formDay.images
                           "
                           name="UploadImage"
@@ -365,7 +378,7 @@
                         <el-dialog :visible.sync="dialogVisible">
                           <img width="100%" :src="dialogImageUrl" alt="" />
                         </el-dialog>
-                      </el-form-item> -->
+                      </el-form-item>
                       <el-form-item label="Description English">
                         <el-input
                           v-model="formDay.description_english"
@@ -492,19 +505,17 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        type: [
+        name: [
           { required: true, message: "type is required", trigger: "change" },
         ],
-        timestamp: [
-          {
-            type: "date",
-            required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
+        duration_in_days: [
+          { required: true, message: "type is required", trigger: "change" },
         ],
-        title: [
-          { required: true, message: "title is required", trigger: "blur" },
+        providerName: [
+          { required: true, message: "type is required", trigger: "change" },
+        ],
+        hotel_category: [
+          { required: true, message: "type is required", trigger: "change" },
         ],
       },
       downloadLoading: false,
@@ -706,7 +717,11 @@ export default {
     postTour() {
       if (this.active == 0) {
         this.calculateDays();
-        this.next();
+        this.$refs["formTour"].validate((valid) => {
+          if (valid) {
+            this.next();
+          }
+        });
       } else if (this.active == 1) {
         var tour = {
           name: this.formTour.name,
@@ -761,8 +776,9 @@ export default {
       }
     },
     postImageTour(dayDescription) {
+      console.log(dayDescription, this.formDayDetail);
       this.formDayDetail.forEach((day, index) => {
-        console.log(day);
+        console.log(day, dayDescription[index].id);
         day.images.forEach((img) => {
           var formData = new FormData();
           formData.append("UploadImage", img.file);
@@ -913,10 +929,10 @@ export default {
       });
       console.log(this.aTourCategory, this.formDayDetail);
       this.getCatProv();
-      this.calculateDays();
     },
     updateData() {
       if (this.active == 0) {
+        this.calculateDays();
         this.next();
         this.calculateDays();
       } else if (this.active == 1) {
@@ -957,7 +973,8 @@ export default {
         axios
           .put(this.url + "Tour", tour)
           .then((response) => {
-            console.log("PUT");
+            console.log(response.data[0]);
+            this.postImageTour(response.data[0].tourDayDescriptions);
             this.getTour();
           })
           .catch((error) => {
@@ -1008,6 +1025,9 @@ export default {
     next() {
       if (this.active++ > 2) this.active = 0;
     },
+    esto(counter) {
+      console.log("counter", counter);
+    },
     /* IMAGE */
     handleRemove(file, fileList) {
       console.log(file, fileList);
@@ -1030,7 +1050,8 @@ export default {
       }
     },
     uploadFile(file) {
-      console.log(this.formDayDetail);
+      console.log(this.formDayDetail, this.arrayPosition, file);
+
       this.formDayDetail[this.arrayPosition].images.push(file);
     },
     getImageByIdDay(day) {
@@ -1101,6 +1122,7 @@ export default {
       this.formDayDetail[this.arrayPosition].titleTourCities =
         this.concatenateTitle(this.arrayPosition);
     },
+    /* TOURDAY */
     calculateDays() {
       console.log("entre a calcular");
       let days = [
@@ -1137,7 +1159,7 @@ export default {
             startDate: this.addDate(index, dateFormat) + " - ",
             startDateFormat: new Date(this.start_date),
             cityName: "",
-            cityId: 1,
+            cityId: 0,
             description_english: "",
             description_spanish: "",
             tourCities: [],
@@ -1148,12 +1170,7 @@ export default {
           this.formDayDetail.push(day);
         } else {
           /* this.start_date = this.editFormTourDayDescription[index].startTime; */
-          console.log(
-            "esto",
-            index <= this.editFormTourDayDescription.length,
-            this.editFormTourDayDescription.length,
-            index
-          );
+          console.log("esto", this.editFormTourDayDescription, index);
           if (index + 1 <= this.editFormTourDayDescription.length) {
             var day = {
               dayName: "Day " + (index + 1) + " - ",
@@ -1174,7 +1191,7 @@ export default {
               titleTourCities:
                 this.editFormTourDayDescription[index]["tourCities"],
               tourId: this.editFormTourDayDescription[index]["tourId"],
-              images: [],
+              images: this.editFormTourDayDescription[index]["images"],
             };
           } else {
             var day = {
@@ -1183,7 +1200,7 @@ export default {
               startDate: this.addDate(index, dateFormat) + " - ",
               startDateFormat: new Date(this.start_date),
               cityName: "",
-              cityId: 1,
+              cityId: 0,
               description_english: "",
               description_spanish: "",
               tourCities: [],
@@ -1192,9 +1209,8 @@ export default {
               images: [],
             };
           }
-
+          console.log(this.formDayDetail, this.editFormTourDayDescription);
           this.formDayDetail.push(day);
-          console.log(this.formDayDetail);
         }
         copyStartDate.setDate(copyStartDate.getDate() + 1);
       }

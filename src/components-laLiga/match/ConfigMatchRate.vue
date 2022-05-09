@@ -194,13 +194,14 @@
       <el-form
         ref="formMatchRate"
         :model="formMatchRate"
+        :rules="rules"
         label-position="top"
         label-width="120px"
         style="margin-left: 50px"
       >
         <el-form-item
           :label="$t('match.matchName') + ' - ' + formMatchRate.startMatch"
-          prop="stadiumId"
+          prop="matchName"
         >
           <el-autocomplete
             v-model="formMatchRate.matchName"
@@ -220,10 +221,10 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item :label="$t('match.matchPrice')" prop="document">
+        <el-form-item :label="$t('match.matchPrice')" prop="match_price">
           <el-input v-model="formMatchRate.match_price" />
         </el-form-item>
-        <el-form-item :label="$t('match.paxType')" prop="phone">
+        <el-form-item :label="$t('match.paxType')" prop="paxTypeIn">
           <el-select v-model="formMatchRate.paxTypeIn" placeholder="Select">
             <el-option
               v-for="item in paxTypeInOption"
@@ -234,7 +235,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('match.startDate')" prop="email">
+        <el-form-item :label="$t('match.startDate')" prop="start_date">
           <el-date-picker
             v-model="formMatchRate.start_date"
             type="datetime"
@@ -244,7 +245,7 @@
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item :label="$t('match.finalDate')" prop="email">
+        <el-form-item :label="$t('match.finalDate')" prop="final_date">
           <el-date-picker
             v-model="formMatchRate.final_date"
             type="datetime"
@@ -253,7 +254,10 @@
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item :label="$t('match.stadiumCategory')" prop="stadiumId">
+        <el-form-item
+          :label="$t('match.stadiumCategory')"
+          prop="stadiumCategoryName"
+        >
           <el-autocomplete
             v-model="formMatchRate.stadiumCategoryName"
             popper-class="my-autocomplete"
@@ -400,52 +404,46 @@ export default {
         startMatch: "",
       },
       rules: {
-        name: [
+        matchName: [
           {
             required: true,
-            message: "Please input name",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
+            message: "Please input text",
             trigger: "blur",
           },
         ],
-        document: [
+        start_date: [
           {
             required: true,
-            message: "Please input document",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
+            message: "Please input text",
             trigger: "blur",
           },
         ],
-        phone: [
+        final_date: [
           {
             required: true,
-            message: "Please input longitude",
-            trigger: "blur",
-          },
-          {
-            min: 3,
-            message: "Length should be 3",
+            message: "Please input text",
             trigger: "blur",
           },
         ],
-        email: [
+        stadiumCategoryName: [
           {
             required: true,
-            message: "Please input city",
+            message: "Please input text",
             trigger: "blur",
           },
+        ],
+        paxTypeIn: [
           {
-            type: "email",
-            message: "Please input correct email address",
-            trigger: ["blur", "change"],
+            required: true,
+            message: "Please input text",
+            trigger: "blur",
+          },
+        ],
+        match_price: [
+          {
+            required: true,
+            message: "Please input text",
+            trigger: "blur",
           },
         ],
       },

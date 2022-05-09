@@ -6,7 +6,7 @@ const cityRouter = {
   path: '/city',
   component: Layout,
   redirect: 'noRedirect',
-  name: 'ComponentDemo',
+  name: 'City',
   alwaysShow: true,
   meta: {
     title: 'city',
