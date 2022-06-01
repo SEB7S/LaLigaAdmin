@@ -184,7 +184,7 @@
           <el-input v-model="formCity.city_nameEs" placeholder="Please input" />
         </el-form-item>
         <el-form-item v-if="formCity.city_name != ''">
-          <span style="margin-right: 5px">Duplicar Nombre en Español: </span>
+          <span style="margin-right: 5px">{{ $t("city.duplicate") }} </span>
           <el-switch v-model="duplicateCity" @change="duplicatedCity($event)">
           </el-switch>
         </el-form-item>

@@ -128,7 +128,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.startDate }}</span>
+          <span>{{ row.startDate | formatDate }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -137,7 +137,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.finalDate }}</span>
+          <span>{{ row.finalDate | formatDate }}</span>
         </template>
       </el-table-column>
       <el-table-column

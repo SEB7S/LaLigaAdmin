@@ -83,6 +83,7 @@ export default {
     user: 'User',
     tournament: 'Tournament',
     categoryProvider: 'Provider Category',
+    dateTours:'Program'
 
   },
   tour: {
@@ -98,6 +99,7 @@ export default {
     stepOneName: 'General Data',
     stepTwoName: 'Detail Days',
     image: 'Choose Image',
+    tourInstance: 'Children'
   },
   match: {
     nameClub: 'Club',
@@ -138,7 +140,8 @@ export default {
     nameEnCity: 'Name En',
     nameEsCity: 'Name Es',
     latitudeCity: 'Latitude',
-    longitudeCity: 'Longitude'
+    longitudeCity: 'Longitude',
+    duplicate: 'Duplicate name'
   },
   stadium: {
     nameStadium: 'Name',

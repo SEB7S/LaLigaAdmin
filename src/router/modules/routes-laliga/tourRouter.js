@@ -18,6 +18,12 @@ const tourRouter = {
       component: () => import('@/components-laLiga/tour/configTour'),
       name: 'manageTour',
       meta: { title: 'manageTour' }
+    },
+    {
+      path: 'programTour',
+      component: () => import('@/components-laLiga/tour/programTour'),
+      name: 'programTour',
+      meta: { title: 'dateTours' }
     }
   ]
 }

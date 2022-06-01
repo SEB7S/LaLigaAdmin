@@ -1,0 +1,761 @@
+<template>
+  <div class="app-container">
+    <el-autocomplete
+      v-model="tour"
+      popper-class="my-autocomplete"
+      :fetch-suggestions="getTour"
+      placeholder="Please input"
+      @select="handleSelect"
+    >
+      <i slot="suffix" class="el-icon-edit el-input__icon" />
+      <template slot-scope="{ item }">
+        <div class="value">
+          {{ item.name }}
+        </div>
+      </template>
+    </el-autocomplete>
+    <h3>Tours</h3>
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tab-pane label="Date" name="first">
+        <div v-show="tour != ''" style="margin: 15px 0">
+          <el-checkbox
+            style="margin: 15px 0"
+            :indeterminate="isIndeterminate"
+            v-model="checkAll"
+            @change="handleCheckAllChange"
+            >Marcar todos</el-checkbox
+          >
+          <div style="margin: 15px 0"></div>
+          <el-checkbox-group
+            v-model="checkedTours"
+            @change="handlecheckedToursChange"
+          >
+            <el-checkbox
+              v-for="(tourDay, index) in aListTours"
+              :label="tourDay"
+              :key="index"
+              border
+              class="space"
+            >
+              {{ index + 1 + ". " + tourDay.name }}
+              {{ tourDay.startDate | formatDate }}</el-checkbox
+            >
+          </el-checkbox-group>
+        </div>
+        <el-button v-show="tour != ''" type="primary" @click="postTourInstance"
+          >Confirmar</el-button
+        >
+      </el-tab-pane>
+      <el-tab-pane label="Config" name="second">
+        <div class="filter-container">
+          <el-input
+            placeholder="Search"
+            style="width: 200px"
+            class="filter-item"
+            v-model="search"
+            @keyup.enter.native="handleFilter"
+          />
+          <el-button
+            class="filter-item"
+            style="margin-left: 10px"
+            type="primary"
+            icon="el-icon-edit"
+            @click="handleCreate"
+          >
+            {{ $t("table.add") }}
+          </el-button>
+          <el-button
+            v-waves
+            :loading="downloadLoading"
+            class="filter-item"
+            type="primary"
+            icon="el-icon-download"
+            @click="handleDownload"
+          >
+            {{ $t("table.export") }}
+          </el-button>
+          <!--       <el-button
+        v-if="showReviewer"
+        v-waves
+        :loading="downloadLoading"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-trash"
+        @click="deleteAll"
+      >
+        {{ $t("table.deleteAll") }}
+      </el-button> -->
+          <el-button
+            v-if="showReviewer && this.categoryStadiumList.length > 0"
+            v-waves
+            :loading="downloadLoading"
+            class="filter-item"
+            type="danger"
+            icon="el-icon-trash"
+            @click="handleDeleteAll"
+          >
+            {{ $t("table.delete") }}
+          </el-button>
+          <el-checkbox
+            v-model="showReviewer"
+            class="filter-item"
+            style="margin-left: 15px"
+            @change="tableKey = tableKey + 1"
+          >
+            {{ $t("table.select") }}
+          </el-checkbox>
+        </div>
+        <el-table
+          :key="tableKey"
+          v-loading="listLoading"
+          :data="list"
+          border
+          fit
+          highlight-current-row
+          style="width: 100%"
+          @sort-change="sortChange"
+          @selection-change="handleSelectionChange"
+        >
+          <el-table-column
+            v-if="showReviewer"
+            type="selection"
+            width="55"
+            align="center"
+          >
+          </el-table-column>
+          <el-table-column
+            label="ID"
+            prop="id"
+            sortable="custom"
+            align="center"
+            width="80"
+            :class-name="getSortClass('id')"
+          >
+            <template slot-scope="{ row }">
+              <span>{{ row.id }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="$t('tour.nameTour')"
+            min-width="100px"
+            align="center"
+          >
+            <template slot-scope="{ row }">
+              <span>{{ row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="$t('tour.nameProvider')"
+            min-width="100px"
+            align="center"
+          >
+            <template slot-scope="{ row }">
+              <span>{{ row.providerName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="$t('tour.durationTour')"
+            min-width="100px"
+            align="center"
+          >
+            <template slot-scope="{ row }">
+              <span>{{ row.duration_in_days }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="$t('tour.status')"
+            min-width="100px"
+            align="center"
+          >
+            <template slot-scope="{ row }">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="provider disabled"
+                placement="top-start"
+                :disabled="row.providerStatus"
+              >
+                <el-switch
+                  v-model="row.status"
+                  active-color="#619b97"
+                  inactive-color="#f5365c"
+                  @change="changeStatus(row, $event)"
+                  :disabled="!row.providerStatus"
+                />
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="$t('table.actions')"
+            align="center"
+            width="230"
+            class-name="small-padding fixed-width"
+          >
+            <template slot-scope="{ row }">
+              <el-button
+                type="primary"
+                size="mini"
+                @click="handleUpdate(row)"
+                icon="el-icon-edit"
+              >
+              </el-button>
+              <el-button
+                v-if="row.status != 'deleted'"
+                size="mini"
+                type="danger"
+                @click="confirmDelete(row)"
+                icon="el-icon-delete"
+              >
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="total > 0"
+          :total="total"
+          :page.sync="listQuery.page"
+          :limit.sync="listQuery.limit"
+          @pagination="getList"
+        />
+        <el-dialog
+          :title="textMap[dialogStatus]"
+          :visible.sync="dialogFormVisible"
+          :before-close="handleClose"
+        >
+          <el-form
+            ref="formCategory"
+            :rules="rules"
+            :model="formCategory"
+            label-position="top"
+            label-width="120px"
+            style="margin-left: 50px"
+          >
+            <el-form-item :label="$t('stadium.nameEnglish')" prop="nameEnglish">
+              <el-input v-model="formCategory.nameEnglish" />
+            </el-form-item>
+            <el-form-item
+              :label="$t('stadium.nameEspanish')"
+              prop="nameEspanish"
+            >
+              <el-input v-model="formCategory.nameEspanish" />
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">
+              {{ $t("table.cancel") }}
+            </el-button>
+            <el-button
+              type="primary"
+              @click="
+                dialogStatus === 'create' ? postTourInstance() : updateData()
+              "
+            >
+              {{ $t("table.confirm") }}
+            </el-button>
+          </div>
+        </el-dialog>
+        <el-dialog
+          :visible.sync="dialogPvVisible"
+          title="Reading statistics"
+          :before-close="handleClose"
+        >
+          <el-table
+            :data="pvData"
+            border
+            fit
+            highlight-current-row
+            style="width: 100%"
+          >
+            <el-table-column prop="key" label="Channel" />
+            <el-table-column prop="pv" label="Pv" />
+          </el-table>
+          <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="dialogPvVisible = false">
+              Confirm
+            </el-button>
+          </span>
+        </el-dialog>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
+</template>
+<script>
+import { fetchList, fetchPv } from "@/api/article";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
+const calendarTypeOptions = [
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
+
+// arr to obj, such as { CN : "China", US : "USA" }
+const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
+const tourDayOptions = [
+  "Real Madrid Fan-1",
+  "Real Madrid Fan-2",
+  "Real Madrid Fan-3",
+  "Real Madrid Fan-4",
+  "Real Madrid Fan-5",
+  "Real Madrid Fan-6",
+  "Real Madrid Fan-7",
+];
+export default {
+  name: "categoryProvider",
+  components: { Pagination },
+  directives: { waves },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
+    },
+    typeFilter(type) {
+      return calendarTypeKeyValue[type];
+    },
+  },
+  data() {
+    return {
+      tableKey: 0,
+      listTours: null,
+      total: 0,
+      listLoading: true,
+      search: "",
+      listQuery: {
+        page: 1,
+        limit: 10,
+        importance: undefined,
+        title: undefined,
+        type: undefined,
+        sort: "+id",
+      },
+      importanceOptions: [1, 2, 3],
+      calendarTypeOptions,
+      sortOptions: [
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
+      ],
+      statusOptions: ["published", "draft", "deleted"],
+      showReviewer: false,
+      temp: {
+        id: undefined,
+        importance: 1,
+        remark: "",
+        timestamp: new Date(),
+        title: "",
+        type: "",
+        status: "published",
+      },
+      dialogFormVisible: false,
+      dialogStatus: "",
+      textMap: {
+        update: "Edit",
+        create: "Create",
+      },
+      dialogPvVisible: false,
+      pvData: [],
+      rules: {
+        nameEnglish: [
+          {
+            required: true,
+            message: "Please input text",
+            trigger: "blur",
+          },
+        ],
+        nameEspanish: [
+          {
+            required: true,
+            message: "Please input text",
+            trigger: "blur",
+          },
+        ],
+      },
+      downloadLoading: false,
+      /** FormStadium */
+      formCategory: {
+        nameEnglish: "",
+        nameEspanish: "",
+      },
+
+      categoryStadiumList: [],
+      /* EndPoint */
+      url: this.$store.getters.url,
+      multipleSelection: [],
+      activeName: "first",
+      list: [],
+      loading: false,
+      tour: "",
+      tourSelected: null,
+      aListTours: [],
+      aListToursFinal: [],
+      /* checkbox */
+      checkAll: false,
+      checkedTours: [],
+      isIndeterminate: true,
+    };
+  },
+  created() {},
+  methods: {
+    /* TABLE */
+    getList() {
+      this.listLoading = true;
+      fetchList(this.listQuery).then((response) => {
+        this.total = response.data.total;
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
+    },
+    handleFilter() {
+      this.listQuery.page = 1;
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
+    },
+    sortChange(data) {
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
+      }
+    },
+    sortByID(order) {
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
+      } else {
+        this.listQuery.sort = "-id";
+      }
+      this.handleFilter();
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
+    },
+    getSortClass: function (key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    /* Category */
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    handleDownload() {
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "nameEnglish", "nameEspanish"];
+        const filterVal = ["id", "name", "nameEspanish"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "RoomType" + date,
+        });
+        this.downloadLoading = false;
+      });
+    },
+    resetTemp() {
+      this.formCategory = {
+        nameEnglish: "",
+        nameEspanish: "",
+      };
+    },
+    /* POST */
+    handleCreate() {
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+    },
+    postTourInstance() {
+      console.log(this.checkedTours);
+      var tour = {
+        duration_in_days: this.listTours.duration_in_days,
+        id: this.listTours.id,
+        idProvider: this.listTours.idProvider,
+        instancesQuantity: this.listTours.instancesQuantity,
+        isMaster: this.listTours.isMaster,
+        masterTourId: this.listTours.masterTourId,
+        name: this.listTours.name,
+        providerName: this.listTours.providerName,
+        providerStatus: this.listTours.providerStatus,
+        status: this.listTours.status,
+        tourCategories: this.listTours.tourCategories,
+        tourDayDescriptions: this.listTours.tourDayDescriptions,
+        tourInstances: this.aListToursFinal,
+      };
+
+      axios
+        .post(this.url + "Tour/AddTourInstanceFromTour", tour)
+        .then((response) => {
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "Success",
+            message: "Categoría Agregado con éxito",
+            type: "success",
+            duration: 2000,
+          });
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    /* UPDATE */
+    handleUpdate(row) {
+      console.log(row);
+      this.hotelUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formCategory.nameEnglish = row.nameEnglish;
+      this.formCategory.nameEspanish = row.nameEspanish;
+      this.formCategory.priorityOrder = row.priorityOrder;
+    },
+    updateData() {
+      this.$refs["formCategory"].validate((valid) => {
+        if (valid) {
+          var category = {
+            id: this.hotelUpdate.id,
+            nameEnglish: this.formCategory.nameEnglish,
+            nameEspanish: this.formCategory.nameEspanish,
+            priorityOrder: this.formCategory.priorityOrder,
+          };
+          axios
+            .put(this.url + "StadiumCategory", category)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: "Success",
+                message: "Update Successfully",
+                type: "success",
+                duration: 2000,
+              });
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    /* GET */
+    getTour(queryString, cb) {
+      axios
+        .get(this.url + "Tour")
+        .then((response) => {
+          console.log(response.data);
+          /* para que el autocomplete solo muestre los tours padres */
+          var links = response.data;
+          var aTours = [];
+          this.list = response.data;
+          aTours = response.data.map((item) => {
+            console.log(item.isMaster);
+            return item.isMaster ? item : 1;
+          });
+          console.log(aTours);
+          links = aTours.filter((element) => element !== 1);
+          var results = queryString
+            ? links.filter(this.createFiltertourDay(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFiltertourDay(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelect(item) {
+      console.log(item);
+      this.tour = item.name;
+      this.tourSelected = 52;
+      this.listTours = item;
+      console.log(this.listTours);
+      /* para listar los tours hijos */
+
+      var aTourChildren = [];
+      aTourChildren = this.list.map((item) => {
+        console.log(item.masterTourId, this.listTours.id);
+        return item.masterTourId === this.listTours.id ? item : 1;
+      });
+      console.log(aTourChildren);
+      this.list = aTourChildren.filter((element) => element !== 1);
+      console.log(this.list);
+      this.listLoading = false;
+      this.caculateDate(
+        item.name,
+        item.tourDayDescriptions[0].startTime,
+        item.id
+      );
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
+    handleCheckAllChange(val) {
+      console.log(val);
+      this.checkedTours = val ? this.aListTours : [];
+      this.isIndeterminate = false;
+    },
+    handlecheckedToursChange(value) {
+      console.log(value);
+      this.aListToursFinal = value;
+      let checkedCount = value.length;
+      this.checkAll = checkedCount === this.aListTours.length;
+      this.isIndeterminate =
+        checkedCount > 0 && checkedCount < this.aListTours.length;
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
+    caculateDate(tourName, initialDate, idTour) {
+      console.log(tourName, initialDate);
+      let date = new Date(initialDate);
+      this.aListTours = [];
+      for (let index = 0; index < 52; index++) {
+        this.aListTours.push({
+          tourId: idTour,
+          name: tourName,
+          startDate: new Date(date.setDate(date.getDate() + 7)),
+        });
+      }
+      this.checkedTours = this.aListTours;
+      this.aListToursFinal = this.aListTours;
+
+      console.log(this.aListTours);
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.categoryStadiumList = val;
+    },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id;
+      axios
+        .delete(this.url + "StadiumCategory/" + id)
+        .then((response) => {
+          this.$notify({
+            title: "Success",
+            message: "Delete Successfully",
+            type: "success",
+            duration: 2000,
+          });
+          this.showReviewer = false;
+          this.categoryStadiumList = [];
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.handleDelete(row, false);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        "This will permanently delete the file. Continue?",
+        "Warning",
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "Delete completed",
+          });
+          this.categoryStadiumList.forEach((value) => {
+            console.log(value);
+            this.handleDelete(value, false);
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "Delete canceled",
+          });
+        });
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
+  },
+  /* INPUT SEARCH */
+  computed: {
+    listTour() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return item.name.toLowerCase().includes(this.search.toLowerCase());
+        });
+      }
+    },
+  },
+};
+</script>
+<style lang="scss">
+@media (max-width: 600px) {
+  .el-dialog {
+    width: 100% !important;
+  }
+}
+.space {
+  margin: 3px;
+  width: 350px;
+}
+.el-checkbox.is-bordered + .el-checkbox.is-bordered {
+  margin-left: 0 !important;
+  margin: 3px !important;
+}
+</style>

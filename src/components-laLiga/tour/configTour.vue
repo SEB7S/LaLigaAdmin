@@ -120,6 +120,15 @@
         </template>
       </el-table-column>
       <el-table-column
+        :label="$t('tour.tourInstance')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row.instancesQuantity }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         :label="$t('tour.status')"
         min-width="100px"
         align="center"
@@ -653,7 +662,16 @@ export default {
         .get(this.url + "Tour")
         .then((response) => {
           console.log("sss", response.data);
-          this.list = response.data;
+          var aTours = []
+          aTours = response.data.map((item) => {
+            console.log(item.masterTourId);
+            return item.masterTourId == null ? item : 1;
+          });
+          console.log(aTours);
+          this.list = aTours.filter((element) => 
+            element !== 1
+          );
+          console.log(this.list);
           this.listLoading = false;
         })
         .catch((error) => {
@@ -706,6 +724,13 @@ export default {
     handleIconClick(ev) {
       console.log(ev);
     },
+    /* Función que suma o resta días a una fecha, si el parámetro
+   días es negativo restará los días*/
+    sumarDias(fecha, dias) {
+      fecha.setDate(fecha.getDate() + dias);
+      console.log(fecha);
+      return fecha;
+    },
     /* POST */
     handleCreate() {
       this.resetTemp();
@@ -730,6 +755,8 @@ export default {
           idProvider: this.formTour.idProvider,
           tourCategories: [],
           tourDayDescriptions: [],
+          isMaster: true,
+          tourInstances: null,
         };
 
         this.formTour.hotel_category.forEach((option) => {
@@ -743,11 +770,13 @@ export default {
 
         this.formDayDetail.forEach((element, index) => {
           console.log(element);
+          var d = new Date(element.startDateFormat);
           var dayDescription = {
             dayNumber: index + 1,
             tourCities: element.titleTourCities,
             matchable: element.matchable,
             startTime: new Date(element.startDateFormat),
+            date: new Date(this.sumarDias(d, index)),
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
             tourId: this.formImageTour.idTour,

@@ -128,7 +128,7 @@
         align="center"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.date | dateformat }}</span>
+          <span>{{ row.date | formatDate }}</span>
         </template>
       </el-table-column>
 
@@ -258,6 +258,7 @@
             v-model="formMatch.date"
             type="datetime"
             placeholder="Select date and time"
+            :picker-options="pickerOptions"
           >
           </el-date-picker>
         </el-form-item>
@@ -422,6 +423,11 @@ export default {
             trigger: "blur",
           },
         ],
+      },
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now();
+        },
       },
       matchUpdate: [],
       /* EndPoint */

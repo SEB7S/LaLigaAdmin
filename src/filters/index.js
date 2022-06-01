@@ -66,3 +66,14 @@ export function toThousandFilter(num) {
 export function uppercaseFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+import moment from 'moment'
+
+/**
+ * Upper case first char
+ * @param {String} value
+ */
+export function formatDate(value) {
+  if (value) {
+    return moment(String(value)).format('lll')
+  }
+}

@@ -82,7 +82,8 @@ export default {
     categoryStadium: 'Categoría Estadio',
     user: 'Usuario',
     tournament: 'Gestionar Torneo',
-    categoryProvider:'Categoría Proveedor'
+    categoryProvider:'Categoría Proveedor',
+    dateTours:"Programar Tour"
   },
   tour: {
     nameTour: 'Nombre',
@@ -92,6 +93,7 @@ export default {
     stepOneName: 'Datos Generales',
     stepTwoName: 'Detalle de Días',
     image: 'Cargar Imágen',
+    tourInstance: 'Hijos'
   },
   match: {
     nameClub: 'Club',
@@ -133,7 +135,8 @@ export default {
     nameEnCity: 'Nombre En',
     nameEsCity: 'Nombre Es',
     latitudeCity: 'Latitud',
-    longitudeCity: 'Longitud'
+    longitudeCity: 'Longitud',
+    duplicate: 'Duplicar nombre en español'
   },
   stadium: {
     nameStadium: 'Nombre',
