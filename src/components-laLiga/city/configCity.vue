@@ -2,13 +2,13 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
+        v-model="search"
         placeholder="Nombre En"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
       />
-      <!-- 
+      <!--
       <el-button
         v-waves
         class="filter-item"
@@ -73,8 +73,7 @@
         type="selection"
         width="55"
         align="center"
-      >
-      </el-table-column>
+      />
       <el-table-column
         label="ID"
         prop="id"
@@ -125,18 +124,16 @@
           <el-button
             type="primary"
             size="mini"
-            @click="handleUpdate(row)"
             icon="el-icon-edit"
-          >
-          </el-button>
+            @click="handleUpdate(row)"
+          />
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="confirmDelete(row)"
             icon="el-icon-delete"
-          >
-          </el-button>
+            @click="confirmDelete(row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -158,7 +155,6 @@
         :rules="rules"
         label-position="top"
         label-width="70px"
-        style="margin-left: 50px"
       >
         <el-form-item :label="$t('city.nameEnCity')" prop="city_name">
           <el-autocomplete
@@ -185,8 +181,7 @@
         </el-form-item>
         <el-form-item v-if="formCity.city_name != ''">
           <span style="margin-right: 5px">{{ $t("city.duplicate") }} </span>
-          <el-switch v-model="duplicateCity" @change="duplicatedCity($event)">
-          </el-switch>
+          <el-switch v-model="duplicateCity" @change="duplicatedCity($event)" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -230,41 +225,41 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle,
-} from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
+  updateArticle
+} from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ConfigCity",
+  name: 'ConfigCity',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -278,38 +273,38 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       downloadLoading: false,
       /** FormCity  */
       formCity: {
-        city_name: "",
-        city_nameEs: "",
+        city_name: '',
+        city_nameEs: ''
       },
       duplicateCity: false,
       cityUpdate: [],
@@ -317,370 +312,25 @@ export default {
       /* EndPoint */
       url: this.$store.getters.url,
 
-      search: "",
+      search: '',
       rules: {
         city_name: [
           {
             required: true,
-            message: "Please input city",
-            trigger: "change",
-          },
+            message: 'Please input city',
+            trigger: 'change'
+          }
         ],
         city_nameEs: [
           {
             required: true,
-            message: "Please input city",
-            trigger: "change",
-          },
-        ],
-      },
-      cityList: [],
-    };
-  },
-  created() {
-    /*     this.getList(); */
-    this.getCity();
-  },
-  methods: {
-    /* TABLE */
-    getList() {
-      this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items;
-        this.total = response.data.total;
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
-    },
-    handleFilter() {
-      this.listQuery.page = 1;
-      this.getCity();
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
-    sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
-      }
-    },
-    sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
-      } else {
-        this.listQuery.sort = "-id";
-      }
-      this.handleFilter();
-    },
-    createData() {
-      this.$refs["dataForm"].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-          this.temp.author = "vue-element-admin";
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp);
-            this.dialogFormVisible = false;
-            this.$notify({
-              title: "Success",
-              message: "Created Successfully",
-              type: "success",
-              duration: 2000,
-            });
-          });
-        }
-      });
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = [
-          "id",
-          "nameEnglish",
-          "nameEspanish",
-          "longitude",
-          "latitude",
-        ];
-        const filterVal = [
-          "id",
-          "nameEnglish",
-          "nameEspanish",
-          "longitude",
-          "latitude",
-        ];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Cities_" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
+            message: 'Please input city',
+            trigger: 'change'
           }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
-    },
-    /* CITY */
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    duplicatedCity(event) {
-      if (event) {
-        this.formCity.city_nameEs = this.formCity.city_name;
-      } else {
-        this.formCity.city_nameEs = "";
-      }
-    },
-    /* GET */
-    getCity() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "City")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    getCities(queryString, cb) {
-      var config = {
-        headers: {
-          "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
-          "x-rapidapi-key":
-            "0513e4a37fmsh5c1de65b72f3182p1ebac7jsn85844b4c6a0e",
-        },
-      };
-
-      var url =
-        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&types=CITY&sort=-population&namePrefix=";
-      if (queryString.length > 2) {
-        axios
-          .get(url + queryString, config)
-          .then((response) => {
-            console.log(response.data["data"]);
-            cb(response.data["data"]);
-            console.log(
-              response.data["data"][0].city,
-              response.data["data"][0].region,
-              response.data["data"][0].country
-            );
-            return response.data["data"];
-          })
-          .catch((error) => {
-            this.status = "error";
-          });
-      }
-    },
-    handleSelect(item) {
-      console.log(item);
-      this.formCity.city_name = item.city + ", " + item.country;
-      this.cities = item;
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
-    /* POST */
-    resetTemp() {
-      this.formCity = {
-        city_name: "",
-        city_nameEs: "",
-      };
-      this.duplicateCity = false;
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.formCity.city_name = "";
-    },
-    postCity() {
-      console.log(this.formCity, this.formCity.city_nameEs === "");
-      this.$refs["formCity"].validate((valid) => {
-        var city = {
-          cityNameEnglish: this.cities.city + ", " + this.cities.country,
-          cityNameEspanish:
-            this.formCity.city_nameEs === ""
-              ? "sin definir"
-              : this.formCity.city_nameEs,
-          latitude: this.cities.latitude.toString(),
-          longitude: this.cities.longitude.toString(),
-        };
-        if (this.duplicateCity) {
-          city.cityNameEspanish = this.cities.city + ", " + this.cities.country;
-        }
-        if (valid) {
-          axios
-            .post(this.url + "City", city)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Ciudad Agregada con éxito",
-                type: "success",
-                duration: 2000,
-              });
-              this.getCity();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* UPDATE */
-    handleUpdate(row) {
-      console.log(row);
-      this.cityUpdate = row;
-      this.formCity.city_name = row.nameEnglish;
-      this.formCity.city_nameEs = row.nameEspanish;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.cities = [];
-      this.duplicateCity = false;
-    },
-    updateData() {
-      this.$refs["formCity"].validate((valid) => {
-        if (valid) {
-          var city = {
-            id: this.cityUpdate.id,
-            nameEnglish:
-              this.cities == []
-                ? this.cities.city + ", " + this.cities.country
-                : this.formCity.city_name,
-            nameEspanish: this.duplicateCity
-              ? this.cities == []
-                ? this.cities.city + ", " + this.cities.country
-                : this.formCity.city_name
-              : this.formCity.city_nameEs,
-            latitude: this.cityUpdate.latitude,
-            longitude: this.cityUpdate.longitude,
-          };
-          axios
-            .put(this.url + "City", city)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getCity();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* DELETE */
-    handleSelectionChange(val) {
-      this.cityList = val;
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "City/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getCity();
-          this.showReviewer = false;
-          this.cityList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    handleDeleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.cityList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+        ]
+      },
+      cityList: []
+    }
   },
   /* INPUT SEARCH */
   computed: {
@@ -696,12 +346,357 @@ export default {
               .includes(this.search.toLowerCase()) ||
             item.latitude.toLowerCase().includes(this.search.toLowerCase()) ||
             item.longitude.toLowerCase().includes(this.search.toLowerCase())
-          );
-        });
+          )
+        })
+      }
+    }
+  },
+  created() {
+    /*     this.getList(); */
+    this.getCity()
+  },
+  methods: {
+    /* TABLE */
+    getList() {
+      this.listLoading = true
+      fetchList(this.listQuery).then((response) => {
+        this.list = response.data.items
+        this.total = response.data.total
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getCity()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
-  },
-};
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+          this.temp.author = 'vue-element-admin'
+          createArticle(this.temp).then(() => {
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = [
+          'id',
+          'nameEnglish',
+          'nameEspanish',
+          'longitude',
+          'latitude'
+        ]
+        const filterVal = [
+          'id',
+          'nameEnglish',
+          'nameEspanish',
+          'longitude',
+          'latitude'
+        ]
+        const data = this.formatJson(filterVal)
+        const date = new Date()
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'Cities_' + date
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    /* CITY */
+    handleClose(done) {
+      this.$confirm('Are you sure to close this form?')
+        .then((_) => {
+          done()
+        })
+        .catch((_) => {})
+    },
+    duplicatedCity(event) {
+      if (event) {
+        this.formCity.city_nameEs = this.formCity.city_name
+      } else {
+        this.formCity.city_nameEs = ''
+      }
+    },
+    /* GET */
+    getCity() {
+      this.listLoading = true
+      axios
+        .get(this.url + 'City')
+        .then((response) => {
+          console.log(response.data)
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    },
+    getCities(queryString, cb) {
+      var config = {
+        headers: {
+          'x-rapidapi-host': 'wft-geo-db.p.rapidapi.com',
+          'x-rapidapi-key':
+            '0513e4a37fmsh5c1de65b72f3182p1ebac7jsn85844b4c6a0e'
+        }
+      }
+
+      var url =
+        'https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&types=CITY&sort=-population&namePrefix='
+      if (queryString.length > 2) {
+        axios
+          .get(url + queryString, config)
+          .then((response) => {
+            console.log(response.data['data'])
+            cb(response.data['data'])
+            console.log(
+              response.data['data'][0].city,
+              response.data['data'][0].region,
+              response.data['data'][0].country
+            )
+            return response.data['data']
+          })
+          .catch((error) => {
+            this.status = 'error'
+          })
+      }
+    },
+    handleSelect(item) {
+      console.log(item)
+      this.formCity.city_name = item.city + ', ' + item.country
+      this.cities = item
+    },
+    handleIconClick(ev) {
+      console.log(ev)
+    },
+    /* POST */
+    resetTemp() {
+      this.formCity = {
+        city_name: '',
+        city_nameEs: ''
+      }
+      this.duplicateCity = false
+    },
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.formCity.city_name = ''
+    },
+    postCity() {
+      console.log(this.formCity, this.formCity.city_nameEs === '')
+      this.$refs['formCity'].validate((valid) => {
+        var city = {
+          cityNameEnglish: this.cities.city + ', ' + this.cities.country,
+          cityNameEspanish:
+            this.formCity.city_nameEs === ''
+              ? 'sin definir'
+              : this.formCity.city_nameEs,
+          latitude: this.cities.latitude.toString(),
+          longitude: this.cities.longitude.toString()
+        }
+        if (this.duplicateCity) {
+          city.cityNameEspanish = this.cities.city + ', ' + this.cities.country
+        }
+        if (valid) {
+          axios
+            .post(this.url + 'City', city)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Ciudad Agregada con éxito',
+                type: 'success',
+                duration: 2000
+              })
+              this.getCity()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* UPDATE */
+    handleUpdate(row) {
+      console.log(row)
+      this.cityUpdate = row
+      this.formCity.city_name = row.nameEnglish
+      this.formCity.city_nameEs = row.nameEspanish
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.cities = []
+      this.duplicateCity = false
+    },
+    updateData() {
+      this.$refs['formCity'].validate((valid) => {
+        if (valid) {
+          var city = {
+            id: this.cityUpdate.id,
+            nameEnglish:
+              this.cities == []
+                ? this.cities.city + ', ' + this.cities.country
+                : this.formCity.city_name,
+            nameEspanish: this.duplicateCity
+              ? this.cities == []
+                ? this.cities.city + ', ' + this.cities.country
+                : this.formCity.city_name
+              : this.formCity.city_nameEs,
+            latitude: this.cityUpdate.latitude,
+            longitude: this.cityUpdate.longitude
+          }
+          axios
+            .put(this.url + 'City', city)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Update Successfully',
+                type: 'success',
+                duration: 2000
+              })
+
+              this.getCity()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.cityList = val
+    },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id
+      axios
+        .delete(this.url + 'City/' + id)
+        .then((response) => {
+          this.$notify({
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
+          this.getCity()
+          this.showReviewer = false
+          this.cityList = []
+        })
+        .catch((error) => {
+          console.error(error.response)
+        })
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.handleDelete(row, false)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.cityList.forEach((value) => {
+            console.log(value)
+            this.handleDelete(value, false)
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    }
+  }
+}
 </script>
 <style lang="scss">
 .my-autocomplete {
@@ -724,9 +719,4 @@ export default {
   width: 300px !important;
 }
 
-@media (max-width: 600px) {
-  .el-dialog {
-    width: 100% !important;
-  }
-}
 </style>

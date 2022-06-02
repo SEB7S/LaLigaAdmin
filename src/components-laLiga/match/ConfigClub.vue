@@ -2,12 +2,12 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
+        v-model="search"
         placeholder="Search"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
-      /><!-- 
+      /><!--
       <el-button
         v-waves
         class="filter-item"
@@ -72,8 +72,7 @@
         type="selection"
         width="55"
         align="center"
-      >
-      </el-table-column>
+      />
       <el-table-column
         label="ID"
         prop="id"
@@ -114,18 +113,16 @@
           <el-button
             type="primary"
             size="mini"
-            @click="handleUpdate(row)"
             icon="el-icon-edit"
-          >
-          </el-button>
+            @click="handleUpdate(row)"
+          />
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="confirmDelete(row)"
             icon="el-icon-delete"
-          >
-          </el-button>
+            @click="confirmDelete(row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -142,8 +139,8 @@
       :before-close="handleClose"
     >
       <el-steps :active="active" align-center finish-status="success">
-        <el-step title="General Data"></el-step>
-        <el-step title="Update Images"></el-step>
+        <el-step title="General Data" />
+        <el-step title="Update Images" />
       </el-steps>
 
       <div v-if="active == 0">
@@ -153,7 +150,6 @@
           :rules="rules"
           label-position="top"
           label-width="120px"
-          style="margin-left: 50px"
         >
           <el-form-item :label="$t('match.nameClub')" prop="clubName">
             <el-input v-model="formClub.clubName" />
@@ -197,13 +193,13 @@
               :data="formImageClub"
               :on-success="handleSuccess"
             >
-              <i class="el-icon-plus"></i>
+              <i class="el-icon-plus" />
             </el-upload>
           </el-form-item>
         </el-form>
 
         <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt="" />
+          <img width="100%" :src="dialogImageUrl" alt="">
         </el-dialog>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -242,40 +238,40 @@
   </div>
 </template>
 <script>
-import { fetchList, fetchPv } from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
+import { fetchList, fetchPv } from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ConfigProvider",
+  name: 'ConfigProvider',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -289,453 +285,70 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       downloadLoading: false,
       /** FormStadium */
       formClub: {
-        clubName: "",
+        clubName: '',
         stadiumId: 0,
-        stadiumName: "",
+        stadiumName: ''
       },
       rules: {
         clubName: [
           {
             required: true,
-            message: "Please input club",
-            trigger: "blur",
+            message: 'Please input club',
+            trigger: 'blur'
           },
           {
             min: 3,
-            message: "Length should be 3",
-            trigger: "blur",
-          },
-        ],
+            message: 'Length should be 3',
+            trigger: 'blur'
+          }
+        ]
 
       },
       clubUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      search: "",
+      search: '',
       clubList: [],
       active: 0,
-      dialogImageUrl: "",
+      dialogImageUrl: '',
       dialogVisible: false,
       fileList: [],
       formImageClub: {
         MediaContentType: 0,
         idClub: 0,
-        id: null,
-      },
-    };
-  },
-  created() {
-    /*     this.getList(); */
-    this.getClub();
-  },
-  methods: {
-    /* TABLE */
-    getList() {
-      this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items;
-        this.total = response.data.total;
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
-    },
-    handleFilter() {
-      this.listQuery.page = 1;
-      this.getClub();
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
-    sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+        id: null
       }
-    },
-    sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
-      } else {
-        this.listQuery.sort = "-id";
-      }
-      this.handleFilter();
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Providers" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
-          }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.city_name = "";
-      this.active = 0;
-    },
-    next() {
-      if (this.active++ > 1) this.active = 0;
-    },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    /* CLUB */
-    resetTemp() {
-      this.formClub = {
-        name: "",
-        stadiumId: 0,
-        stadiumName: "",
-      };
-    },
-    /* GET */
-    getClub() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Club")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    /* POST */
-    postClub() {
-      if (this.active == 0) {
-        this.$refs["formClub"].validate((valid) => {
-          var club = {
-            clubName: this.formClub.clubName,
-            stadiumId: this.formClub.stadiumId,
-          };
-          if (valid) {
-            axios
-              .post(this.url + "Club", club)
-              .then((response) => {
-                this.next();
-                this.$notify({
-                  title: "Success",
-                  message: "Club Agregado con éxito",
-                  type: "success",
-                  duration: 2000,
-                });
-
-                this.formImageClub.idClub = response.data.id;
-                this.getClub();
-                console.log(this.formImageClub.idClub, response);
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }
-        });
-      } else if (this.active == 1) {
-        this.dialogFormVisible = false;
-      }
-    },
-    /* UPDATE */
-    changeStatus(data, status) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          var provider = {
-            id: data.id,
-            name: data.name,
-            document: data.document,
-            status: status,
-            phone: data.phone,
-            email: data.email,
-          };
-          axios
-            .put(this.url + "Provider", provider)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Status changed Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getClub();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-          this.getClub();
-        });
-    },
-    handleUpdate(row) {
-      this.getImageByIdClub(row);
-      console.log(row);
-      this.clubUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formClub.clubName = row.name;
-      this.formClub.stadiumId = row.stadiumId;
-      this.formClub.stadiumName = row.stadiumName;
-      this.active = 0;
-    },
-    updateData() {
-      if (this.active == 0) {
-        this.$refs["formClub"].validate((valid) => {
-          if (valid) {
-            var provider = {
-              id: this.clubUpdate.id,
-              clubName: this.formClub.clubName,
-              stadiumId: this.formClub.stadiumId,
-            };
-            axios
-              .put(this.url + "Club", provider)
-              .then((response) => {
-                this.next();
-                this.$notify({
-                  title: "Success",
-                  message: "Update Successfully",
-                  type: "success",
-                  duration: 2000,
-                });
-
-                this.getClub();
-              })
-              .catch((error) => {
-                console.error(error.response);
-              });
-          }
-        });
-      } else if (this.active == 1) {
-        this.dialogFormVisible = false;
-      }
-    },
-    /* DELETE */
-    handleSelectionChange(val) {
-      this.clubList = val;
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "Club/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getClub();
-          this.showReviewer = false;
-          this.clubList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    handleDeleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.clubList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    /* STADIUM */
-    getStadium(queryString, cb) {
-      axios
-        .get(this.url + "Stadium")
-        .then((response) => {
-          console.log(response.data);
-          var links = response.data;
-          var results = queryString
-            ? links.filter(this.createFilter(queryString))
-            : links;
-          cb(results);
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    createFilter(queryString) {
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
-    handleSelect(item) {
-      console.log(item);
-      this.formClub.stadiumName = item.name;
-      this.formClub.stadiumId = item.id;
-    },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
-    /* IMAGE */
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-      axios
-        .delete(this.url + "ClubMediaImage/DeleteClubMedia?id=" + file.id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    handleSuccess(response, file, fileList) {
-      this.formImageClub.id = response.id;
-      console.log(this.formImageClub.id, response);
-    },
-    handlePictureCardPreview(file) {
-      console.log(file);
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    getImageByIdClub(club) {
-      axios
-        .get(this.url + "ClubMediaImage/GetAllByClub?idClub=" + club.id)
-        .then((response) => {
-          console.log(response.data);
-          this.fileList = response.data;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
+    }
   },
   /* INPUT SEARCH */
   computed: {
@@ -747,17 +360,395 @@ export default {
             item.document.toLowerCase().includes(this.search.toLowerCase()) ||
             item.phone.toLowerCase().includes(this.search.toLowerCase()) ||
             item.email.toLowerCase().includes(this.search.toLowerCase())
-          );
-        });
+          )
+        })
+      }
+    }
+  },
+  created() {
+    /*     this.getList(); */
+    this.getClub()
+  },
+  methods: {
+    /* TABLE */
+    getList() {
+      this.listLoading = true
+      fetchList(this.listQuery).then((response) => {
+        this.list = response.data.items
+        this.total = response.data.total
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getClub()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
-  },
-};
-</script>
-<style lang="scss">
-@media (max-width: 600px) {
-  .el-dialog {
-    width: 100% !important;
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['id', 'name', 'document', 'phone', 'email']
+        const filterVal = ['id', 'name', 'document', 'phone', 'email']
+        const data = this.formatJson(filterVal)
+        const date = new Date()
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'Providers' + date
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.city_name = ''
+      this.active = 0
+    },
+    next() {
+      if (this.active++ > 1) this.active = 0
+    },
+    handleClose(done) {
+      this.$confirm('Are you sure to close this form?')
+        .then((_) => {
+          done()
+        })
+        .catch((_) => {})
+    },
+    /* CLUB */
+    resetTemp() {
+      this.formClub = {
+        name: '',
+        stadiumId: 0,
+        stadiumName: ''
+      }
+    },
+    /* GET */
+    getClub() {
+      this.listLoading = true
+      axios
+        .get(this.url + 'Club')
+        .then((response) => {
+          console.log(response.data)
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    },
+    /* POST */
+    postClub() {
+      if (this.active == 0) {
+        this.$refs['formClub'].validate((valid) => {
+          var club = {
+            clubName: this.formClub.clubName,
+            stadiumId: this.formClub.stadiumId
+          }
+          if (valid) {
+            axios
+              .post(this.url + 'Club', club)
+              .then((response) => {
+                this.next()
+                this.$notify({
+                  title: 'Success',
+                  message: 'Club Agregado con éxito',
+                  type: 'success',
+                  duration: 2000
+                })
+
+                this.formImageClub.idClub = response.data.id
+                this.getClub()
+                console.log(this.formImageClub.idClub, response)
+              })
+              .catch((error) => {
+                console.error(error.response)
+              })
+          }
+        })
+      } else if (this.active == 1) {
+        this.dialogFormVisible = false
+      }
+    },
+    /* UPDATE */
+    changeStatus(data, status) {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          var provider = {
+            id: data.id,
+            name: data.name,
+            document: data.document,
+            status: status,
+            phone: data.phone,
+            email: data.email
+          }
+          axios
+            .put(this.url + 'Provider', provider)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Status changed Successfully',
+                type: 'success',
+                duration: 2000
+              })
+
+              this.getClub()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+          this.getClub()
+        })
+    },
+    handleUpdate(row) {
+      this.getImageByIdClub(row)
+      console.log(row)
+      this.clubUpdate = row
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.formClub.clubName = row.name
+      this.formClub.stadiumId = row.stadiumId
+      this.formClub.stadiumName = row.stadiumName
+      this.active = 0
+    },
+    updateData() {
+      if (this.active == 0) {
+        this.$refs['formClub'].validate((valid) => {
+          if (valid) {
+            var provider = {
+              id: this.clubUpdate.id,
+              clubName: this.formClub.clubName,
+              stadiumId: this.formClub.stadiumId
+            }
+            axios
+              .put(this.url + 'Club', provider)
+              .then((response) => {
+                this.next()
+                this.$notify({
+                  title: 'Success',
+                  message: 'Update Successfully',
+                  type: 'success',
+                  duration: 2000
+                })
+
+                this.getClub()
+              })
+              .catch((error) => {
+                console.error(error.response)
+              })
+          }
+        })
+      } else if (this.active == 1) {
+        this.dialogFormVisible = false
+      }
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.clubList = val
+    },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id
+      axios
+        .delete(this.url + 'Club/' + id)
+        .then((response) => {
+          this.$notify({
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
+          this.getClub()
+          this.showReviewer = false
+          this.clubList = []
+        })
+        .catch((error) => {
+          console.error(error.response)
+        })
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.handleDelete(row, false)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.clubList.forEach((value) => {
+            console.log(value)
+            this.handleDelete(value, false)
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    },
+    /* STADIUM */
+    getStadium(queryString, cb) {
+      axios
+        .get(this.url + 'Stadium')
+        .then((response) => {
+          console.log(response.data)
+          var links = response.data
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links
+          cb(results)
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    },
+    createFilter(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+      }
+    },
+    handleSelect(item) {
+      console.log(item)
+      this.formClub.stadiumName = item.name
+      this.formClub.stadiumId = item.id
+    },
+    handleIconClick(ev) {
+      console.log(ev)
+    },
+    /* IMAGE */
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+      axios
+        .delete(this.url + 'ClubMediaImage/DeleteClubMedia?id=' + file.id)
+        .then((response) => {
+          this.$notify({
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
+        })
+        .catch((error) => {
+          console.error(error.response)
+        })
+    },
+    handleSuccess(response, file, fileList) {
+      this.formImageClub.id = response.id
+      console.log(this.formImageClub.id, response)
+    },
+    handlePictureCardPreview(file) {
+      console.log(file)
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    getImageByIdClub(club) {
+      axios
+        .get(this.url + 'ClubMediaImage/GetAllByClub?idClub=' + club.id)
+        .then((response) => {
+          console.log(response.data)
+          this.fileList = response.data
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    }
   }
 }
+</script>
+<style lang="scss">
 </style>

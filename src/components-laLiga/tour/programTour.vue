@@ -19,40 +19,40 @@
       <el-tab-pane label="Date" name="first">
         <div v-show="tour != ''" style="margin: 15px 0">
           <el-checkbox
+            v-model="checkAll"
             style="margin: 15px 0"
             :indeterminate="isIndeterminate"
-            v-model="checkAll"
             @change="handleCheckAllChange"
-            >Marcar todos</el-checkbox
-          >
-          <div style="margin: 15px 0"></div>
+          >Marcar todos</el-checkbox>
+          <div style="margin: 15px 0" />
           <el-checkbox-group
             v-model="checkedTours"
             @change="handlecheckedToursChange"
           >
             <el-checkbox
               v-for="(tourDay, index) in aListTours"
-              :label="tourDay"
               :key="index"
+              :label="tourDay"
               border
               class="space"
             >
               {{ index + 1 + ". " + tourDay.name }}
-              {{ tourDay.startDate | formatDate }}</el-checkbox
-            >
+              {{ tourDay.startDate | formatDate }}</el-checkbox>
           </el-checkbox-group>
         </div>
-        <el-button v-show="tour != ''" type="primary" @click="postTourInstance"
-          >Confirmar</el-button
-        >
+        <el-button
+          v-show="tour != ''"
+          type="primary"
+          @click="postTourInstance"
+        >Confirmar</el-button>
       </el-tab-pane>
       <el-tab-pane label="Config" name="second">
         <div class="filter-container">
           <el-input
+            v-model="search"
             placeholder="Search"
             style="width: 200px"
             class="filter-item"
-            v-model="search"
             @keyup.enter.native="handleFilter"
           />
           <el-button
@@ -99,7 +99,6 @@
           <el-checkbox
             v-model="showReviewer"
             class="filter-item"
-            style="margin-left: 15px"
             @change="tableKey = tableKey + 1"
           >
             {{ $t("table.select") }}
@@ -121,8 +120,7 @@
             type="selection"
             width="55"
             align="center"
-          >
-          </el-table-column>
+          />
           <el-table-column
             label="ID"
             prop="id"
@@ -179,8 +177,8 @@
                   v-model="row.status"
                   active-color="#619b97"
                   inactive-color="#f5365c"
-                  @change="changeStatus(row, $event)"
                   :disabled="!row.providerStatus"
+                  @change="changeStatus(row, $event)"
                 />
               </el-tooltip>
             </template>
@@ -195,18 +193,16 @@
               <el-button
                 type="primary"
                 size="mini"
-                @click="handleUpdate(row)"
                 icon="el-icon-edit"
-              >
-              </el-button>
+                @click="handleUpdate(row)"
+              />
               <el-button
                 v-if="row.status != 'deleted'"
                 size="mini"
                 type="danger"
-                @click="confirmDelete(row)"
                 icon="el-icon-delete"
-              >
-              </el-button>
+                @click="confirmDelete(row)"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -228,7 +224,6 @@
             :model="formCategory"
             label-position="top"
             label-width="120px"
-            style="margin-left: 50px"
           >
             <el-form-item :label="$t('stadium.nameEnglish')" prop="nameEnglish">
               <el-input v-model="formCategory.nameEnglish" />
@@ -280,48 +275,48 @@
   </div>
 </template>
 <script>
-import { fetchList, fetchPv } from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
+import { fetchList, fetchPv } from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 const tourDayOptions = [
-  "Real Madrid Fan-1",
-  "Real Madrid Fan-2",
-  "Real Madrid Fan-3",
-  "Real Madrid Fan-4",
-  "Real Madrid Fan-5",
-  "Real Madrid Fan-6",
-  "Real Madrid Fan-7",
-];
+  'Real Madrid Fan-1',
+  'Real Madrid Fan-2',
+  'Real Madrid Fan-3',
+  'Real Madrid Fan-4',
+  'Real Madrid Fan-5',
+  'Real Madrid Fan-6',
+  'Real Madrid Fan-7'
+]
 export default {
-  name: "categoryProvider",
+  name: 'CategoryProvider',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -329,37 +324,37 @@ export default {
       listTours: null,
       total: 0,
       listLoading: true,
-      search: "",
+      search: '',
       listQuery: {
         page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -367,138 +362,148 @@ export default {
         nameEnglish: [
           {
             required: true,
-            message: "Please input text",
-            trigger: "blur",
-          },
+            message: 'Please input text',
+            trigger: 'blur'
+          }
         ],
         nameEspanish: [
           {
             required: true,
-            message: "Please input text",
-            trigger: "blur",
-          },
-        ],
+            message: 'Please input text',
+            trigger: 'blur'
+          }
+        ]
       },
       downloadLoading: false,
       /** FormStadium */
       formCategory: {
-        nameEnglish: "",
-        nameEspanish: "",
+        nameEnglish: '',
+        nameEspanish: ''
       },
 
       categoryStadiumList: [],
       /* EndPoint */
       url: this.$store.getters.url,
       multipleSelection: [],
-      activeName: "first",
+      activeName: 'first',
       list: [],
       loading: false,
-      tour: "",
+      tour: '',
       tourSelected: null,
       aListTours: [],
       aListToursFinal: [],
       /* checkbox */
       checkAll: false,
       checkedTours: [],
-      isIndeterminate: true,
-    };
+      isIndeterminate: true
+    }
+  },
+  /* INPUT SEARCH */
+  computed: {
+    listTour() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return item.name.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
+    }
   },
   created() {},
   methods: {
     /* TABLE */
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       fetchList(this.listQuery).then((response) => {
-        this.total = response.data.total;
+        this.total = response.data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
+      this.listQuery.page = 1
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
+    getSortClass: function(key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     /* Category */
     handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
+      this.$confirm('Are you sure to close this form?')
         .then((_) => {
-          done();
+          done()
         })
-        .catch((_) => {});
+        .catch((_) => {})
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "nameEnglish", "nameEspanish"];
-        const filterVal = ["id", "name", "nameEspanish"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['id', 'nameEnglish', 'nameEspanish']
+        const filterVal = ['id', 'name', 'nameEspanish']
+        const data = this.formatJson(filterVal)
+        const date = new Date()
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "RoomType" + date,
-        });
-        this.downloadLoading = false;
-      });
+          filename: 'RoomType' + date
+        })
+        this.downloadLoading = false
+      })
     },
     resetTemp() {
       this.formCategory = {
-        nameEnglish: "",
-        nameEspanish: "",
-      };
+        nameEnglish: '',
+        nameEspanish: ''
+      }
     },
     /* POST */
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
     },
     postTourInstance() {
-      console.log(this.checkedTours);
+      console.log(this.checkedTours)
       var tour = {
         duration_in_days: this.listTours.duration_in_days,
         id: this.listTours.id,
@@ -512,250 +517,240 @@ export default {
         status: this.listTours.status,
         tourCategories: this.listTours.tourCategories,
         tourDayDescriptions: this.listTours.tourDayDescriptions,
-        tourInstances: this.aListToursFinal,
-      };
+        tourInstances: this.aListToursFinal
+      }
 
       axios
-        .post(this.url + "Tour/AddTourInstanceFromTour", tour)
+        .post(this.url + 'Tour/AddTourInstanceFromTour', tour)
         .then((response) => {
-          this.dialogFormVisible = false;
+          this.dialogFormVisible = false
           this.$notify({
-            title: "Success",
-            message: "Categoría Agregado con éxito",
-            type: "success",
-            duration: 2000,
-          });
+            title: 'Success',
+            message: 'Categoría Agregado con éxito',
+            type: 'success',
+            duration: 2000
+          })
         })
         .catch((error) => {
-          console.error(error.response);
-        });
+          console.error(error.response)
+        })
     },
     /* UPDATE */
     handleUpdate(row) {
-      console.log(row);
-      this.hotelUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formCategory.nameEnglish = row.nameEnglish;
-      this.formCategory.nameEspanish = row.nameEspanish;
-      this.formCategory.priorityOrder = row.priorityOrder;
+      console.log(row)
+      this.hotelUpdate = row
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.formCategory.nameEnglish = row.nameEnglish
+      this.formCategory.nameEspanish = row.nameEspanish
+      this.formCategory.priorityOrder = row.priorityOrder
     },
     updateData() {
-      this.$refs["formCategory"].validate((valid) => {
+      this.$refs['formCategory'].validate((valid) => {
         if (valid) {
           var category = {
             id: this.hotelUpdate.id,
             nameEnglish: this.formCategory.nameEnglish,
             nameEspanish: this.formCategory.nameEspanish,
-            priorityOrder: this.formCategory.priorityOrder,
-          };
+            priorityOrder: this.formCategory.priorityOrder
+          }
           axios
-            .put(this.url + "StadiumCategory", category)
+            .put(this.url + 'StadiumCategory', category)
             .then((response) => {
-              this.dialogFormVisible = false;
+              this.dialogFormVisible = false
               this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
+                title: 'Success',
+                message: 'Update Successfully',
+                type: 'success',
+                duration: 2000
+              })
             })
             .catch((error) => {
-              console.error(error.response);
-            });
+              console.error(error.response)
+            })
         }
-      });
+      })
     },
     /* GET */
     getTour(queryString, cb) {
       axios
-        .get(this.url + "Tour")
+        .get(this.url + 'Tour')
         .then((response) => {
-          console.log(response.data);
+          console.log(response.data)
           /* para que el autocomplete solo muestre los tours padres */
-          var links = response.data;
-          var aTours = [];
-          this.list = response.data;
+          var links = response.data
+          var aTours = []
+          this.list = response.data
           aTours = response.data.map((item) => {
-            console.log(item.isMaster);
-            return item.isMaster ? item : 1;
-          });
-          console.log(aTours);
-          links = aTours.filter((element) => element !== 1);
+            console.log(item.isMaster)
+            return item.isMaster ? item : 1
+          })
+          console.log(aTours)
+          links = aTours.filter((element) => element !== 1)
           var results = queryString
             ? links.filter(this.createFiltertourDay(queryString))
-            : links;
-          cb(results);
+            : links
+          cb(results)
         })
         .catch((error) => {
-          this.status = "error";
-          console.error(error.response);
-        });
+          this.status = 'error'
+          console.error(error.response)
+        })
     },
     createFiltertourDay(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+      }
     },
     handleSelect(item) {
-      console.log(item);
-      this.tour = item.name;
-      this.tourSelected = 52;
-      this.listTours = item;
-      console.log(this.listTours);
+      console.log(item)
+      this.tour = item.name
+      this.tourSelected = 52
+      this.listTours = item
+      console.log(this.listTours)
       /* para listar los tours hijos */
 
-      var aTourChildren = [];
+      var aTourChildren = []
       aTourChildren = this.list.map((item) => {
-        console.log(item.masterTourId, this.listTours.id);
-        return item.masterTourId === this.listTours.id ? item : 1;
-      });
-      console.log(aTourChildren);
-      this.list = aTourChildren.filter((element) => element !== 1);
-      console.log(this.list);
-      this.listLoading = false;
+        console.log(item.masterTourId, this.listTours.id)
+        return item.masterTourId === this.listTours.id ? item : 1
+      })
+      console.log(aTourChildren)
+      this.list = aTourChildren.filter((element) => element !== 1)
+      console.log(this.list)
+      this.listLoading = false
       this.caculateDate(
         item.name,
         item.tourDayDescriptions[0].startTime,
         item.id
-      );
+      )
     },
     handleIconClick(ev) {
-      console.log(ev);
+      console.log(ev)
     },
     handleCheckAllChange(val) {
-      console.log(val);
-      this.checkedTours = val ? this.aListTours : [];
-      this.isIndeterminate = false;
+      console.log(val)
+      this.checkedTours = val ? this.aListTours : []
+      this.isIndeterminate = false
     },
     handlecheckedToursChange(value) {
-      console.log(value);
-      this.aListToursFinal = value;
-      let checkedCount = value.length;
-      this.checkAll = checkedCount === this.aListTours.length;
+      console.log(value)
+      this.aListToursFinal = value
+      const checkedCount = value.length
+      this.checkAll = checkedCount === this.aListTours.length
       this.isIndeterminate =
-        checkedCount > 0 && checkedCount < this.aListTours.length;
+        checkedCount > 0 && checkedCount < this.aListTours.length
     },
     handleClick(tab, event) {
-      console.log(tab, event);
+      console.log(tab, event)
     },
     caculateDate(tourName, initialDate, idTour) {
-      console.log(tourName, initialDate);
-      let date = new Date(initialDate);
-      this.aListTours = [];
+      console.log(tourName, initialDate)
+      const date = new Date(initialDate)
+      this.aListTours = []
       for (let index = 0; index < 52; index++) {
         this.aListTours.push({
           tourId: idTour,
           name: tourName,
-          startDate: new Date(date.setDate(date.getDate() + 7)),
-        });
+          startDate: new Date(date.setDate(date.getDate() + 7))
+        })
       }
-      this.checkedTours = this.aListTours;
-      this.aListToursFinal = this.aListTours;
+      this.checkedTours = this.aListTours
+      this.aListToursFinal = this.aListTours
 
-      console.log(this.aListTours);
+      console.log(this.aListTours)
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.categoryStadiumList = val;
+      this.categoryStadiumList = val
     },
     handleDelete(row, selected) {
-      var id = selected ? row : row.id;
+      var id = selected ? row : row.id
       axios
-        .delete(this.url + "StadiumCategory/" + id)
+        .delete(this.url + 'StadiumCategory/' + id)
         .then((response) => {
           this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.showReviewer = false;
-          this.categoryStadiumList = [];
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
+          this.showReviewer = false
+          this.categoryStadiumList = []
         })
         .catch((error) => {
-          console.error(error.response);
-        });
+          console.error(error.response)
+        })
     },
     confirmDelete(row) {
       this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
+        'This will permanently delete the file. Continue?',
+        'Warning',
         {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
         }
       )
         .then(() => {
           this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
     },
     handleDeleteAll() {
       this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
+        'This will permanently delete the file. Continue?',
+        'Warning',
         {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
         }
       )
         .then(() => {
           this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
+            type: 'success',
+            message: 'Delete completed'
+          })
           this.categoryStadiumList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
+            console.log(value)
+            this.handleDelete(value, false)
+          })
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
     },
     handleClick(tab, event) {
-      console.log(tab, event);
-    },
-  },
-  /* INPUT SEARCH */
-  computed: {
-    listTour() {
-      if (this.list) {
-        return this.list.filter((item) => {
-          return item.name.toLowerCase().includes(this.search.toLowerCase());
-        });
-      }
-    },
-  },
-};
-</script>
-<style lang="scss">
-@media (max-width: 600px) {
-  .el-dialog {
-    width: 100% !important;
+      console.log(tab, event)
+    }
   }
 }
+</script>
+<style lang="scss">
+.el-message-box{
+  width: 95%;
+  max-width: 418px;
+  margin: .5rem;
+}
+
 .space {
   margin: 3px;
   width: 350px;
 }
 .el-checkbox.is-bordered + .el-checkbox.is-bordered {
-  margin-left: 0 !important;
-  margin: 3px !important;
+  margin: 3px;
 }
 </style>

@@ -2,10 +2,10 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
+        v-model="search"
         placeholder="Search"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
       />
       <el-button
@@ -74,8 +74,7 @@
         type="selection"
         width="55"
         align="center"
-      >
-      </el-table-column>
+      />
       <el-table-column
         label="ID"
         prop="id"
@@ -117,18 +116,16 @@
           <el-button
             type="primary"
             size="mini"
-            @click="handleUpdate(row)"
             icon="el-icon-edit"
-          >
-          </el-button>
+            @click="handleUpdate(row)"
+          />
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="confirmDelete(row)"
             icon="el-icon-delete"
-          >
-          </el-button>
+            @click="confirmDelete(row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -150,7 +147,6 @@
         :model="formCategory"
         label-position="top"
         label-width="120px"
-        style="margin-left: 50px"
       >
         <el-form-item :label="$t('stadium.nameEnglish')" prop="nameEnglish">
           <el-input v-model="formCategory.nameEnglish" />
@@ -196,40 +192,40 @@
   </div>
 </template>
 <script>
-import { fetchList, fetchPv } from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
+import { fetchList, fetchPv } from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "categoryProvider",
+  name: 'CategoryProvider',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -237,37 +233,37 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      search: "",
+      search: '',
       listQuery: {
         page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -275,281 +271,30 @@ export default {
         nameEnglish: [
           {
             required: true,
-            message: "Please input text",
-            trigger: "blur",
-          },
+            message: 'Please input text',
+            trigger: 'blur'
+          }
         ],
         nameEspanish: [
           {
             required: true,
-            message: "Please input text",
-            trigger: "blur",
-          },
-        ],
+            message: 'Please input text',
+            trigger: 'blur'
+          }
+        ]
       },
       downloadLoading: false,
       /** FormStadium */
       formCategory: {
-        nameEnglish: "",
-        nameEspanish: "",
+        nameEnglish: '',
+        nameEspanish: ''
       },
 
       categoryStadiumList: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      multipleSelection: [],
-    };
-  },
-  created() {
-    this.getCategory();
-  },
-  methods: {
-    /* TABLE */
-    getList() {
-      this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items;
-        this.total = response.data.total;
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
-    },
-    handleFilter() {
-      this.listQuery.page = 1;
-      this.getCategory();
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
-    sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
-      }
-    },
-    sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
-      } else {
-        this.listQuery.sort = "-id";
-      }
-      this.handleFilter();
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
-          }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
-    },
-    /* Category */
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "nameEnglish", "nameEspanish"];
-        const filterVal = ["id", "name", "nameEspanish"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "RoomType" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    resetTemp() {
-      this.formCategory = {
-        nameEnglish: "",
-        nameEspanish: "",
-      };
-    },
-    /* POST */
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-    },
-    postCategory() {
-      this.$refs["formCategory"].validate((valid) => {
-        var category = {
-          nameEnglish: this.formCategory.nameEnglish,
-          nameEspanish: this.formCategory.nameEspanish,
-        };
-        if (valid) {
-          axios
-            .post(this.url + "StadiumCategory", category)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Categoría Agregado con éxito",
-                type: "success",
-                duration: 2000,
-              });
-              this.getCategory();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* UPDATE */
-    handleUpdate(row) {
-      console.log(row);
-      this.hotelUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formCategory.nameEnglish = row.nameEnglish;
-      this.formCategory.nameEspanish = row.nameEspanish;
-      this.formCategory.priorityOrder = row.priorityOrder;
-    },
-    updateData() {
-      this.$refs["formCategory"].validate((valid) => {
-        if (valid) {
-          var category = {
-            id: this.hotelUpdate.id,
-            nameEnglish: this.formCategory.nameEnglish,
-            nameEspanish: this.formCategory.nameEspanish,
-            priorityOrder: this.formCategory.priorityOrder,
-          };
-          axios
-            .put(this.url + "StadiumCategory", category)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getCategory();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-
-    /* GET */
-    getCategory() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "StadiumCategory")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    /* DELETE */
-    handleSelectionChange(val) {
-      this.categoryStadiumList = val;
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "StadiumCategory/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getCategory();
-          this.showReviewer = false;
-          this.categoryStadiumList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    handleDeleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.categoryStadiumList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+      multipleSelection: []
+    }
   },
   /* INPUT SEARCH */
   computed: {
@@ -561,17 +306,263 @@ export default {
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
             item.nameEspanish.toLowerCase().includes(this.search.toLowerCase())
-          );
-        });
+          )
+        })
+      }
+    }
+  },
+  created() {
+    this.getCategory()
+  },
+  methods: {
+    /* TABLE */
+    getList() {
+      this.listLoading = true
+      fetchList(this.listQuery).then((response) => {
+        this.list = response.data.items
+        this.total = response.data.total
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getCategory()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
-  },
-};
-</script>
-<style lang="scss">
-@media (max-width: 600px) {
-  .el-dialog {
-    width: 100% !important;
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    /* Category */
+    handleClose(done) {
+      this.$confirm('Are you sure to close this form?')
+        .then((_) => {
+          done()
+        })
+        .catch((_) => {})
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['id', 'nameEnglish', 'nameEspanish']
+        const filterVal = ['id', 'name', 'nameEspanish']
+        const data = this.formatJson(filterVal)
+        const date = new Date()
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'RoomType' + date
+        })
+        this.downloadLoading = false
+      })
+    },
+    resetTemp() {
+      this.formCategory = {
+        nameEnglish: '',
+        nameEspanish: ''
+      }
+    },
+    /* POST */
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+    },
+    postCategory() {
+      this.$refs['formCategory'].validate((valid) => {
+        var category = {
+          nameEnglish: this.formCategory.nameEnglish,
+          nameEspanish: this.formCategory.nameEspanish
+        }
+        if (valid) {
+          axios
+            .post(this.url + 'StadiumCategory', category)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Categoría Agregado con éxito',
+                type: 'success',
+                duration: 2000
+              })
+              this.getCategory()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* UPDATE */
+    handleUpdate(row) {
+      console.log(row)
+      this.hotelUpdate = row
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.formCategory.nameEnglish = row.nameEnglish
+      this.formCategory.nameEspanish = row.nameEspanish
+      this.formCategory.priorityOrder = row.priorityOrder
+    },
+    updateData() {
+      this.$refs['formCategory'].validate((valid) => {
+        if (valid) {
+          var category = {
+            id: this.hotelUpdate.id,
+            nameEnglish: this.formCategory.nameEnglish,
+            nameEspanish: this.formCategory.nameEspanish,
+            priorityOrder: this.formCategory.priorityOrder
+          }
+          axios
+            .put(this.url + 'StadiumCategory', category)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Update Successfully',
+                type: 'success',
+                duration: 2000
+              })
+
+              this.getCategory()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+
+    /* GET */
+    getCategory() {
+      this.listLoading = true
+      axios
+        .get(this.url + 'StadiumCategory')
+        .then((response) => {
+          console.log(response.data)
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.categoryStadiumList = val
+    },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id
+      axios
+        .delete(this.url + 'StadiumCategory/' + id)
+        .then((response) => {
+          this.$notify({
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
+          this.getCategory()
+          this.showReviewer = false
+          this.categoryStadiumList = []
+        })
+        .catch((error) => {
+          console.error(error.response)
+        })
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.handleDelete(row, false)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.categoryStadiumList.forEach((value) => {
+            console.log(value)
+            this.handleDelete(value, false)
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    }
   }
 }
+</script>
+<style lang="scss">
 </style>

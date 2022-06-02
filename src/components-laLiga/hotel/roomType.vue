@@ -17,10 +17,10 @@
         Search
       </el-button> -->
       <el-input
+        v-model="search"
         placeholder="Search"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
       />
       <el-button
@@ -78,8 +78,7 @@
         type="selection"
         width="55"
         align="center"
-      >
-      </el-table-column>
+      />
       <el-table-column
         label="ID"
         prop="id"
@@ -129,18 +128,16 @@
           <el-button
             type="primary"
             size="mini"
-            @click="handleUpdate(row)"
             icon="el-icon-edit"
-          >
-          </el-button>
+            @click="handleUpdate(row)"
+          />
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="confirmDelete(row)"
             icon="el-icon-delete"
-          >
-          </el-button>
+            @click="confirmDelete(row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -162,7 +159,6 @@
         :model="formRoomType"
         label-position="top"
         label-width="120px"
-        style="margin-left: 50px"
       >
         <el-form-item :label="$t('hotel.nameEnHotel')" prop="nameEnglish">
           <el-input v-model="formRoomType.nameEnglish" />
@@ -175,7 +171,7 @@
             v-model="formRoomType.maxPax"
             :min="1"
             :max="5"
-          ></el-input-number>
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -219,41 +215,41 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle,
-} from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
+  updateArticle
+} from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "categoryProvider",
+  name: 'CategoryProvider',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -261,37 +257,37 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      search: "",
+      search: '',
       listQuery: {
         page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -299,299 +295,43 @@ export default {
         nameEnglish: [
           {
             required: true,
-            message: "Please input name",
-            trigger: "blur",
-          },
+            message: 'Please input name',
+            trigger: 'blur'
+          }
         ],
         nameEspanish: [
           {
             required: true,
-            message: "Please input name",
-            trigger: "blur",
-          },
+            message: 'Please input name',
+            trigger: 'blur'
+          }
         ],
         maxPax: [
           {
             required: true,
-            message: "Please input max pax",
-            trigger: "blur",
-          },
-        ],
+            message: 'Please input max pax',
+            trigger: 'blur'
+          }
+        ]
       },
       downloadLoading: false,
       /** FormCity  */
-      city_name: "",
-      city_nameEs: "",
+      city_name: '',
+      city_nameEs: '',
       cities: [],
       /** FormStadium */
       formRoomType: {
-        nameEnglish: "",
-        nameEspanish: "",
+        nameEnglish: '',
+        nameEspanish: '',
         maxPax: 1,
-        stadiumId: "",
-        stadiumName: "",
+        stadiumId: '',
+        stadiumName: ''
       },
       hotelUpdate: [],
       roomTypeList: [],
       /* EndPoint */
-      url: this.$store.getters.url,
-    };
-  },
-  created() {
-    this.getRoomType();
-  },
-  methods: {
-    /* TABLE */
-    getList() {
-      this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items;
-        this.total = response.data.total;
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
-    },
-    handleFilter() {
-      this.listQuery.page = 1;
-      this.getRoomType();
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
-    sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
-      }
-    },
-    sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
-      } else {
-        this.listQuery.sort = "-id";
-      }
-      this.handleFilter();
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Stadiums" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
-          }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
-    },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    /* ROOM TYPE */
-    resetTemp() {
-      this.formRoomType = {
-        nameEnglish: "",
-        nameEspanish: "",
-        maxPax: 1,
-        stadiumId: "",
-        stadiumName: "",
-      };
-    },
-    /* GET */
-    getRoomType() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "RoomType")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    /* POST */
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.city_name = "";
-    },
-    postRoomType() {
-      this.$refs["formRoomType"].validate((valid) => {
-        var roomType = {
-          nameEnglish: this.formRoomType.nameEnglish,
-          nameEspanish: this.formRoomType.nameEspanish,
-          maxPax: this.formRoomType.maxPax,
-        };
-        if (valid) {
-          axios
-            .post(this.url + "RoomType", roomType)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Categoría Agregado con éxito",
-                type: "success",
-                duration: 2000,
-              });
-              this.getRoomType();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* UPDATE */
-    handleUpdate(row) {
-      console.log(row);
-      this.hotelUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formRoomType.nameEnglish = row.nameEnglish;
-      this.formRoomType.nameEspanish = row.nameEspanish;
-      this.formRoomType.maxPax = row.maxPax;
-      this.formRoomType.stadiumId = row.stadiumId;
-    },
-    updateData() {
-      this.$refs["formRoomType"].validate((valid) => {
-        if (valid) {
-          var roomType = {
-            id: this.hotelUpdate.id,
-            nameEnglish: this.formRoomType.nameEnglish,
-            nameEspanish: this.formRoomType.nameEspanish,
-            maxPax: this.formRoomType.maxPax,
-          };
-          axios
-            .put(this.url + "RoomType", roomType)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getRoomType();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* DELETE */
-    handleSelectionChange(val) {
-      this.roomTypeList = val;
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "RoomType/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getRoomType();
-          this.showReviewer = false;
-          this.roomTypeList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    handleDeleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.roomTypeList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+      url: this.$store.getters.url
+    }
   },
   /* INPUT SEARCH */
   computed: {
@@ -603,17 +343,266 @@ export default {
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
             item.nameEspanish.toLowerCase().includes(this.search.toLowerCase())
-          );
-        });
+          )
+        })
+      }
+    }
+  },
+  created() {
+    this.getRoomType()
+  },
+  methods: {
+    /* TABLE */
+    getList() {
+      this.listLoading = true
+      fetchList(this.listQuery).then((response) => {
+        this.list = response.data.items
+        this.total = response.data.total
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getRoomType()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
-  },
-};
-</script>
-<style lang="scss">
-@media (max-width: 600px) {
-  .el-dialog {
-    width: 100% !important;
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['id', 'name', 'Ciudad', 'longitude', 'latitude']
+        const filterVal = ['id', 'name', 'cityId', 'longitude', 'latitude']
+        const data = this.formatJson(filterVal)
+        const date = new Date()
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'Stadiums' + date
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    handleClose(done) {
+      this.$confirm('Are you sure to close this form?')
+        .then((_) => {
+          done()
+        })
+        .catch((_) => {})
+    },
+    /* ROOM TYPE */
+    resetTemp() {
+      this.formRoomType = {
+        nameEnglish: '',
+        nameEspanish: '',
+        maxPax: 1,
+        stadiumId: '',
+        stadiumName: ''
+      }
+    },
+    /* GET */
+    getRoomType() {
+      this.listLoading = true
+      axios
+        .get(this.url + 'RoomType')
+        .then((response) => {
+          console.log(response.data)
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    },
+    /* POST */
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.city_name = ''
+    },
+    postRoomType() {
+      this.$refs['formRoomType'].validate((valid) => {
+        var roomType = {
+          nameEnglish: this.formRoomType.nameEnglish,
+          nameEspanish: this.formRoomType.nameEspanish,
+          maxPax: this.formRoomType.maxPax
+        }
+        if (valid) {
+          axios
+            .post(this.url + 'RoomType', roomType)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Categoría Agregado con éxito',
+                type: 'success',
+                duration: 2000
+              })
+              this.getRoomType()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* UPDATE */
+    handleUpdate(row) {
+      console.log(row)
+      this.hotelUpdate = row
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.formRoomType.nameEnglish = row.nameEnglish
+      this.formRoomType.nameEspanish = row.nameEspanish
+      this.formRoomType.maxPax = row.maxPax
+      this.formRoomType.stadiumId = row.stadiumId
+    },
+    updateData() {
+      this.$refs['formRoomType'].validate((valid) => {
+        if (valid) {
+          var roomType = {
+            id: this.hotelUpdate.id,
+            nameEnglish: this.formRoomType.nameEnglish,
+            nameEspanish: this.formRoomType.nameEspanish,
+            maxPax: this.formRoomType.maxPax
+          }
+          axios
+            .put(this.url + 'RoomType', roomType)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: 'Success',
+                message: 'Update Successfully',
+                type: 'success',
+                duration: 2000
+              })
+
+              this.getRoomType()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.roomTypeList = val
+    },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id
+      axios
+        .delete(this.url + 'RoomType/' + id)
+        .then((response) => {
+          this.$notify({
+            title: 'Success',
+            message: 'Delete Successfully',
+            type: 'success',
+            duration: 2000
+          })
+          this.getRoomType()
+          this.showReviewer = false
+          this.roomTypeList = []
+        })
+        .catch((error) => {
+          console.error(error.response)
+        })
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.handleDelete(row, false)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        'This will permanently delete the file. Continue?',
+        'Warning',
+        {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed'
+          })
+          this.roomTypeList.forEach((value) => {
+            console.log(value)
+            this.handleDelete(value, false)
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: 'Delete canceled'
+          })
+        })
+    }
   }
 }
-</style>
+</script>
