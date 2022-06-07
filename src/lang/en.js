@@ -14,7 +14,7 @@ export default {
     jsonEditor: 'JSON Editor',
     dndList: 'Dnd List',
     splitPane: 'SplitPane',
-    avatarUpload: 'Avatar Upload',
+    avatarUpload: 'Avatar upload',
     dropzone: 'Dropzone',
     sticky: 'Sticky',
     countTo: 'Count To',
@@ -52,7 +52,7 @@ export default {
     errorLog: 'Error Log',
     excel: 'Excel',
     exportExcel: 'Export Excel',
-    selectExcel: 'Export Selected',
+    selectExcel: 'Select Excel',
     mergeHeader: 'Merge Header',
     uploadExcel: 'Upload Excel',
     zip: 'Zip',
@@ -74,16 +74,16 @@ export default {
     match: 'Match',
     manageMatch: 'Manage Match',
     manageRates: 'Manage Rate',
-    clubs: 'Club',
+    clubs: 'Manage lub',
     provider: 'Provider',
     manageProvider: 'Manage Provider',
     stadium: 'Stadium',
     manageStadium: 'Manage Stadium',
     categoryStadium: 'Category Stadium',
     user: 'User',
-    tournament: 'Tournament',
+    tournament: 'Manage Tournament',
     categoryProvider: 'Provider Category',
-    dateTours:'Program'
+    dateTours:'Program Tour'
 
   },
   tour: {
@@ -157,8 +157,8 @@ export default {
   },
   user: {
     nameUser: 'Usuario',
-    rolUser: '',
-    permission: ''
+    rolUser: 'Role',
+    permission: 'Permission'
   },
   navbar: {
     dashboard: 'Dashboard',
@@ -183,10 +183,10 @@ export default {
   },
   permission: {
     addRole: 'New Role',
-    editPermission: 'Edit',
+    editPermission: 'Edit permission',
     roles: 'Your roles',
     switchRoles: 'Switch roles',
-    tips: 'In some cases, using v-permission will have no effect. For example: Element-UI  el-tab or el-table-column and other scenes that dynamically render dom. You can only do this with v-if.',
+    tips: 'In some cases, using v-permission will have no effect. For example: Element-UI  el-tab or el-table-column and other scenes that dynamically render DOM. You can only do this with v-if.',
     delete: 'Delete',
     confirm: 'Confirm',
     cancel: 'Cancel'
@@ -270,5 +270,53 @@ export default {
     tagsView: 'Open Tags-View',
     fixedHeader: 'Fixed Header',
     sidebarLogo: 'Sidebar Logo'
+  },
+  modals: {
+    closeFormMsg: "Are you sure to close this form?",
+    warning: "Warning",
+    deleteItemWarning: "This will permanently delete the file. Continue?",
+    confirmButton: "Ok",
+    cancelButton: "Cancel",
+    changeStatus: "Do you want to {mgs} this status?",
+    activate: "activate",
+    inactivate: "inactivate",
+
+    addAnotherMatch: "Match added, Do you want add other match?"
+  },
+  notifications: {
+    success: "Success",
+    updateSuccess: "Update Successfully",
+    addedSuccessfully: "Item added successfully",
+    deleteComplete: "Delete complete",
+    delete: "Delete Successfully",
+    deleteCanceled: "Delete canceled",
+    deleteSuccessfully: "Delete Successfully",
+    changeStateSuccess: "Status changed successfully",
+
+    clubAddedSuccessfully: "Club added successfully",
+    providerAddedSuccessfully: "Provider added successfully",
+    providerDuplicated: "Provider duplicated",
+    addTournament: "Add Tournamed",
+    hotelAddedSuccess: "Hotel added successfully",
+    stadiumAddedSuccess: "Stadium added successfully",
+    cathegoryAddedSuccess: "Category added successfully",
+    unableDelete: "It is not possible to delete because it is being used in other modules",
+    createSuccess: "Created Successfully",
+    cityAddedSuccess: "City added successfully"
+  },
+  forms:{
+    incompleteInput: "Please, complete this input",
+    incompleteInputLength: "Length should be 3",
+
+    nameIncomplete: "Please, introduce a name",
+    latitudeIncomplete: "Please enter latitude",
+    longitudeIncomplete: "Please enter longitude",
+    cityIncomplete: "please indicate the city",
+    categoryIncomplete: "Please indicate category",
+    emailFormatIncorrect: "Please enter correct email address",
+    providerIncomplete: "Please indicate a provider",
+    categoryHtIncomplete: "Please enter HT Category",
+    tournamentIncomplete: "Please enter a tournament",
+    paxIncomplete: "Please input max pax"
   }
 }

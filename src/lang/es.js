@@ -15,20 +15,20 @@ export default {
     dndList: 'Lista Dnd',
     splitPane: 'Panel dividido',
     avatarUpload: 'Subir avatar',
-    dropzone: 'Subir ficheros',
+    dropzone: 'Soltar ficheros',
     sticky: 'Sticky',
     countTo: 'CountTo',
     componentMixin: 'Mixin',
     backToTop: 'Ir arriba',
     dragDialog: 'Drag Dialog',
     dragSelect: 'Drag Select',
-    dragKanban: 'Drag Kanban',
+    dragKanban: 'Arrastrar Kanban',
     charts: 'Gráficos',
-    keyboardChart: 'Keyboard Chart',
+    keyboardChart: 'Grafico del teclado',
     lineChart: 'Gráfico de líneas',
     mixChart: 'Mix Chart',
     example: 'Ejemplo',
-    nested: 'Rutas anidadass',
+    nested: 'Rutas anidadas',
     menu1: 'Menu 1',
     'menu1-1': 'Menu 1-1',
     'menu1-2': 'Menu 1-2',
@@ -52,7 +52,7 @@ export default {
     errorLog: 'Registro de errores',
     excel: 'Excel',
     exportExcel: 'Exportar a Excel',
-    selectExcel: 'Export seleccionado',
+    selectExcel: 'Seleccionar Excel',
     mergeHeader: 'Merge Header',
     uploadExcel: 'Subir Excel',
     zip: 'Zip',
@@ -62,7 +62,7 @@ export default {
     clipboardDemo: 'Clipboard',
     i18n: 'I18n',
     externalLink: 'Enlace externo',
-    profile: 'Profile',
+    profile: 'Perfil',
     tour: 'Tour',
     manageTour: 'Gestionar Tour',
     city: 'Ciudad',
@@ -86,6 +86,10 @@ export default {
     dateTours:"Programar Tour"
   },
   tour: {
+    add: 'Añadir',
+    export: 'Exportar',
+    edit: 'Editar',
+    delete: 'Eliminar',
     nameTour: 'Nombre',
     nameProvider: 'Proveedor',
     durationTour: 'Duración (Días)',
@@ -152,8 +156,8 @@ export default {
   },
   user: {
     nameUser: 'Usuario',
-    rolUser: '',
-    permission: ''
+    rolUser: 'Rol',
+    permission: 'Permiso'
   },
   navbar: {
     logOut: 'Salir',
@@ -161,16 +165,16 @@ export default {
     github: 'Github',
     theme: 'Tema',
     size: 'Tamaño global',
-    profile: 'Profile'
+    profile: 'Perfil'
   },
   login: {
     title: 'La Liga - Administrador',
-    logIn: 'Acceso',
+    logIn: 'Acceder',
     username: 'Usuario',
     password: 'Contraseña',
-    any: 'nada',
+    any: 'Nada',
     thirdparty: 'Conectar con',
-    thirdpartyTips: 'No se puede simular en local, así que combine su propia simulación de negocios. ! !'
+    thirdpartyTips: 'No se puede simular en local, así que combine su propia simulación de negocios! ! !'
   },
   documentation: {
     documentation: 'Documentación',
@@ -181,33 +185,33 @@ export default {
     editPermission: 'Permiso de edición',
     roles: 'Tus permisos',
     switchRoles: 'Cambiar permisos',
-    tips: 'In some cases it is not suitable to use v-permission, such as element Tab component or el-table-column and other asynchronous rendering dom cases which can only be achieved by manually setting the v-if.',
+    tips: 'En algunos casos, el uso de v-permission no tendrá ningún efecto. Por ejemplo: Element-UI el-tab o el-table-column y otras escenas que renderizan dinámicamente el DOM. Solo puedes hacer esto con v-if.',
     delete: 'Borrar',
     confirm: 'Confirmar',
     cancel: 'Cancelar'
   },
   guide: {
-    description: 'The guide page is useful for some people who entered the project for the first time. You can briefly introduce the features of the project. Demo is based on ',
+    description: 'La página de guía es útil para algunas personas que ingresaron al proyecto por primera vez. Puede presentar brevemente las características del proyecto. La demo se basa en',
     button: 'Ver guía'
   },
   components: {
     documentation: 'Documentación',
-    tinymceTips: 'Rich text editor is a core part of management system, but at the same time is a place with lots of problems. In the process of selecting rich texts, I also walked a lot of detours. The common rich text editors in the market are basically used, and the finally chose Tinymce. See documentation for more detailed rich text editor comparisons and introductions.',
-    dropzoneTips: 'Because my business has special needs, and has to upload images to qiniu, so instead of a third party, I chose encapsulate it by myself. It is very simple, you can see the detail code in @/components/Dropzone.',
-    stickyTips: 'when the page is scrolled to the preset position will be sticky on the top.',
-    backToTopTips1: 'When the page is scrolled to the specified position, the Back to Top button appears in the lower right corner',
-    backToTopTips2: 'You can customize the style of the button, show / hide, height of appearance, height of the return. If you need a text prompt, you can use element-ui el-tooltip elements externally',
-    imageUploadTips: 'Since I was using only the vue@1 version, and it is not compatible with mockjs at the moment, I modified it myself, and if you are going to use it, it is better to use official version.'
+    tinymceTips: 'El editor de texto enriquecido es una parte central del sistema de gestión, pero al mismo tiempo es un lugar con muchos problemas. En el proceso de selección de textos ricos, también conduce a muchos desvíos. Básicamente se utilizan los editores de texto enriquecido comunes en el mercado, y finalmente se eligió Tinymce. Consulte la documentación para obtener comparaciones e introducciones más detalladas del editor de texto enriquecido.',
+    dropzoneTips: 'Debido a que mi negocio tiene necesidades especiales y tiene que subir imágenes a qiniu, entonces, en lugar de un tercero, elegí encapsularlo yo mismo. Es muy sencillo, puedes ver el código detallado en @/components/Dropzone.',
+    stickyTips: 'Cuando la página se desplace a la posición preestablecida se pegará en la parte superior.',
+    backToTopTips1: 'Cuando la página se desplaza a la posición especificada, el botón "Volver al principio" aparece en la esquina inferior derecha',
+    backToTopTips2: 'Puede personalizar el estilo del botón, mostrar/ocultar, altura de aparición, altura de retorno. Si necesita un mensaje de texto, puede usar elementos de información sobre herramientas de element-ui externamente',
+    imageUploadTips: 'Como estaba usando solo la versión vue@1, y no es compatible con mockjs por el momento, la modifiqué yo mismo, y si la vas a usar, es mejor que uses la versión oficial.'
   },
   table: {
-    dynamicTips1: 'Fixed header, sorted by header order',
-    dynamicTips2: 'Not fixed header, sorted by click order',
+    dynamicTips1: 'Encabezado fijo, ordenado por orden de encabezado',
+    dynamicTips2: 'Encabezado no fijo, ordenado por orden de clic',
     dragTips1: 'Orden por defecto',
-    dragTips2: 'The after dragging order',
+    dragTips2: 'Ordenar despues de arrastrar',
     title: 'Título',
     importance: 'Importancia',
     type: 'Tipo',
-    remark: 'Remark',
+    remark: 'Remarcar',
     search: 'Buscar',
     add: 'Añadir',
     export: 'Exportar',
@@ -220,7 +224,7 @@ export default {
     actions: 'Acciones',
     edit: 'Editar',
     publish: 'Publicar',
-    draft: 'Draft',
+    draft: 'Borrador',
     delete: 'Eliminar',
     cancel: 'Cancelar',
     confirm: 'Confirmar',
@@ -229,11 +233,11 @@ export default {
     deleteAll: 'Eliminar todo'
   },
   example: {
-    warning: 'Creating and editing pages cannot be cached by keep-alive because keep-alive include does not currently support caching based on routes, so it is currently cached based on component name. If you want to achieve a similar caching effect, you can use a browser caching scheme such as localStorage. Or do not use keep-alive include to cache all pages directly. See details'
+    warning: 'Keep-alive no puede almacenar en caché la creación y edición de páginas porque la inclusión de keep-alive actualmente no admite el almacenamiento en caché en función de las rutas, por lo que actualmente se almacena en caché en función del nombre del componente. Si desea lograr un efecto de almacenamiento en caché similar, puede usar un esquema de almacenamiento en caché del navegador como localStorage. O no use la inclusión de mantenimiento de vida para almacenar en caché todas las páginas directamente. Ver detalles'
   },
   errorLog: {
-    tips: 'Please click the bug icon in the upper right corner',
-    description: 'Now the management system are basically the form of the spa, it enhances the user experience, but it also increases the possibility of page problems, a small negligence may lead to the entire page deadlock. Fortunately Vue provides a way to catch handling exceptions, where you can handle errors or report exceptions.',
+    tips: 'Haga clic en el icono de error en la esquina superior derecha',
+    description: 'Ahora, el sistema de gestión es básicamente un formulario del spa, esto mejora la experiencia del usuario, pero también aumenta la posibilidad de problemas en la página, una pequeña negligencia puede llevar a que toda la página se bloquee. Afortunadamente, Vue proporciona una forma de detectar el manejo de excepciones, donde puede manejar errores o informar excepciones.',
     documentation: 'Documento de introducción'
   },
   excel: {
@@ -246,12 +250,12 @@ export default {
     placeholder: 'Por favor escribe un nombre de fichero'
   },
   pdf: {
-    tips: 'Here we use window.print() to implement the feature of downloading pdf.'
+    tips: 'Aquí usamos window.print() para implementar la función de descargar PDF.'
   },
   theme: {
     change: 'Cambiar tema',
     documentation: 'Documentación del tema',
-    tips: 'Tips: It is different from the theme-pick on the navbar is two different skinning methods, each with different application scenarios. Refer to the documentation for details.'
+    tips: 'Sugerencia: Es diferente de la selección de temas en la barra de navegación, hay dos métodos de desollado diferentes, cada uno con diferentes escenarios de aplicación. Consulte la documentación para obtener más detalles.'
   },
   tagsView: {
     refresh: 'Actualizar',
@@ -260,10 +264,58 @@ export default {
     closeAll: 'Cerrar todos'
   },
   settings: {
-    title: 'Page style setting',
-    theme: 'Theme Color',
-    tagsView: 'Open Tags-View',
-    fixedHeader: 'Fixed Header',
-    sidebarLogo: 'Sidebar Logo'
+    title: 'Configuracion de estilo',
+    theme: 'Color de la pagina',
+    tagsView: 'Ver Tags',
+    fixedHeader: 'Cabecera fija',
+    sidebarLogo: 'Logo en la barra lateral'
+  },
+  modals: {
+    closeFormMsg: "¿Estás seguro de que quieres cerrar este formulario?",
+    warning: "Advertencia",
+    deleteItemWarning: "Se eliminará el archivo permanentemente.¿Desea continuar?",
+    confirmButton: "Aceptar",
+    cancelButton: "Cancelar",
+    changeStatus: "¿Quieres {mgs} este estado?",
+    activate: "activar",
+    inactivate: "desactivar",
+
+    addAnotherMatch: "Partido añadido ¿Desea agregar otro?" 
+  },
+  notifications: {
+    success: "Exito",
+    updateSuccess: "Actualizado exitosamente",
+    addedSuccessfully: "Item añadido exitosamente",
+    deleteComplete: "Eliminación completada",
+    delete: "Eliminado con exito",
+    deleteCanceled: "Eliminación cancelada",
+    deleteSuccessfully: "Eliminado con exito",
+    changeStateSuccess: "Estado cambiado exitosamente",
+
+    clubAddedSuccessfully: "Club agregado con exito",
+    providerAddedSuccessfully: "Proveedor agregado con éxito",
+    providerDuplicated: "Proovedor duplicado",
+    addTournament: "Añadir torneo",
+    hotelAddedSuccess: 'Hotel agregado con éxito',
+    cathegoryAddedSuccess: "Categoría agregada con éxito",
+    stadiumAddedSuccess: "Estadio agregado con éxito",
+    unableDelete: "No es posible eliminar por que se está usando en otros módulos",
+    createSuccess: "Creado con éxito",
+    cityAddedSuccess: "Ciudad agregada con éxito"
+  },
+  forms:{
+    incompleteInput: "Por favor rellene este campo.",
+    incompleteInputLength: "La longitud debe ser de 3",
+
+    nameIncomplete: "Por favor, introduzca el nombre",
+    latitudeIncomplete: "Por favor introduzca la latitud",
+    longitudeIncomplete: "Por favor introduzca la longitud",
+    cityIncomplete: "Por favor indique la ciudad",
+    categoryIncomplete: "Por favor indique la categoria",
+    emailFormatIncorrect: "Por favor introduzca una dirreción de correo electronico valida",
+    providerIncomplete: "Por favor ingrese un provedor",
+    categoryHtIncomplete: "Por favor ingrese la categoria HT",
+    tournamentIncomplete: "Por favor ingrese un torneo",
+    paxIncomplete: "Please input max pax"
   }
 }

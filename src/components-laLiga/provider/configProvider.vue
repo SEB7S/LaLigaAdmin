@@ -228,6 +228,7 @@
 </template>
 <script>
 import { fetchList, fetchPv } from '@/api/article'
+import i18n from '@/lang/index.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -318,12 +319,12 @@ export default {
         name: [
           {
             required: true,
-            message: 'Please input name',
+            message:  i18n.t('forms.nameIncomplete'),
             trigger: 'blur'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ],
@@ -342,24 +343,24 @@ export default {
         phone: [
           {
             required: true,
-            message: 'Please input longitude',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ],
         email: [
           {
             required: true,
-            message: 'Please input city',
+            message: i18n.t('forms.cityIncomplete'),
             trigger: 'blur'
           },
           {
             type: 'email',
-            message: 'Please input correct email address',
+            message: i18n.t('forms.emailFormatIncorrect'),
             trigger: ['blur', 'change']
           }
         ]
@@ -466,7 +467,7 @@ export default {
       })
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(i18n,t('modals.closeFormMsg'))
         .then((_) => {
           done()
         })
@@ -521,8 +522,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Proveedor Agregado con éxito',
+                title:i18n.t('notifications.success'),
+                message: i18n.t('notifications.providerAddedSuccessfully'),
                 type: 'success',
                 duration: 2000
               })
@@ -537,11 +538,11 @@ export default {
     /* UPDATE */
     changeStatus(data, status) {
       this.$confirm(
-        `Do you want to ${status ? 'activate ' : 'inactivate'} this status?`,
-        'Warning',
+        i18n.t('modals.changeStatus', {mgs : status ?  i18n.t('modals.activate') : i18n.t('modals.inactivate')}),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'Yes',
-          cancelButtonText: 'No',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -559,8 +560,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Status changed Successfully',
+                title: i18n('notifications.success'),
+                message: i18n('notifications.changeStateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -602,8 +603,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Update Successfully',
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.updateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -626,8 +627,8 @@ export default {
         .delete(this.url + 'Provider/' + id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n('notifications.success'),
+            message: i18n('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -641,42 +642,42 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n('notifications.deleteComplete')
           })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n('notifications.deleteComplete')
           })
           this.providerList.forEach((value) => {
             console.log(value)
@@ -686,7 +687,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n('notifications.deleteCanceled')
           })
         })
     }

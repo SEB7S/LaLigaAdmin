@@ -434,6 +434,7 @@
 </template>
 <script>
 import { fetchList, fetchPv } from '@/api/article'
+import i18n from '@/lang/index.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -508,16 +509,16 @@ export default {
       pvData: [],
       rules: {
         name: [
-          { required: true, message: 'type is required', trigger: 'change' }
+          { required: true, message: i18n.t('forms.incompleteInput'), trigger: 'change' }
         ],
         duration_in_days: [
-          { required: true, message: 'type is required', trigger: 'change' }
+          { required: true, message: i18n.t('forms.incompleteInput'), trigger: 'change' }
         ],
         providerName: [
-          { required: true, message: 'type is required', trigger: 'change' }
+          { required: true, message: i18n.t('forms.incompleteInput'), trigger: 'change' }
         ],
         hotel_category: [
-          { required: true, message: 'type is required', trigger: 'change' }
+          { required: true, message: i18n.t('forms.incompleteInput'), trigger: 'change' }
         ]
       },
       downloadLoading: false,
@@ -796,8 +797,8 @@ export default {
           .then((response) => {
             this.getTour()
             this.$notify({
-              title: 'Success',
-              message: 'Successfully',
+              title: i18n.t('notifications.success'),
+              message: i18n.t('notifications.addedSuccessfully'),
               type: 'success',
               duration: 1000
             })
@@ -872,8 +873,8 @@ export default {
         .delete(this.url + 'Tour/' + id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.delete'),
             type: 'success',
             duration: 2000
           })
@@ -887,42 +888,42 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.tourList.forEach((value) => {
             console.log(value)
@@ -932,7 +933,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
@@ -1021,11 +1022,11 @@ export default {
     },
     changeStatus(data, status) {
       this.$confirm(
-        `Do you want to ${status ? 'activate ' : 'inactivate'} this status?`,
-        'Warning',
+        i18n.t('modals.changeStatus', {mgs : status ? i18n.t('modals.activate') : i18n.t('modals.inactivate')}),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'Yes',
-          cancelButtonText: 'No',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -1042,8 +1043,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Status changed Successfully',
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.changeStateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -1073,8 +1074,8 @@ export default {
           )
           .then((response) => {
             this.$notify({
-              title: 'Success',
-              message: 'Delete Successfully',
+              title: i18n.t('notifications.success'),
+              message: i18n.t('notifications.delete'),
               type: 'success',
               duration: 2000
             })
@@ -1288,7 +1289,7 @@ export default {
       return fechaFinal
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(i18n.t('modals.closeFormMsg'))
         .then((_) => {
           done()
         })
@@ -1298,9 +1299,7 @@ export default {
 }
 </script>
 <style lang="scss">
-.el-form-item {
-  margin-bottom: 22px;
-}
+
 .el-step__head.is-process {
   color: #619b97;
   border-color: #619b97;

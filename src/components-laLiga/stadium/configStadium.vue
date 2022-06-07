@@ -296,6 +296,7 @@ import {
   createArticle,
   updateArticle
 } from '@/api/article'
+import i18n from '@/lang/index.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -408,23 +409,23 @@ export default {
         name: [
           {
             required: true,
-            message: 'Please input name',
+            message: i18n.t('forms.nameIncomplete'),
             trigger: 'change'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ],
         latitude: [
           {
-            message: 'Please input latitude',
+            message: i18n.t('forms.latitudeIncomplete'),
             trigger: 'blur'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           },
           {
@@ -434,12 +435,12 @@ export default {
         ],
         longitude: [
           {
-            message: 'Please input longitude',
+            message: i18n.t('forms.longitudeIncomplete'),
             trigger: 'blur'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           },
           {
@@ -450,14 +451,14 @@ export default {
         city_name: [
           {
             required: true,
-            message: 'Please input city',
+            message: i18n.t('forms.cityIncomplete'),
             trigger: 'change'
           }
         ],
         categoryStadium: [
           {
             required: true,
-            message: 'Please input category',
+            message: i18n.t('forms.categoryIncomplete'),
             trigger: 'change'
           }
         ]
@@ -617,8 +618,8 @@ export default {
                 this.formImageStadium.idStadium = response.data.id
                 this.next()
                 this.$notify({
-                  title: 'Success',
-                  message: 'Estadio Agregado con éxito',
+                  title: i18n.t('notifications.success'),
+                  message: i18n.t('notifications.stadiumAddedSuccess'),
                   type: 'success',
                   duration: 2000
                 })
@@ -669,8 +670,8 @@ export default {
         .delete(this.url + 'Stadium/' + id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -682,8 +683,7 @@ export default {
           console.error(error.response.data)
           this.$notify({
             title: 'Error',
-            message:
-              'No es posible eliminar por que se está usando en otros módulos',
+            message: i18n.t('notifications.unableDelete'),
             type: 'error',
             duration: 3000
           })
@@ -691,11 +691,11 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -705,24 +705,24 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+             message: i18n.t('notifications.deleteComplete')
           })
           this.stadiumList.forEach((value) => {
             console.log(value)
@@ -732,7 +732,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
@@ -792,8 +792,8 @@ export default {
               .then((response) => {
                 this.next()
                 this.$notify({
-                  title: 'Success',
-                  message: 'Update Successfully',
+                  title: i18n.t('notifications.success'),
+                  message: i18n.t('notifications.uptadeSuccess'),
                   type: 'success',
                   duration: 2000
                 })
@@ -850,8 +850,8 @@ export default {
         .delete(this.url + 'StadiumMediaImage/DeleteStadiumMedia?id=' + file.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -870,7 +870,7 @@ export default {
       this.dialogVisible = true
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(i18n.t('modals.closeFormMsg'))
         .then((_) => {
           done()
         })

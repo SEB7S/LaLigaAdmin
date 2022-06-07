@@ -181,6 +181,7 @@ import {
   createArticle,
   updateArticle
 } from '@/api/article'
+import i18n from '@/lang/index.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -263,7 +264,7 @@ export default {
         categoryName: [
           {
             required: true,
-            message: 'Please input category',
+            message: i18n.t('forms.categoryIncomplete'),
             trigger: 'blur'
           }
         ]
@@ -412,8 +413,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Hotel Agregado con éxito',
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.hotelAddedSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -445,8 +446,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Update Successfully',
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.updateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -470,8 +471,8 @@ export default {
         .then((response) => {
           console.log(response)
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -485,11 +486,11 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -499,17 +500,17 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -526,7 +527,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
@@ -591,7 +592,7 @@ export default {
       this.formCategory.providerId = item.id
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(i18n.t('modals.closeFormMsg'))
         .then((_) => {
           done()
         })

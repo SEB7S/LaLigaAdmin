@@ -238,6 +238,7 @@
   </div>
 </template>
 <script>
+import i18n from '@/lang/index.js'
 import { fetchList, fetchPv } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -323,12 +324,12 @@ export default {
         clubName: [
           {
             required: true,
-            message: 'Please input club',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ]
@@ -455,7 +456,10 @@ export default {
       if (this.active++ > 1) this.active = 0
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(
+        i18n.t('modals.closeFormMsg'),
+        i18n.t('modals.warning')
+        )
         .then((_) => {
           done()
         })
@@ -497,8 +501,8 @@ export default {
               .then((response) => {
                 this.next()
                 this.$notify({
-                  title: 'Success',
-                  message: 'Club Agregado con éxito',
+                  title: i18n.t('notifications.success'),
+                  message: i18n.t('notifications.clubAddedSuccessfully'),
                   type: 'success',
                   duration: 2000
                 })
@@ -519,18 +523,18 @@ export default {
     /* UPDATE */
     changeStatus(data, status) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('modals.deleteComplete')
           })
           var provider = {
             id: data.id,
@@ -545,8 +549,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Status changed Successfully',
+                title: n18n.t('notifications.success'),
+                message: n18n.t('notifications.changeStateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -560,7 +564,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
           this.getClub()
         })
@@ -590,8 +594,8 @@ export default {
               .then((response) => {
                 this.next()
                 this.$notify({
-                  title: 'Success',
-                  message: 'Update Successfully',
+                  title: i18n.t('notifications.success'),
+                  message: i18n.t('notifications.updateSuccess'),
                   type: 'success',
                   duration: 2000
                 })
@@ -617,8 +621,8 @@ export default {
         .delete(this.url + 'Club/' + id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message:  i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -632,42 +636,42 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+         i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.clubList.forEach((value) => {
             console.log(value)
@@ -677,7 +681,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
@@ -717,8 +721,8 @@ export default {
         .delete(this.url + 'ClubMediaImage/DeleteClubMedia?id=' + file.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })

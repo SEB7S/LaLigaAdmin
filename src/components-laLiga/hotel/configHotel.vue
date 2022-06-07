@@ -457,6 +457,7 @@ import {
   createArticle,
   updateArticle
 } from '@/api/article'
+import i18n from '@/lang/index.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -558,12 +559,12 @@ export default {
         nameEnglish: [
           {
             required: true,
-            message: 'Please input name',
+            message:  i18n.t('forms.nameIncomplete'),
             trigger: 'change'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ],
@@ -571,50 +572,50 @@ export default {
         nameSpanish: [
           {
             required: true,
-            message: 'Please input name',
+            message:  i18n.t('forms.nameIncomplete'),
             trigger: 'change'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ],
         providerName: [
           {
             required: true,
-            message: 'Please input provider',
+            message: i18n.t('forms.providerIncomplete'),
             trigger: 'change'
           }
         ],
         city_name: [
           {
             required: true,
-            message: 'Please input city',
+            message: i18n.t('forms.cityIncomplete'),
             trigger: 'change'
           }
         ],
         name_en: [
           {
             required: true,
-            message: 'Please input name',
+            message:  i18n.t('forms.nameIncomplete'),
             trigger: 'change'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ],
         name_es: [
           {
             required: true,
-            message: 'Please input name',
+            message:  i18n.t('forms.nameIncomplete'),
             trigger: 'change'
           },
           {
             min: 3,
-            message: 'Length should be 3',
+            message: i18n.t('forms.incompleteInputLength'),
             trigger: 'blur'
           }
         ]
@@ -763,7 +764,7 @@ export default {
       return sort === `+${key}` ? 'ascending' : 'descending'
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(i18n.t('modals.closeFormMsg'))
         .then((_) => {
           done()
         })
@@ -884,8 +885,8 @@ export default {
             console.log(response, response.data[0].id)
 
             this.$notify({
-              title: 'Success',
-              message: 'Hotel Agregado con éxito',
+              title: i18n.t('notifications.success'),
+              message: i18n.t('notifications.hotelAddedSuccess'),
               type: 'success',
               duration: 2000
             })
@@ -950,8 +951,8 @@ export default {
           .put(this.url + 'Hotel', hotel)
           .then((response) => {
             this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
+              title: i18n.t('notifications.success'),
+              message: i18n.t('notifications.updateSuccess'),
               type: 'success',
               duration: 2000
             })
@@ -977,8 +978,8 @@ export default {
         .delete(this.url + 'Hotel/' + id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -992,42 +993,42 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.hotelList.forEach((value) => {
             console.log(value)
@@ -1037,7 +1038,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
@@ -1124,11 +1125,11 @@ export default {
     },
     changeStatus(data, status) {
       this.$confirm(
-        `Do you want to ${status ? 'activate ' : 'inactivate'} this status?`,
-        'Warning',
+        i18n.t('modals.changeStatus', {mgs : status ?  i18n.t('modals.activate') : i18n.t('modals.inactivate')}),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'Yes',
-          cancelButtonText: 'No',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -1147,8 +1148,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Status changed Successfully',
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.changeStateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -1183,8 +1184,8 @@ export default {
         .delete(this.url + 'HotelMediaImage/DeleteHotelMedia?id=' + file.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.changeStateSuccess'),
             type: 'success',
             duration: 2000
           })

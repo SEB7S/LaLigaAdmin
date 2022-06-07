@@ -306,6 +306,7 @@
   </div>
 </template>
 <script>
+import i18n from '@/lang/index.js'
 import { fetchList, fetchPv } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -407,42 +408,42 @@ export default {
         matchName: [
           {
             required: true,
-            message: 'Please input text',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           }
         ],
         start_date: [
           {
             required: true,
-            message: 'Please input text',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           }
         ],
         final_date: [
           {
             required: true,
-            message: 'Please input text',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           }
         ],
         stadiumCategoryName: [
           {
             required: true,
-            message: 'Please input text',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           }
         ],
         paxTypeIn: [
           {
             required: true,
-            message: 'Please input text',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           }
         ],
         match_price: [
           {
             required: true,
-            message: 'Please input text',
+            message: i18n.t('forms.incompleteInput'),
             trigger: 'blur'
           }
         ]
@@ -566,7 +567,7 @@ export default {
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleClose(done) {
-      this.$confirm('Are you sure to close this form?')
+      this.$confirm(i18n.t('modals.closeFormMsg'))
         .then((_) => {
           done()
         })
@@ -633,11 +634,11 @@ export default {
             .then((response) => {
               setTimeout(() => {
                 this.$confirm(
-                  'Match added, Do you want add other match?',
+                  i18n.t('modals.addAnotherMatch'),
                   'Info',
                   {
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: i18n.t('modals.confirmButton'),
+                    cancelButtonText: i18n.t('modals.cancelButton'),
                     type: 'success'
                   }
                 )
@@ -659,11 +660,11 @@ export default {
     /* UPDATE */
     changeStatus(data, status) {
       this.$confirm(
-        `Do you want to ${status ? 'activate ' : 'inactivate'} this status?`,
-        'Warning',
+        i18n.t('modals.changeStatus', {mgs : status ?  i18n.t('modals.activate') : i18n.t('modals.inactivate')}),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'Yes',
-          cancelButtonText: 'No',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
@@ -684,8 +685,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Status changed Successfully',
+                title: i18n('notifications.success'),
+                message: i18n('notifications.changeStateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -735,8 +736,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Update Successfully',
+                title: i18n('notifications.success'),
+                message: i18n('notifications.uptadeSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -759,8 +760,8 @@ export default {
         .delete(this.url + 'MatchRate/' + id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n('notifications.success'),
+            message: i18n('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -774,42 +775,42 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n('modals.deleteItemWarning'),
+        i18n('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n('modals.confirmButton'),
+          cancelButtonText: i18n('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n('notifications.deleteComplete')
           })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
+        i18n('modals.deleteItemWarning'),
         'Warning',
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n('modals.confirmButton'),
+          cancelButtonText: i18n('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n('notifications.deleteComplete')
           })
           this.matchRateList.forEach((value) => {
             console.log(value)
@@ -819,7 +820,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n('notifications.deleteCanceled')
           })
         })
     },
