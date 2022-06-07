@@ -141,7 +141,7 @@ export default {
     nameEsCity: 'Name Es',
     latitudeCity: 'Latitude',
     longitudeCity: 'Longitude',
-    duplicate: 'Duplicate name'
+    duplicate: 'Duplicate city'
   },
   stadium: {
     nameStadium: 'Name',

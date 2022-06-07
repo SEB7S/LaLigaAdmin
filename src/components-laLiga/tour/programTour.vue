@@ -32,12 +32,13 @@
           >
             <el-checkbox
               v-for="(tourDay, index) in aListTours"
-              :label="tourDay"
+              :label="tourDay.nameInstance"
               :key="index"
               border
               class="space"
+              :disabled="tourDay.disabled"
             >
-              {{ index + 1 + ". " + tourDay.name }}
+              {{ tourDay.nameInstance }}
               {{ tourDay.startDate | formatDate }}</el-checkbox
             >
           </el-checkbox-group>
@@ -56,21 +57,13 @@
             @keyup.enter.native="handleFilter"
           />
           <el-button
-            class="filter-item"
-            style="margin-left: 10px"
-            type="primary"
-            icon="el-icon-edit"
-            @click="handleCreate"
-          >
-            {{ $t("table.add") }}
-          </el-button>
-          <el-button
             v-waves
             :loading="downloadLoading"
             class="filter-item"
             type="primary"
             icon="el-icon-download"
             @click="handleDownload"
+            style="margin-left: 10px"
           >
             {{ $t("table.export") }}
           </el-button>
@@ -86,7 +79,7 @@
         {{ $t("table.deleteAll") }}
       </el-button> -->
           <el-button
-            v-if="showReviewer && this.categoryStadiumList.length > 0"
+            v-if="showReviewer && this.aTourList.length > 0"
             v-waves
             :loading="downloadLoading"
             class="filter-item"
@@ -162,6 +155,13 @@
               <span>{{ row.duration_in_days }}</span>
             </template>
           </el-table-column>
+          <el-table-column label="start Date" min-width="100px" align="center">
+            <template slot-scope="{ row }">
+              <span v-if="row.tourDayDescriptions.length > 0">{{
+                row.tourDayDescriptions[0]["startTime"] | formatDate
+              }}</span>
+            </template>
+          </el-table-column>
           <el-table-column
             :label="$t('tour.status')"
             min-width="100px"
@@ -222,35 +222,238 @@
           :visible.sync="dialogFormVisible"
           :before-close="handleClose"
         >
-          <el-form
-            ref="formCategory"
-            :rules="rules"
-            :model="formCategory"
-            label-position="top"
-            label-width="120px"
-            style="margin-left: 50px"
-          >
-            <el-form-item :label="$t('stadium.nameEnglish')" prop="nameEnglish">
-              <el-input v-model="formCategory.nameEnglish" />
-            </el-form-item>
-            <el-form-item
-              :label="$t('stadium.nameEspanish')"
-              prop="nameEspanish"
-            >
-              <el-input v-model="formCategory.nameEspanish" />
-            </el-form-item>
-          </el-form>
+          <div>
+            <el-steps :active="active" finish-status="success" align-center>
+              <el-step :title="$t('tour.nameTour')" icon="el-icon-edit" />
+              <el-step :title="$t('tour.stepTwoName')" icon="el-icon-date" />
+            </el-steps>
+          </div>
+          <div style="margin-top: 60px; padding: 25px">
+            <div v-if="active == 0">
+              <el-form
+                ref="formTour"
+                :rules="rules"
+                :model="formTour"
+                label-position="top"
+                label-width="120px"
+              >
+                <el-form-item :label="$t('tour.nameTour')" prop="name">
+                  <el-input v-model="formTour.name" />
+                </el-form-item>
+                <el-form-item
+                  :label="$t('tour.durationTour')"
+                  prop="duration_in_days"
+                >
+                  <el-input-number
+                    v-model="formTour.duration_in_days"
+                    :min="1"
+                    :max="35"
+                  />
+                </el-form-item>
+                <el-form-item
+                  :label="$t('provider.nameProvider')"
+                  prop="providerName"
+                >
+                  <el-autocomplete
+                    v-model="formTour.providerName"
+                    popper-class="my-autocomplete"
+                    :fetch-suggestions="getProviders"
+                    placeholder="Please input"
+                    style="width: 100%"
+                    @select="handleSelectProv"
+                  >
+                    <i slot="suffix" class="el-icon-edit el-input__icon" />
+                    <template slot-scope="{ item }">
+                      <div class="value">{{ item.name }}</div>
+                    </template>
+                  </el-autocomplete>
+                </el-form-item>
+                <el-form-item
+                  :label="$t('provider.categoryProvider')"
+                  prop="hotel_category"
+                >
+                  <el-select
+                    v-model="formTour.hotel_category"
+                    multiple
+                    filterable
+                    placeholder="Select"
+                  >
+                    <el-option
+                      v-for="item in formTour.options"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+            </div>
+            <div v-else-if="active == 1">
+              <el-form
+                ref="formTour2"
+                :rules="rules"
+                :model="temp"
+                label-position="top"
+                label-width="120px"
+              >
+                <el-form-item label="Start Day">
+                  <el-date-picker
+                    v-model="start_date"
+                    type="date"
+                    placeholder="Pick a day"
+                    @change="calculateDays"
+                  >
+                  </el-date-picker>
+                </el-form-item>
+              </el-form>
+              <el-collapse v-model="activeNames" accordion>
+                <div
+                  v-for="(formDay, counter) in formDayDetail"
+                  :key="counter"
+                  @click="arrayPosition = counter"
+                >
+                  <div class="grid-content">
+                    <el-collapse-item
+                      :title="
+                        formDay.dayName +
+                        formDay.startDate +
+                        formDay.dayName2 +
+                        ' ( ' +
+                        formDay.titleTourCities +
+                        ' ) '
+                      "
+                      :name="counter"
+                    >
+                      <el-form
+                        ref="formTour"
+                        :rules="rules"
+                        :model="temp"
+                        label-position="top"
+                        label-width="120px"
+                      >
+                        <div>
+                          <el-form-item label="City">
+                            <el-autocomplete
+                              v-model="formDay.cityName"
+                              popper-class="my-autocomplete"
+                              :fetch-suggestions="getCities"
+                              placeholder="Please input"
+                              style="width: 100%"
+                              @select="handleSelectCity"
+                              @focus="arrayPosition = counter"
+                            >
+                              <i
+                                slot="suffix"
+                                class="el-icon-edit el-input__icon"
+                              />
+                              <template slot-scope="{ item }">
+                                <div
+                                  v-show="item.hotels.length > 0"
+                                  class="value"
+                                >
+                                  {{ item.nameEnglish }}
+                                </div>
+                              </template>
+                            </el-autocomplete>
+                          </el-form-item>
+                          <el-form-item label="Tour Cities">
+                            <el-input
+                              placeholder="Please input"
+                              v-model="sCity"
+                              @keyup.enter.native="addTourCities(counter)"
+                              clearable
+                              :disabled="formDay.tourCities.length == 3"
+                            >
+                            </el-input>
+                          </el-form-item>
+                          <el-form-item>
+                            <el-row
+                              :gutter="20"
+                              v-for="(tourCity, counter2) in formDay.tourCities"
+                              :key="counter2"
+                            >
+                              <el-col :span="10"
+                                ><div class="grid-content">
+                                  <el-tag
+                                    size="medium"
+                                    closable
+                                    @close="deleteTourCities(counter, counter2)"
+                                  >
+                                    {{ formDay.tourCities[counter2] }}
+                                  </el-tag>
+                                </div>
+                              </el-col>
+                            </el-row>
+                          </el-form-item>
+                          <el-form-item label="">
+                            <el-switch
+                              v-model="formDay.matchable"
+                              active-text="Enable for match"
+                              inactive-text=""
+                            >
+                            </el-switch>
+                          </el-form-item>
+
+                          <el-form-item
+                            v-if="
+                              (formDay.cityName != '' &&
+                                dialogStatus === 'create') ||
+                              (formDayDetail.length > 0 &&
+                                formDayDetail[counter].cityName != '')
+                            "
+                            label="Image"
+                          >
+                            <el-upload
+                              :action="''"
+                              :http-request="uploadFile"
+                              list-type="picture-card"
+                              :on-preview="handlePictureCardPreview"
+                              :on-remove="handleRemove"
+                              :file-list="
+                                formDayDetail.length > 0 &&
+                                formDayDetail[counter].images
+                                  ? formDayDetail[counter].images
+                                  : formDay.images
+                              "
+                              name="UploadImage"
+                              :data="formImageTour"
+                            >
+                              <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="dialogVisible">
+                              <img width="100%" :src="dialogImageUrl" alt="" />
+                            </el-dialog>
+                          </el-form-item>
+                          <el-form-item label="Description English">
+                            <el-input
+                              v-model="formDay.description_english"
+                              type="textarea"
+                              placeholder="Please input"
+                            />
+                          </el-form-item>
+                          <el-form-item label="Description Spanish">
+                            <el-input
+                              v-model="formDay.description_spanish"
+                              type="textarea"
+                              placeholder="Please input"
+                            />
+                          </el-form-item></div
+                      ></el-form>
+                    </el-collapse-item>
+                  </div>
+                </div>
+              </el-collapse>
+            </div>
+          </div>
+
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">
-              {{ $t("table.cancel") }}
-            </el-button>
+            <el-button @click="dialogFormVisible = false"> Cancel </el-button>
             <el-button
               type="primary"
-              @click="
-                dialogStatus === 'create' ? postTourInstance() : updateData()
-              "
+              @click="dialogStatus === 'create' ? postTour() : updateData()"
             >
-              {{ $t("table.confirm") }}
+              {{ active != 1 ? $t("table.next") : $t("table.confirm") }}
             </el-button>
           </div>
         </el-dialog>
@@ -297,15 +500,6 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name;
   return acc;
 }, {});
-const tourDayOptions = [
-  "Real Madrid Fan-1",
-  "Real Madrid Fan-2",
-  "Real Madrid Fan-3",
-  "Real Madrid Fan-4",
-  "Real Madrid Fan-5",
-  "Real Madrid Fan-6",
-  "Real Madrid Fan-7",
-];
 export default {
   name: "categoryProvider",
   components: { Pagination },
@@ -386,7 +580,7 @@ export default {
         nameEspanish: "",
       },
 
-      categoryStadiumList: [],
+      aTourList: [],
       /* EndPoint */
       url: this.$store.getters.url,
       multipleSelection: [],
@@ -401,6 +595,35 @@ export default {
       checkAll: false,
       checkedTours: [],
       isIndeterminate: true,
+      active: 0,
+      formTour: {
+        name: "",
+        duration_in_days: 0,
+        status: false,
+        idProvider: 0,
+        providerName: "",
+        hotel_category: [],
+        options: [],
+      },
+      idTourCreated: 0,
+      formDayDetail: [],
+      getDayDescription: [],
+      arrayPosition: 0,
+      tourUpdate: [],
+      activeNames: [0],
+      start_date: new Date(),
+      formImageTour: {
+        MediaContentType: 0,
+        idTour: 0,
+      },
+      aTourCategory: [],
+      editTourDayDescription: false,
+      editFormTourDayDescription: [],
+      tourList: [],
+      sCity: "",
+      fileUploads: [],
+      dialogVisible: false,
+      dialogImageUrl: "",
     };
   },
   created() {},
@@ -486,10 +709,17 @@ export default {
       });
     },
     resetTemp() {
-      this.formCategory = {
-        nameEnglish: "",
-        nameEspanish: "",
+      this.formTour = {
+        name: "",
+        duration_in_days: 0,
+        status: true,
+        idProvider: "",
+        providerName: "",
+        hotel_category: [],
+        options: [],
       };
+      this.fileUploads = [];
+      this.formDayDetail = [];
     },
     /* POST */
     handleCreate() {
@@ -521,10 +751,12 @@ export default {
           this.dialogFormVisible = false;
           this.$notify({
             title: "Success",
-            message: "Categoría Agregado con éxito",
+            message: "Las instancias fueron creadas con exito",
             type: "success",
             duration: 2000,
           });
+          this.getTour();
+          this.activeName = "second";
         })
         .catch((error) => {
           console.error(error.response);
@@ -533,38 +765,126 @@ export default {
     /* UPDATE */
     handleUpdate(row) {
       console.log(row);
-      this.hotelUpdate = row;
+      this.resetTemp();
+      this.editFormTourDayDescription = [];
+      this.active = 0;
+      this.tourUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.formCategory.nameEnglish = row.nameEnglish;
-      this.formCategory.nameEspanish = row.nameEspanish;
-      this.formCategory.priorityOrder = row.priorityOrder;
+      this.formTour.name = row.name;
+      this.formTour.duration_in_days = row.duration_in_days;
+      this.formTour.status = row.status;
+      this.formTour.idProvider = row.idProvider;
+      this.formTour.providerName = row.providerName;
+      this.editFormTourDayDescription = row.tourDayDescriptions;
+      this.formImageTour.idTour = row.id;
+      this.editTourDayDescription = true;
+      this.start_date = new Date(row.tourDayDescriptions[0].startTime);
+      row.tourCategories.forEach((element, index) => {
+        console.log(element);
+        this.formTour.hotel_category[index] = element.providerCategoryId;
+        this.aTourCategory[index] = element.id;
+      });
+      this.editFormTourDayDescription.forEach((element, index) => {
+        this.getImageByIdDay(element);
+      });
+      console.log(this.aTourCategory, this.formDayDetail);
+      this.getCatProv();
     },
     updateData() {
-      this.$refs["formCategory"].validate((valid) => {
-        if (valid) {
-          var category = {
-            id: this.hotelUpdate.id,
-            nameEnglish: this.formCategory.nameEnglish,
-            nameEspanish: this.formCategory.nameEspanish,
-            priorityOrder: this.formCategory.priorityOrder,
+      if (this.active == 0) {
+        this.calculateDays();
+        this.next();
+        this.calculateDays();
+      } else if (this.active == 1) {
+        var tour = {
+          name: this.formTour.name,
+          duration_in_days: this.formTour.duration_in_days,
+          status: this.formTour.status,
+          idProvider: this.formTour.idProvider,
+          id: this.tourUpdate.id,
+          tourCategories: [],
+          tourDayDescriptions: [],
+        };
+        this.formDayDetail.forEach((element, index) => {
+          console.log(element);
+          var dayDescription = {
+            id: element.id,
+            dayNumber: index + 1,
+            matchable: element.matchable,
+            tourCities: element.titleTourCities,
+            startTime: new Date(this.start_date),
+            dayDescriptionEnglish: element.description_english,
+            dayDescriptionSpanish: element.description_spanish,
+            tourId: element.tourId,
+            cityId: element.cityId,
+          };
+          tour.tourDayDescriptions.push(dayDescription);
+        });
+        this.formTour.hotel_category.forEach((option, index) => {
+          console.log(option);
+          var tourCategory = {
+            tourId: this.tourUpdate.id,
+            providerCategoryId: option,
+            id: this.aTourCategory[index],
+          };
+          tour.tourCategories.push(tourCategory);
+        });
+        console.log(tour);
+        axios
+          .put(this.url + "Tour", tour)
+          .then((response) => {
+            console.log(response.data[0]);
+            this.postImageTour(response.data[0].tourDayDescriptions);
+            this.getTour();
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+        this.dialogFormVisible = false;
+        console.log("esto", this.formDayDetail);
+      }
+    },
+    changeStatus(data, status) {
+      this.$confirm(
+        `Do you want to ${status ? "activate " : "inactivate"} this status?`,
+        "Warning",
+        {
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          var tour = {
+            id: data.id,
+            name: data.name,
+            duration_in_days: data.duration_in_days,
+            status: status,
+            idProvider: data.idProvider,
           };
           axios
-            .put(this.url + "StadiumCategory", category)
+            .put(this.url + "Tour", tour)
             .then((response) => {
               this.dialogFormVisible = false;
               this.$notify({
                 title: "Success",
-                message: "Update Successfully",
+                message: "Status changed Successfully",
                 type: "success",
                 duration: 2000,
               });
+              this.getProvider();
             })
             .catch((error) => {
-              console.error(error.response);
+              console.error(error);
             });
-        }
-      });
+        })
+        .catch(() => {
+          this.getTour();
+        });
+    },
+    next() {
+      if (this.active++ > 2) this.active = 0;
     },
     /* GET */
     getTour(queryString, cb) {
@@ -572,6 +892,7 @@ export default {
         .get(this.url + "Tour")
         .then((response) => {
           console.log(response.data);
+
           /* para que el autocomplete solo muestre los tours padres */
           var links = response.data;
           var aTours = [];
@@ -582,6 +903,7 @@ export default {
           });
           console.log(aTours);
           links = aTours.filter((element) => element !== 1);
+
           var results = queryString
             ? links.filter(this.createFiltertourDay(queryString))
             : links;
@@ -604,21 +926,29 @@ export default {
       this.listTours = item;
       console.log(this.listTours);
       /* para listar los tours hijos */
-
       var aTourChildren = [];
       aTourChildren = this.list.map((item) => {
         console.log(item.masterTourId, this.listTours.id);
         return item.masterTourId === this.listTours.id ? item : 1;
       });
       console.log(aTourChildren);
-      this.list = aTourChildren.filter((element) => element !== 1);
-      console.log(this.list);
+      this.list = aTourChildren
+        .filter((element) => element !== 1)
+        .slice()
+        .sort((a, b) => {
+          let dateA = new Date(a.tourDayDescriptions[0].startTime);
+          let dateB = new Date(b.tourDayDescriptions[0].startTime);
+          return dateA - dateB;
+        });
       this.listLoading = false;
       this.caculateDate(
         item.name,
         item.tourDayDescriptions[0].startTime,
-        item.id
+        item.id,
+        item
       );
+
+      console.log(this.checkedTours, this.list);
     },
     handleIconClick(ev) {
       console.log(ev);
@@ -629,8 +959,32 @@ export default {
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
-      console.log(value);
-      this.aListToursFinal = value;
+      this.aListToursFinal = [];
+      var copyValue = value;
+      console.log(value, this.aListTours);
+      /* CONVIRTIENDO ARRAY DE STRING EN ARRAY DE OBJETS  */
+      value.forEach((element, index) => {
+        this.aListTours.forEach((element2, index) => {
+          if (element === element2.nameInstance) {
+            this.aListToursFinal.push({
+              tourId: element2.tourId,
+              nameInstance: element2.nameInstance,
+              startDate: element2.startDate,
+            });
+          }
+        });
+      });
+      if (this.listTours.tourInstances.length > 0) {
+        this.listTours.tourInstances.forEach((element, index) => {
+          console.log(element);
+          this.aListToursFinal.forEach((element2, index2) => {
+            if (element2.nameInstance === element.nameInstance) {
+              this.aListToursFinal.splice(index2, 1);
+            }
+          });
+        });
+      }
+      console.log(this.aListToursFinal);
       let checkedCount = value.length;
       this.checkAll = checkedCount === this.aListTours.length;
       this.isIndeterminate =
@@ -639,30 +993,91 @@ export default {
     handleClick(tab, event) {
       console.log(tab, event);
     },
-    caculateDate(tourName, initialDate, idTour) {
-      console.log(tourName, initialDate);
+    caculateDate(tourName, initialDate, idTour, tour) {
+      console.log(tourName, tour);
       let date = new Date(initialDate);
       this.aListTours = [];
       for (let index = 0; index < 52; index++) {
         this.aListTours.push({
           tourId: idTour,
-          name: tourName,
+          nameInstance: index + 1 + ". " + tourName,
           startDate: new Date(date.setDate(date.getDate() + 7)),
+          disabled: false,
         });
       }
-      this.checkedTours = this.aListTours;
+      if (tour.tourInstances.length == 0) {
+        this.aListTours.forEach((element, index) => {
+          this.checkedTours.push(element.nameInstance);
+        });
+      } else {
+        this.checkedTours = [];
+        tour.tourInstances.forEach((element, index) => {
+          this.checkedTours.push(element.nameInstance);
+          this.aListTours.forEach((element2, index) => {
+            if (element2.nameInstance == element.nameInstance) {
+              element2.disabled = true;
+            }
+          });
+        });
+      }
+
       this.aListToursFinal = this.aListTours;
 
-      console.log(this.aListTours);
+      console.log(this.aListTours, this.checkedTours);
+    },
+    getCatProv() {
+      axios
+        .get(
+          this.url +
+            "ProviderCategories/GetProviderCategoriesbyIdProvider?id=" +
+            this.formTour.idProvider
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.formTour.options = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.log(error.response);
+        });
+    },
+    getProviders(queryString, cb) {
+      axios
+        .get(this.url + "Provider/GetProviderWithCategories")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilter(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilter(queryString) {
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    handleSelectProv(item) {
+      this.formTour.providerName = item.name;
+      this.formTour.idProvider = item.id;
+      this.getCatProv();
+    },
+    handleIconClickProv(ev) {
+      console.log(ev);
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.categoryStadiumList = val;
+      this.aTourList = val;
     },
     handleDelete(row, selected) {
       var id = selected ? row : row.id;
       axios
-        .delete(this.url + "StadiumCategory/" + id)
+        .delete(this.url + "Tour/" + id)
         .then((response) => {
           this.$notify({
             title: "Success",
@@ -671,7 +1086,10 @@ export default {
             duration: 2000,
           });
           this.showReviewer = false;
-          this.categoryStadiumList = [];
+          this.aTourList = [];
+          this.deleteTourInstance(id);
+          this.getTour();
+          this.handleSelect(this.listTours);
         })
         .catch((error) => {
           console.error(error.response);
@@ -692,6 +1110,7 @@ export default {
             type: "success",
             message: "Delete completed",
           });
+          console.log(row);
           this.handleDelete(row, false);
         })
         .catch(() => {
@@ -716,8 +1135,8 @@ export default {
             type: "success",
             message: "Delete completed",
           });
-          this.categoryStadiumList.forEach((value) => {
-            console.log(value);
+          this.aTourList.forEach((value) => {
+            console.log("hola", value);
             this.handleDelete(value, false);
           });
         })
@@ -730,6 +1149,284 @@ export default {
     },
     handleClick(tab, event) {
       console.log(tab, event);
+    },
+    deleteTourInstance(id) {
+      this.listTours.tourInstances.forEach((element, index) => {
+        if (element.tourhijo == id) {
+          axios
+            .delete(this.url + "TourInstance/" + element.id)
+            .then((response) => {
+              this.$notify({
+                title: "Success",
+                message: "Delete Successfully",
+                type: "success",
+                duration: 2000,
+              });
+              this.showReviewer = false;
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    /* IMAGE */
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+      if (this.dialogStatus == "update") {
+        axios
+          .delete(
+            this.url + "TourDayMediaImage/DeleteTourDayMedia?id=" + file.id
+          )
+          .then((response) => {
+            this.$notify({
+              title: "Success",
+              message: "Delete Successfully",
+              type: "success",
+              duration: 2000,
+            });
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+      }
+    },
+    uploadFile(file) {
+      console.log(this.formDayDetail, this.arrayPosition, file);
+
+      this.formDayDetail[this.arrayPosition].images.push(file);
+    },
+    getImageByIdDay(day) {
+      console.log(day);
+      axios
+        .get(this.url + "TourDayMediaImage/GetAllByTourDay?tourday=" + day.id)
+        .then((response) => {
+          console.log(response.data);
+          day.images = response.data;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG) {
+        this.$message.error("La imagen debe estar en formato JPG!");
+      }
+      if (!isLt2M) {
+        this.$message.error("La imagen excede los 2MB!");
+      }
+
+      return isJPG && isLt2M;
+    },
+    handleChange(val) {
+      console.log(val);
+    },
+    /* CITY */
+    getCities(queryString, cb) {
+      axios
+        .get(this.url + "City")
+        .then((response) => {
+          console.log(response.data);
+          var links = response.data;
+          var results = queryString
+            ? links.filter(this.createFilterCity(queryString))
+            : links;
+          cb(results);
+        })
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    createFilterCity(queryString) {
+      return (link) => {
+        return (
+          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
+      };
+    },
+    handleSelectCity(item) {
+      console.log(item, this.arrayPosition + 1, this.formDayDetail.length);
+      this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
+      this.formDayDetail[this.arrayPosition].cityId = item.id;
+      if (this.arrayPosition + 1 < this.formDayDetail.length) {
+        this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
+          item.nameEnglish.split(",")[0]
+        );
+      }
+      this.formDayDetail[this.arrayPosition].titleTourCities =
+        this.concatenateTitle(this.arrayPosition);
+    },
+    /* TOURDAY */
+    calculateDays() {
+      console.log("entre a calcular");
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+
+      console.log(this.start_date);
+      const copyStartDate = new Date(this.start_date);
+      this.formDayDetail = [];
+      var weekDay = 0;
+      var countDays = 0;
+      const dateFormat =
+        this.start_date.getDate() +
+        "/" +
+        (this.start_date.getMonth() + 1) +
+        "/" +
+        this.start_date.getFullYear();
+      for (
+        let index = 0;
+        index < parseInt(this.formTour.duration_in_days);
+        index++
+      ) {
+        weekDay = copyStartDate.getDay();
+        if (!this.editTourDayDescription) {
+          var day = {
+            dayName: "Day " + (index + 1) + " - ",
+            dayName2: days[weekDay],
+            startDate: this.addDate(index, dateFormat) + " - ",
+            startDateFormat: new Date(this.start_date),
+            cityName: "",
+            cityId: 0,
+            description_english: "",
+            description_spanish: "",
+            tourCities: [],
+            titleTourCities: "",
+            matchable: false,
+            images: [],
+          };
+          this.formDayDetail.push(day);
+        } else {
+          /* this.start_date = this.editFormTourDayDescription[index].startTime; */
+          console.log("esto", this.editFormTourDayDescription, index);
+          if (index + 1 <= this.editFormTourDayDescription.length) {
+            var day = {
+              dayName: "Day " + (index + 1) + " - ",
+              dayName2: days[weekDay],
+              startDate: this.addDate(index, dateFormat) + " - ",
+              startDateFormat: new Date(this.start_date),
+              cityName:
+                this.editFormTourDayDescription[index]["cityNameEnglish"],
+              cityId: this.editFormTourDayDescription[index]["cityId"],
+              description_english:
+                this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
+              description_spanish:
+                this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
+              matchable: this.editFormTourDayDescription[index]["matchable"],
+              id: this.editFormTourDayDescription[index]["id"],
+              tourCities:
+                this.editFormTourDayDescription[index]["tourCities"].split("/"),
+              titleTourCities:
+                this.editFormTourDayDescription[index]["tourCities"],
+              tourId: this.editFormTourDayDescription[index]["tourId"],
+              images: this.editFormTourDayDescription[index]["images"],
+            };
+          } else {
+            var day = {
+              dayName: "Day " + (index + 1) + " - ",
+              dayName2: days[weekDay],
+              startDate: this.addDate(index, dateFormat) + " - ",
+              startDateFormat: new Date(this.start_date),
+              cityName: "",
+              cityId: 0,
+              description_english: "",
+              description_spanish: "",
+              tourCities: [],
+              titleTourCities: "",
+              matchable: false,
+              images: [],
+            };
+          }
+          console.log(this.formDayDetail, this.editFormTourDayDescription);
+          this.formDayDetail.push(day);
+        }
+        copyStartDate.setDate(copyStartDate.getDate() + 1);
+      }
+    },
+    addDate(d, fecha) {
+      var months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      var Fecha = new Date();
+      var sFecha =
+        fecha ||
+        Fecha.getDate() +
+          "/" +
+          (Fecha.getMonth() + 1) +
+          "/" +
+          Fecha.getFullYear();
+      var sep = sFecha.indexOf("/") !== -1 ? "/" : "-";
+      var aFecha = sFecha.split(sep);
+      var fecha = aFecha[2] + "/" + aFecha[1] + "/" + aFecha[0];
+      fecha = new Date(fecha);
+      fecha.setDate(fecha.getDate() + parseInt(d));
+      var anno = fecha.getFullYear();
+      var mes = months[fecha.getMonth()];
+      var dia = fecha.getDate();
+      mes = mes < 10 ? "0" + mes : mes;
+      dia = dia < 10 ? "0" + dia : dia;
+      var fechaFinal = dia + sep + mes + sep + anno;
+      console.log(fechaFinal);
+      return fechaFinal;
+    },
+    handleClose(done) {
+      this.$confirm("Are you sure to close this form?")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+    addTourCities(index) {
+      this.formDayDetail[index].tourCities.push(this.sCity);
+      this.formDayDetail[index].titleTourCities = this.concatenateTitle(index);
+      this.sCity = "";
+    },
+    deleteTourCities(index, element) {
+      this.formDayDetail[index].tourCities.splice(element, 1);
+      this.formDayDetail[index].titleTourCities = this.concatenateTitle(index);
+    },
+    concatenateTitle(index) {
+      let result = "";
+
+      this.formDayDetail[index].tourCities.length == 2 &&
+      this.formDayDetail[index].tourCities[0] ===
+        this.formDayDetail[index].tourCities[1]
+        ? this.formDayDetail[index].tourCities.pop
+        : "";
+      this.formDayDetail[index].tourCities.forEach((element) => {
+        result = result.concat(element) + "/";
+      });
+
+      result = result.concat(this.formDayDetail[index].cityName.split(",")[0]);
+      return result;
+    },
+    changeArrayPositions(array, x, y) {
+      [array[x], array[y]] = [array[y], array[x]];
     },
   },
   /* INPUT SEARCH */

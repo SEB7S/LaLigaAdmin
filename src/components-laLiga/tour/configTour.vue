@@ -547,7 +547,6 @@ export default {
       url: this.$store.getters.url,
       active: 0,
       dialogImageUrl: "",
-      dialogVisible: false,
       activeNames: [0],
       start_date: new Date(),
       formImageTour: {
@@ -560,6 +559,7 @@ export default {
       sCity: "",
       aTourCategory: [],
       fileUploads: [],
+      dialogVisible: false,
     };
   },
   created() {
@@ -662,15 +662,13 @@ export default {
         .get(this.url + "Tour")
         .then((response) => {
           console.log("sss", response.data);
-          var aTours = []
+          var aTours = [];
           aTours = response.data.map((item) => {
             console.log(item.masterTourId);
             return item.masterTourId == null ? item : 1;
           });
           console.log(aTours);
-          this.list = aTours.filter((element) => 
-            element !== 1
-          );
+          this.list = aTours.filter((element) => element !== 1);
           console.log(this.list);
           this.listLoading = false;
         })
@@ -797,6 +795,7 @@ export default {
             });
             console.log(response.data.tourDayDescriptions);
             this.postImageTour(response.data.tourDayDescriptions);
+            this.getTour()
           })
           .catch((error) => {
             console.error(error.response);
