@@ -755,7 +755,7 @@ export default {
             type: "success",
             duration: 2000,
           });
-          this.getTour();
+          this.getTourbyId(this.listTours);
           this.activeName = "second";
         })
         .catch((error) => {
@@ -836,7 +836,7 @@ export default {
           .then((response) => {
             console.log(response.data[0]);
             this.postImageTour(response.data[0].tourDayDescriptions);
-            this.getTour();
+            this.getTourbyId(this.listTours);
           })
           .catch((error) => {
             console.error(error.response);
@@ -880,7 +880,7 @@ export default {
             });
         })
         .catch(() => {
-          this.getTour();
+          this.getTourGeneral();
         });
     },
     next() {
@@ -892,7 +892,6 @@ export default {
         .get(this.url + "Tour")
         .then((response) => {
           console.log(response.data);
-
           /* para que el autocomplete solo muestre los tours padres */
           var links = response.data;
           var aTours = [];
@@ -901,61 +900,79 @@ export default {
             console.log(item.isMaster);
             return item.isMaster ? item : 1;
           });
-          console.log(aTours);
+          console.log("me actualicé", this.list);
           links = aTours.filter((element) => element !== 1);
-
           var results = queryString
             ? links.filter(this.createFiltertourDay(queryString))
             : links;
           cb(results);
         })
+
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    getTourForTable() {
+      axios
+        .get(this.url + "Tour")
+        .then((response) => {
+          console.log(response.data);
+          /* para que el autocomplete solo muestre los tours padres */
+          var aTours = [];
+          this.list = response.data;
+          aTours = response.data.map((item) => {
+            console.log(item.isMaster);
+            return item.isMaster ? item : 1;
+          });
+          this.orderList();
+          console.log("me actualicé", this.list);
+        })
+
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+
+    getTourbyId(tour) {
+      axios
+        .get(this.url + "Tour/GetTourById?id=" + tour.id)
+        .then((response) => {
+          this.listTours = response.data[0];
+          console.log(this.listTours);
+          this.getTourForTable();
+          this.caculateDate(this.listTours);
+        })
+
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
         });
     },
     createFiltertourDay(queryString) {
+      console.log(queryString);
       return (link) => {
         return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
       };
     },
     handleSelect(item) {
-      console.log(item);
       this.tour = item.name;
       this.tourSelected = 52;
       this.listTours = item;
-      console.log(this.listTours);
       /* para listar los tours hijos */
-      var aTourChildren = [];
-      aTourChildren = this.list.map((item) => {
-        console.log(item.masterTourId, this.listTours.id);
-        return item.masterTourId === this.listTours.id ? item : 1;
-      });
-      console.log(aTourChildren);
-      this.list = aTourChildren
-        .filter((element) => element !== 1)
-        .slice()
-        .sort((a, b) => {
-          let dateA = new Date(a.tourDayDescriptions[0].startTime);
-          let dateB = new Date(b.tourDayDescriptions[0].startTime);
-          return dateA - dateB;
-        });
       this.listLoading = false;
-      this.caculateDate(
-        item.name,
-        item.tourDayDescriptions[0].startTime,
-        item.id,
-        item
-      );
-
-      console.log(this.checkedTours, this.list);
+      this.caculateDate(item);
+      console.log(this.listTours);
     },
     handleIconClick(ev) {
       console.log(ev);
     },
     handleCheckAllChange(val) {
       console.log(val);
-      this.checkedTours = val ? this.aListTours : [];
+      val
+        ? (this.checkedTours = this.aListTours)
+        : this.checkTour(this.listTours);
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
@@ -993,24 +1010,32 @@ export default {
     handleClick(tab, event) {
       console.log(tab, event);
     },
-    caculateDate(tourName, initialDate, idTour, tour) {
-      console.log(tourName, tour);
-      let date = new Date(initialDate);
+    caculateDate(tour) {
+      console.log("entré");
+      let date = new Date(tour.tourDayDescriptions[0].startTime);
       this.aListTours = [];
       for (let index = 0; index < 52; index++) {
         this.aListTours.push({
-          tourId: idTour,
-          nameInstance: index + 1 + ". " + tourName,
+          tourId: tour.id,
+          nameInstance: index + 1 + ". " + tour.name,
           startDate: new Date(date.setDate(date.getDate() + 7)),
           disabled: false,
         });
       }
+      this.checkTour(tour);
+      this.aListToursFinal = this.aListTours;
+      console.log(this.aListTours, this.checkedTours);
+    },
+    checkTour(tour) {
+      this.checkedTours = [];
       if (tour.tourInstances.length == 0) {
         this.aListTours.forEach((element, index) => {
+          console.log("hola");
           this.checkedTours.push(element.nameInstance);
         });
+        console.log(this.aListTours, this.checkedTours);
       } else {
-        this.checkedTours = [];
+        console.log("entré aqui");
         tour.tourInstances.forEach((element, index) => {
           this.checkedTours.push(element.nameInstance);
           this.aListTours.forEach((element2, index) => {
@@ -1020,10 +1045,22 @@ export default {
           });
         });
       }
-
-      this.aListToursFinal = this.aListTours;
-
-      console.log(this.aListTours, this.checkedTours);
+    },
+    orderList() {
+      var aTourChildren = [];
+      aTourChildren = this.list.map((item) => {
+        return item.masterTourId === this.listTours.id ? item : 1;
+      });
+      console.log("fecha", this.list);
+      this.list = aTourChildren
+        .filter((element) => element !== 1 && !element.isMaster)
+        .slice()
+        .sort((a, b) => {
+          let dateA = new Date(a.tourDayDescriptions[0].startTime);
+          let dateB = new Date(b.tourDayDescriptions[0].startTime);
+          return dateA - dateB;
+        });
+      console.log("fecha 2", this.list);
     },
     getCatProv() {
       axios
@@ -1086,10 +1123,8 @@ export default {
             duration: 2000,
           });
           this.showReviewer = false;
-          this.aTourList = [];
           this.deleteTourInstance(id);
-          this.getTour();
-          this.handleSelect(this.listTours);
+          this.getTourbyId(this.listTours);
         })
         .catch((error) => {
           console.error(error.response);
