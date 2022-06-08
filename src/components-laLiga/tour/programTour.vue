@@ -887,6 +887,7 @@ export default {
       if (this.active++ > 2) this.active = 0;
     },
     /* GET */
+    /* para el select */
     getTour(queryString, cb) {
       axios
         .get(this.url + "Tour")
@@ -913,6 +914,13 @@ export default {
           console.error(error.response);
         });
     },
+    createFiltertourDay(queryString) {
+      console.log(queryString);
+      return (link) => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
+    },
+    /* para la tabla */
     getTourForTable() {
       axios
         .get(this.url + "Tour")
@@ -934,7 +942,7 @@ export default {
           console.error(error.response);
         });
     },
-
+    /* Para actualizar la el tour actual */
     getTourbyId(tour) {
       axios
         .get(this.url + "Tour/GetTourById?id=" + tour.id)
@@ -950,12 +958,7 @@ export default {
           console.error(error.response);
         });
     },
-    createFiltertourDay(queryString) {
-      console.log(queryString);
-      return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-      };
-    },
+
     handleSelect(item) {
       this.tour = item.name;
       this.tourSelected = 52;
@@ -1023,6 +1026,7 @@ export default {
         });
       }
       this.checkTour(tour);
+      this.orderList();
       this.aListToursFinal = this.aListTours;
       console.log(this.aListTours, this.checkedTours);
     },
@@ -1124,7 +1128,6 @@ export default {
           });
           this.showReviewer = false;
           this.deleteTourInstance(id);
-          this.getTourbyId(this.listTours);
         })
         .catch((error) => {
           console.error(error.response);
@@ -1198,6 +1201,7 @@ export default {
                 duration: 2000,
               });
               this.showReviewer = false;
+              this.getTourbyId(this.listTours);
             })
             .catch((error) => {
               console.error(error.response);
