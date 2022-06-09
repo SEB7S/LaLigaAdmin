@@ -364,6 +364,10 @@ $light_gray: #455ba0;
   .title-container {
     position: relative;
 
+    img{
+      max-width: 100%;
+    }
+
     .title {
       font-size: 16px;
       color: $light_gray;

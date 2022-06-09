@@ -5,7 +5,7 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
+      <template>
         <search id="header-search" class="right-menu-item" />
 
         <error-log class="errLog-container right-menu-item hover-effect" />
@@ -15,8 +15,8 @@
         <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
-        <el-tooltip content="Users" effect="dark" placement="bottom">
-          <router-link to="/user">
+        <el-tooltip content="Users" effect="dark" placement="bottom" class="">
+          <router-link to="/user" style="height: 50px">
            <svg-icon icon-class="peoples" class="right-menu-item" style="font-size:34px !important" />
           </router-link>
          
@@ -175,6 +175,32 @@ export default {
           top: 25px;
           font-size: 12px;
         }
+      }
+    }
+  }
+}
+@media screen and (max-width: 593px){
+  .navbar{
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    .breadcrumb-container {
+      font-size: .7rem;
+      .el-breadcrumb__item{
+        display: flex;
+        flex-wrap: nowrap;
+      }
+    }
+    .right-menu{
+      width: 100%;
+      display: flex;
+      flex-wrap:wrap;
+      justify-content: space-around;
+      min-height: 65px;
+      overflow: hidden;
+      transition: 1s height;
+      .right-menu-item {
+        height: 50px;
       }
     }
   }

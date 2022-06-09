@@ -2,12 +2,12 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
+        v-model="search"
         placeholder="Search"
         style="width: 200px"
         class="filter-item"
-        v-model="search"
         @keyup.enter.native="handleFilter"
-      /><!-- 
+      /><!--
       <el-button
         v-waves
         class="filter-item"
@@ -72,8 +72,7 @@
         type="selection"
         width="55"
         align="center"
-      >
-      </el-table-column>
+      />
       <el-table-column
         label="ID"
         prop="id"
@@ -105,18 +104,16 @@
           <el-button
             type="primary"
             size="mini"
-            @click="handleUpdate(row)"
             icon="el-icon-edit"
-          >
-          </el-button>
+            @click="handleUpdate(row)"
+          />
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
-            @click="confirmDelete(row)"
             icon="el-icon-delete"
-          >
-          </el-button>
+            @click="confirmDelete(row)"
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -138,7 +135,6 @@
         :rules="rules"
         label-position="top"
         label-width="120px"
-        style="margin-left: 50px"
       >
         <el-form-item :label="$t('match.tournamentName')" prop="tounamentName">
           <el-input v-model="formTournament.tounamentName" />
@@ -181,40 +177,41 @@
   </div>
 </template>
 <script>
-import { fetchList, fetchPv } from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
+import { fetchList, fetchPv } from '@/api/article'
+import i18n from '@/lang/index.js'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ConfigProvider",
+  name: 'ConfigProvider',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   data() {
     return {
@@ -228,378 +225,373 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       downloadLoading: false,
       /** FormStadium */
       formTournament: {
-        tounamentName: "",
+        tounamentName: ''
       },
       rules: {
         tounamentName: [
           {
             required: true,
-            message: "Please input tournament",
-            trigger: "change",
-          },
-        ],
+            message: i18n.t('forms.tournamentIncomplete'),
+            trigger: 'change'
+          }
+        ]
       },
       tournamentUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      search: "",
+      search: '',
       tournamentList: [],
       active: 0,
-      dialogImageUrl: "",
+      dialogImageUrl: '',
       dialogVisible: false,
       fileList: [],
       formImageClub: {
         MediaContentType: 0,
         idClub: 0,
-        id: null,
-      },
-    };
-  },
-  created() {
-    /*     this.getList(); */
-    this.getTournament();
-  },
-  methods: {
-    /* TABLE */
-    getList() {
-      this.listLoading = true;
-      fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items;
-        this.total = response.data.total;
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
-    },
-    handleFilter() {
-      this.listQuery.page = 1;
-      this.getTournament();
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
-    },
-    sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+        id: null
       }
-    },
-    sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
-      } else {
-        this.listQuery.sort = "-id";
-      }
-      this.handleFilter();
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
-    },
-    handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: "Providers" + date,
-        });
-        this.downloadLoading = false;
-      });
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
-          } else {
-            return v[j];
-          }
-        })
-      );
-    },
-    getSortClass: function (key) {
-      /*       const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending"; */
-    },
-    next() {
-      if (this.active++ > 1) this.active = 0;
-    },
-    handleClose(done) {
-      this.$confirm("Are you sure to close this form?")
-        .then((_) => {
-          done();
-        })
-        .catch((_) => {});
-    },
-    /* TOURNAMENT */
-    resetTemp() {
-      this.formTournament = {
-        tounamentName: "",
-      };
-    },
-    /* GET */
-    getTournament() {
-      this.listLoading = true;
-      axios
-        .get(this.url + "Tournament")
-        .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
-        })
-        .catch((error) => {
-          this.status = "error";
-        });
-    },
-    /* POST */
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-    },
-    postTournament() {
-      this.$refs["formTournament"].validate((valid) => {
-        var club = {
-          tounamentName: this.formTournament.tounamentName,
-        };
-        if (valid) {
-          axios
-            .post(this.url + "Tournament", club)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Tournament Add",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getTournament();
-              console.log(this.formImageClub.idClub);
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* UPDATE */
-    changeStatus(data, status) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          var provider = {
-            id: data.id,
-            name: data.name,
-            document: data.document,
-            status: status,
-            phone: data.phone,
-            email: data.email,
-          };
-          axios
-            .put(this.url + "Provider", provider)
-            .then((response) => {
-              this.dialogFormVisible = false;
-              this.$notify({
-                title: "Success",
-                message: "Status changed Successfully",
-                type: "success",
-                duration: 2000,
-              });
-
-              this.getTournament();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-          this.getTournament();
-        });
-    },
-    handleUpdate(row) {
-      console.log(row);
-      this.tournamentUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formTournament.tounamentName = row.name;
-      this.active = 0;
-    },
-    updateData() {
-      this.$refs["formTournament"].validate((valid) => {
-        if (valid) {
-          var tournament = {
-            id: this.tournamentUpdate.id,
-            tounamentName: this.formTournament.tounamentName,
-          };
-          axios
-            .put(this.url + "Tournament", tournament)
-            .then((response) => {
-              this.next();
-              this.$notify({
-                title: "Success",
-                message: "Update Successfully",
-                type: "success",
-                duration: 2000,
-              });
-              this.dialogFormVisible = false;
-              this.getTournament();
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        }
-      });
-    },
-    /* DELETE */
-    handleSelectionChange(val) {
-      this.tournamentList = val;
-    },
-    handleDelete(row, selected) {
-      var id = selected ? row : row.id;
-      axios
-        .delete(this.url + "Tournament/" + id)
-        .then((response) => {
-          this.$notify({
-            title: "Success",
-            message: "Delete Successfully",
-            type: "success",
-            duration: 2000,
-          });
-          this.getTournament();
-          this.showReviewer = false;
-          this.tournamentList = [];
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
-    },
-    confirmDelete(row) {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.handleDelete(row, false);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
-    handleDeleteAll() {
-      this.$confirm(
-        "This will permanently delete the file. Continue?",
-        "Warning",
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-          type: "warning",
-        }
-      )
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.tournamentList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "Delete canceled",
-          });
-        });
-    },
+    }
   },
   /* INPUT SEARCH */
   computed: {
     provider() {
       if (this.list.length > 0) {
         return this.list.filter((item) => {
-          return item.name.toLowerCase().includes(this.search.toLowerCase());
-        });
+          return item.name.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
+    }
+  },
+  created() {
+    /*     this.getList(); */
+    this.getTournament()
+  },
+  methods: {
+    /* TABLE */
+    getList() {
+      this.listLoading = true
+      fetchList(this.listQuery).then((response) => {
+        this.list = response.data.items
+        this.total = response.data.total
+
+        // Just to simulate the time of the request
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getTournament()
+    },
+    handleModifyStatus(row, status) {
+      this.$message({
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
+    },
+    sortChange(data) {
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
-  },
-};
-</script>
-<style lang="scss">
-@media (max-width: 600px) {
-  .el-dialog {
-    width: 100% !important;
+    sortByID(order) {
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
+      } else {
+        this.listQuery.sort = '-id'
+      }
+      this.handleFilter()
+    },
+    handleFetchPv(pv) {
+      fetchPv(pv).then((response) => {
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
+    },
+    handleDownload() {
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['id', 'name', 'document', 'phone', 'email']
+        const filterVal = ['id', 'name', 'document', 'phone', 'email']
+        const data = this.formatJson(filterVal)
+        const date = new Date()
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'Providers' + date
+        })
+        this.downloadLoading = false
+      })
+    },
+    formatJson(filterVal) {
+      return this.list.map((v) =>
+        filterVal.map((j) => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+    getSortClass: function(key) {
+      /*       const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending"; */
+    },
+    next() {
+      if (this.active++ > 1) this.active = 0
+    },
+    handleClose(done) {
+      this.$confirm(i18n.t('modals.closeFormMsg'))
+        .then((_) => {
+          done()
+        })
+        .catch((_) => {})
+    },
+    /* TOURNAMENT */
+    resetTemp() {
+      this.formTournament = {
+        tounamentName: ''
+      }
+    },
+    /* GET */
+    getTournament() {
+      this.listLoading = true
+      axios
+        .get(this.url + 'Tournament')
+        .then((response) => {
+          console.log(response.data)
+          this.list = response.data
+          this.listLoading = false
+        })
+        .catch((error) => {
+          this.status = 'error'
+        })
+    },
+    /* POST */
+    handleCreate() {
+      this.resetTemp()
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+    },
+    postTournament() {
+      this.$refs['formTournament'].validate((valid) => {
+        var club = {
+          tounamentName: this.formTournament.tounamentName
+        }
+        if (valid) {
+          axios
+            .post(this.url + 'Tournament', club)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.addTournament'),
+                type: 'success',
+                duration: 2000
+              })
+
+              this.getTournament()
+              console.log(this.formImageClub.idClub)
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* UPDATE */
+    changeStatus(data, status) {
+      this.$confirm(
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
+        {
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: i18n.t('notifications.deleteComplete'),
+          })
+          var provider = {
+            id: data.id,
+            name: data.name,
+            document: data.document,
+            status: status,
+            phone: data.phone,
+            email: data.email
+          }
+          axios
+            .put(this.url + 'Provider', provider)
+            .then((response) => {
+              this.dialogFormVisible = false
+              this.$notify({
+                title:  i18n.t('notifications.success'),
+                message: i18n.t('notifications.changeStateSuccess'),
+                type: 'success',
+                duration: 2000
+              })
+
+              this.getTournament()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: i18n.t('notifications.deleteCanceled')
+          })
+          this.getTournament()
+        })
+    },
+    handleUpdate(row) {
+      console.log(row)
+      this.tournamentUpdate = row
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.formTournament.tounamentName = row.name
+      this.active = 0
+    },
+    updateData() {
+      this.$refs['formTournament'].validate((valid) => {
+        if (valid) {
+          var tournament = {
+            id: this.tournamentUpdate.id,
+            tounamentName: this.formTournament.tounamentName
+          }
+          axios
+            .put(this.url + 'Tournament', tournament)
+            .then((response) => {
+              this.next()
+              this.$notify({
+                title: i18n('notifications.success'),
+                message: i18n('notifications.updateSuccess'),
+                type: 'success',
+                duration: 2000
+              })
+              this.dialogFormVisible = false
+              this.getTournament()
+            })
+            .catch((error) => {
+              console.error(error.response)
+            })
+        }
+      })
+    },
+    /* DELETE */
+    handleSelectionChange(val) {
+      this.tournamentList = val
+    },
+    handleDelete(row, selected) {
+      var id = selected ? row : row.id
+      axios
+        .delete(this.url + 'Tournament/' + id)
+        .then((response) => {
+          this.$notify({
+            title: i18n('notifications.success'),
+            message: i18n('notifications.deleteSuccessfully'),
+            type: 'success',
+            duration: 2000
+          })
+          this.getTournament()
+          this.showReviewer = false
+          this.tournamentList = []
+        })
+        .catch((error) => {
+          console.error(error.response)
+        })
+    },
+    confirmDelete(row) {
+      this.$confirm(
+        i18n('modals.deleteItemWarning'),
+        i18n('modals.warning'),
+        {
+          cconfirmButtonText: i18n('modals.confirmButton'),
+          cancelButtonText: i18n('modals.cancelButton'),
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: i18n('notifications.deleteComplete')
+          })
+          this.handleDelete(row, false)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: i18n('notifications.deleteCanceled')
+          })
+        })
+    },
+    handleDeleteAll() {
+      this.$confirm(
+        i18n('modals.deleteItemWarning'),
+        i18n('modals.warning'),
+        {
+          confirmButtonText: i18n('modals.confirmButton'),
+          cancelButtonText: i18n('modals.cancelButton'),
+          type: 'warning'
+        }
+      )
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: 18n('notifications.deleteComplete')
+          })
+          this.tournamentList.forEach((value) => {
+            console.log(value)
+            this.handleDelete(value, false)
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message:  i18n('notifications.deleteCanceled')
+          })
+        })
+    }
   }
 }
+</script>
+<style lang="scss">
 </style>
