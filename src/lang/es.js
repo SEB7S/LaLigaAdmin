@@ -157,7 +157,10 @@ export default {
   user: {
     nameUser: 'Usuario',
     rolUser: 'Rol',
-    permission: 'Permiso'
+    permission: 'Permiso',
+    latitudeUser: "Latitud",
+    longitudeUser: "Longitud",
+    cityUser: "Ciudad"
   },
   navbar: {
     logOut: 'Salir',
@@ -316,6 +319,9 @@ export default {
     providerIncomplete: "Por favor ingrese un provedor",
     categoryHtIncomplete: "Por favor ingrese la categoria HT",
     tournamentIncomplete: "Por favor ingrese un torneo",
-    paxIncomplete: "Please input max pax"
+    paxIncomplete: "Please input max pax",
+
+    imageIncorrectFormat: "La imagen debe estar en formato JPG",
+    imageOutOfSize: "La imagen excede los 2MB"
   }
 }

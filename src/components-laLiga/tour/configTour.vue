@@ -1110,10 +1110,10 @@ export default {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
       const isLt2M = file.size / 1024 / 1024 < 2
       if (!isJPG) {
-        this.$message.error('La imagen debe estar en formato JPG!')
+        this.$message.error(i18n.t('forms.imageIncorrectFormat'))
       }
       if (!isLt2M) {
-        this.$message.error('La imagen excede los 2MB!')
+        this.$message.error(i18n.t('forms.imageOutOfSize'))
       }
 
       return isJPG && isLt2M

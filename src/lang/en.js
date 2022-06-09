@@ -156,9 +156,12 @@ export default {
     categoryStadium: 'Category'
   },
   user: {
-    nameUser: 'Usuario',
+    nameUser: 'Username',
     rolUser: 'Role',
-    permission: 'Permission'
+    permission: 'Permission',
+    latitudeUser: "Latitude",
+    longitudeUser: "Longitude",
+    cityUser: "City"
   },
   navbar: {
     dashboard: 'Dashboard',
@@ -317,6 +320,9 @@ export default {
     providerIncomplete: "Please indicate a provider",
     categoryHtIncomplete: "Please enter HT Category",
     tournamentIncomplete: "Please enter a tournament",
-    paxIncomplete: "Please input max pax"
+    paxIncomplete: "Please input max pax",
+
+    imageIncorrectFormat: "The image must be in JPG format",
+    imageOutOfSize: "Image exceeds 2MB"
   }
 }

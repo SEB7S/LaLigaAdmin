@@ -23,7 +23,7 @@
         icon="el-icon-edit"
         @click="handleCreate"
       >
-        Add
+        {{ $t("table.add") }}
       </el-button>
       <el-button
         v-waves
@@ -33,7 +33,7 @@
         icon="el-icon-download"
         @click="handleDownload"
       >
-        Export
+        {{ $t("table.export") }}
       </el-button>
       <el-checkbox
         v-model="showReviewer"
@@ -67,44 +67,47 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Nmae" min-width="100px" align="center">
+      <el-table-column :label="$t('user.nameUser')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="City" min-width="100px" align="center">
+      <el-table-column :label="$t('user.cityUser')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.cityName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Latitude" min-width="100px" align="center">
+      <el-table-column :label="$t('user.latitudeUser')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.latitude }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Longitude" min-width="100px" align="center">
+      <el-table-column :label="$t('user.longitudeUser')" min-width="100px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.longitude }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="Actions"
+        :label="$t('table.actions')"
         align="center"
         width="230"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
-          </el-button>
+          <el-button 
+          type="primary" 
+          size="mini" 
+          icon="el-icon-edit" 
+          @click="handleUpdate(row)"
+          />
+          
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
             type="danger"
+            icon="el-icon-delete"
             @click="confirmDelete(row)"
-          >
-            Delete
-          </el-button>
+          />
         </template>
       </el-table-column>
     </el-table>
@@ -122,20 +125,18 @@
         ref="dataForm"
         :rules="rules"
         :model="temp"
-        label-position="left"
-        label-width="120px"
-        style="width: 800px; margin-left: 50px"
+        label-position="top"
       >
-        <el-form-item label="Name">
+        <el-form-item :label="$t('user.nameUser')">
           <el-input v-model="formStadium.name" />
         </el-form-item>
-        <el-form-item label="Latitude">
+        <el-form-item :label="$t('user.latitudeUser')">
           <el-input v-model="formStadium.latitude" />
         </el-form-item>
-        <el-form-item label="Longitude">
+        <el-form-item :label="$t('user.longitudeUser')" >
           <el-input v-model="formStadium.longitude" />
         </el-form-item>
-        <el-form-item label="City">
+        <el-form-item :label="$t('user.cityUser')">
           <el-autocomplete
             v-model="formStadium.city_name"
             popper-class="my-autocomplete"
@@ -156,12 +157,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> 
+          {{ $t("table.cancel") }}
+        </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? postStadium() : updateData()"
         >
-          Confirm
+          {{ $t("table.confirm") }}
         </el-button>
       </div>
     </el-dialog>
@@ -192,6 +195,7 @@ import {
   createArticle,
   updateArticle
 } from '@/api/article'
+import i18n from '@/lang/index.js'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -447,8 +451,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: 'Success',
-                message: 'Estadio Agregado con éxito',
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.stadiumAddedSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -478,8 +482,8 @@ export default {
         .delete(this.url + 'Stadium/' + row.id)
         .then((response) => {
           this.$notify({
-            title: 'Success',
-            message: 'Delete Successfully',
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -491,25 +495,25 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        'This will permanently delete the file. Continue?',
-        'Warning',
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: 'Delete completed'
+            message: i18n.t('notifications.deleteComplete')
           })
           this.handleDelete(row)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: 'Delete canceled'
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
