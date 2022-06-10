@@ -10,10 +10,10 @@
 
         <error-log class="errLog-container right-menu-item hover-effect" />
 
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
+        <screenfull id="screenfull" class="right-menu-item hover-effect sm-display-none" />
 
         <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
+          <size-select id="size-select" class="right-menu-item hover-effect  sm-display-none" />
         </el-tooltip>
         <el-tooltip content="Users" effect="dark" placement="bottom" class="">
           <router-link to="/user" style="height: 50px">
@@ -25,7 +25,7 @@
 
       </template>
 
-      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+      <el-dropdown class="avatar-container right-menu-item hover-effect sm-display-none" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <i class="el-icon-caret-bottom" />
@@ -180,6 +180,7 @@ export default {
   }
 }
 @media screen and (max-width: 593px){
+  
   .navbar{
     display: flex;
     flex-wrap: wrap;
@@ -194,13 +195,20 @@ export default {
     .right-menu{
       width: 100%;
       display: flex;
-      flex-wrap:wrap;
       justify-content: space-around;
+      flex-wrap: wrap;
       min-height: 65px;
       overflow: hidden;
       transition: 1s height;
+      .sm-display-none{
+          display: none;
+        }
       .right-menu-item {
-        height: 50px;
+        height: 50px; 
+        .header-search.show{
+          width: 100%;
+        }
+        
       }
     }
   }
