@@ -163,7 +163,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :before-close="handleClose"
+      :close-on-click-modal = "false"
       class="mobile"
     >
       <el-steps :active="active" align-center finish-status="success">
@@ -270,7 +270,7 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :close-on-click-modal = "false">
       <el-table
         :data="pvData"
         border

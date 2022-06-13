@@ -183,7 +183,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :before-close="handleClose"
+      :close-on-click-modal = "false"
     >
       <div>
         <el-steps :active="active" finish-status="success" align-center>
@@ -404,7 +404,7 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button @click="dialogFormVisible = false"> {{ $t("table.cancel") }} </el-button>
         <el-button
           type="primary"
           @click="dialogStatus === 'create' ? postTour() : updateData()"
@@ -413,7 +413,7 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :close-on-click-modal = "false">
       <el-table
         :data="pvData"
         border

@@ -41,13 +41,17 @@ export default {
 }
 .wscn-http404 {
   position: relative;
-  width: 1200px;
+  max-width: 1200px;
   padding: 0 50px;
   overflow: hidden;
+  width: 100vw;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
   .pic-404 {
     position: relative;
     float: left;
-    width: 600px;
+    max-width: 600px;
+    width: 100%;
     overflow: hidden;
     &__parent {
       width: 100%;
@@ -224,5 +228,16 @@ export default {
       }
     }
   }
+}
+@media screen and (max-width: 738px){
+  .wscn-http404{
+    display: block;
+    padding: 0 1rem;
+
+    .bullshit{
+      margin: auto;
+      float: none;
+    }
+  } 
 }
 </style>
