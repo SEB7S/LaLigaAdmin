@@ -286,16 +286,17 @@ export default {
     addAnotherMatch: "Partido añadido ¿Desea agregar otro?" 
   },
   notifications: {
-    success: "Exito",
+    changeLanguajeSuccess: "Lenguaje cambiado con éxito",
+    success: "Éxito",
     updateSuccess: "Actualizado exitosamente",
     addedSuccessfully: "Item añadido exitosamente",
     deleteComplete: "Eliminación completada",
-    delete: "Eliminado con exito",
+    delete: "Eliminado con éxito",
     deleteCanceled: "Eliminación cancelada",
-    deleteSuccessfully: "Eliminado con exito",
+    deleteSuccessfully: "Eliminado con éxito",
     changeStateSuccess: "Estado cambiado exitosamente",
 
-    clubAddedSuccessfully: "Club agregado con exito",
+    clubAddedSuccessfully: "Club agregado con éxito",
     providerAddedSuccessfully: "Proveedor agregado con éxito",
     providerDuplicated: "Proovedor duplicado",
     addTournament: "Añadir torneo",

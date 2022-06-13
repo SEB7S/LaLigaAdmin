@@ -287,6 +287,7 @@ export default {
     addAnotherMatch: "Match added, Do you want add other match?"
   },
   notifications: {
+    changeLanguajeSuccess: "Switch language success",
     success: "Success",
     updateSuccess: "Update Successfully",
     addedSuccessfully: "Item added successfully",

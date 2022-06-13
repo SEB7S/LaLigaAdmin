@@ -147,7 +147,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :before-close="handleClose"
+      :close-on-click-modal = "false"
     >
       <el-form
         ref="formCategory"

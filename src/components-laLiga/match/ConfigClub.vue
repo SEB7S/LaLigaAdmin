@@ -136,7 +136,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :before-close="handleClose"
+      :close-on-click-modal = "false"
     >
       <el-steps :active="active" align-center finish-status="success">
         <el-step title="General Data" />
@@ -217,7 +217,7 @@
     <el-dialog
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
-      :before-close="handleClose"
+      :close-on-click-modal = "false"
     >
       <el-table
         :data="pvData"

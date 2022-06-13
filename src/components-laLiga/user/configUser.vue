@@ -16,6 +16,8 @@
       >
         Search
       </el-button> -->
+      <!--COMMENT-->
+      <!-- COMMENT2 -->
       <el-button
         class="filter-item"
         style="margin-left: 10px"
@@ -120,7 +122,7 @@
       @pagination="getList"
     />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal = "false">
       <el-form
         ref="dataForm"
         :rules="rules"
@@ -169,7 +171,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :close-on-click-modal = "false">
       <el-table
         :data="pvData"
         border
