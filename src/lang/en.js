@@ -74,7 +74,7 @@ export default {
     match: 'Match',
     manageMatch: 'Manage Match',
     manageRates: 'Manage Rate',
-    clubs: 'Manage lub',
+    clubs: 'Manage Club',
     provider: 'Provider',
     manageProvider: 'Manage Provider',
     stadium: 'Stadium',

@@ -16,8 +16,41 @@
     </el-autocomplete>
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="Date" name="first">
-        <div v-show="tour != ''" style="margin: 15px 0">
+      <el-tab-pane label="Season" name="first">
+        <el-form
+          v-if="tour != ''"
+          ref="formSeason"
+          :rules="rules"
+          :model="formSeason"
+          label-position="top"
+          label-width="120px"
+        >
+        
+          <h4>Configurar Temporadas</h4>
+          <el-form-item :label="$t('tour.nameTour')" prop="nameEnglish">
+            <el-input v-model="formSeason.nameEnglish" />
+          </el-form-item>
+          <el-form-item :label="$t('tour.nameProvider')" prop="nameEspanish">
+            <el-input
+              placeholder="Please input"
+              v-model="listTours.providerName"
+              :disabled="true"
+            >
+            </el-input>
+          </el-form-item>
+          <el-form-item :label="$t('route.categoryProvider')" prop="nameEspanish">
+            <el-input
+              placeholder="Please input"
+              :disabled="true"
+              v-model="name_categories"
+            >
+            </el-input>
+          </el-form-item>
+            <el-checkbox v-model="checked">Valor por defecto</el-checkbox>
+        </el-form>
+      </el-tab-pane>
+      <el-tab-pane label="Date" name="second">
+        <div v-if="tour != ''" style="margin: 15px 0">
           <el-checkbox
             style="margin: 15px 0"
             :indeterminate="isIndeterminate"
@@ -26,28 +59,60 @@
             >Marcar todos</el-checkbox
           >
           <div style="margin: 15px 0"></div>
+
           <el-checkbox-group
+            style="display: grid"
             v-model="checkedTours"
             @change="handlecheckedToursChange"
           >
-            <el-checkbox
-              v-for="(tourDay, index) in aListTours"
-              :label="tourDay.nameInstance"
-              :key="index"
-              border
-              class="space"
-              :disabled="tourDay.disabled"
-            >
-              {{ tourDay.nameInstance }}
-              {{ tourDay.startDate | formatDate }}</el-checkbox
-            >
+            <el-row :gutter="20">
+              <el-col :span="6"
+                ><div class="grid-content bg-purple">
+                  <el-checkbox
+                    v-for="(tourDay, index) in aListTours"
+                    :label="tourDay.nameInstance"
+                    :key="index"
+                    border
+                    class="space"
+                    :disabled="tourDay.disabled"
+                  >
+                    {{ tourDay.nameInstance }}
+                    {{ tourDay.startDate | formatDate }}
+                  </el-checkbox>
+                </div></el-col
+              >
+              <el-col :span="6">
+                <div
+                  v-for="(tourDay, index) in aListTours"
+                  :label="tourDay.nameInstance"
+                  :key="index"
+                >
+                  <el-select
+                    v-model="season"
+                    placeholder="Select"
+                    :disabled="tourDay.disabled"
+                    style="margin: 3px"
+                    @change="itemSelected"
+                  >
+                    <el-option
+                      v-for="item in seasons"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+
+                    >
+                    
+                    </el-option>
+                  </el-select></div
+              ></el-col>
+            </el-row>
           </el-checkbox-group>
         </div>
         <el-button v-show="tour != ''" type="primary" @click="postTourInstance"
           >Confirmar</el-button
         >
       </el-tab-pane>
-      <el-tab-pane label="Config" name="second">
+      <el-tab-pane label="Config" name="third">
         <div class="filter-container">
           <el-input
             placeholder="Search"
@@ -157,9 +222,9 @@
           </el-table-column>
           <el-table-column label="start Date" min-width="100px" align="center">
             <template slot-scope="{ row }">
-              <span v-if="row.tourDayDescriptions.length > 0">{{
-                row.tourDayDescriptions[0]["startTime"] | formatDate
-              }}</span>
+              <span v-if="row.tourDayDescriptions.length > 0"
+                >{{ row.tourDayDescriptions[0]["startTime"] | formatDate }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column
@@ -220,7 +285,7 @@
         <el-dialog
           :title="textMap[dialogStatus]"
           :visible.sync="dialogFormVisible"
-          :close-on-click-modal = "false"
+          :close-on-click-modal="false"
         >
           <div>
             <el-steps :active="active" finish-status="success" align-center>
@@ -460,7 +525,7 @@
         <el-dialog
           :visible.sync="dialogPvVisible"
           title="Reading statistics"
-          :close-on-click-modal = "false"
+          :close-on-click-modal="false"
         >
           <el-table
             :data="pvData"
@@ -488,6 +553,7 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
+import i18n from "@/lang/index.js";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -624,6 +690,52 @@ export default {
       fileUploads: [],
       dialogVisible: false,
       dialogImageUrl: "",
+      formSeason: {
+        nameEnglish: "",
+        nameEspanish: "",
+        stadiumId: "",
+        stadiumName: "",
+      },
+      rules: {
+        nameEnglish: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+        nameEspanish: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+      },
+      seasons: [
+        {
+          value: "Option1",
+          label: "Baja",
+        },
+        {
+          value: "Option2",
+          label: "Media",
+        },
+        {
+          value: "Option3",
+          label: "Alta",
+        },
+        {
+          value: "Option4",
+          label: "Custom",
+        },
+        {
+          value: false,
+          label: "new Season...",
+        },
+      ],
+      season: "",
+      name_categories: "",
     };
   },
   created() {},
@@ -967,6 +1079,9 @@ export default {
       this.listLoading = false;
       this.caculateDate(item);
       console.log(this.listTours);
+      this.name_categories = this.listTours.tourCategories
+        .map((u) => u.providerCategoryName)
+        .join(", ");
     },
     handleIconClick(ev) {
       console.log(ev);
@@ -1467,6 +1582,12 @@ export default {
     changeArrayPositions(array, x, y) {
       [array[x], array[y]] = [array[y], array[x]];
     },
+    itemSelected(item){
+      console.log(item)
+      if(item == false){
+        this.activeName = 'first'
+      }
+    }
   },
   /* INPUT SEARCH */
   computed: {
@@ -1491,7 +1612,7 @@ export default {
   width: 350px;
 }
 .el-checkbox.is-bordered + .el-checkbox.is-bordered {
-  margin-left: 0 !important;
   margin: 3px !important;
 }
+
 </style>
