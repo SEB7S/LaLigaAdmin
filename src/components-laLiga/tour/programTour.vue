@@ -17,37 +17,7 @@
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
-        <el-form
-          v-if="tour != ''"
-          ref="formSeason"
-          :rules="rules"
-          :model="formSeason"
-          label-position="top"
-          label-width="120px"
-        >
-        
-          <h4>Configurar Temporadas</h4>
-          <el-form-item :label="$t('tour.nameTour')" prop="nameEnglish">
-            <el-input v-model="formSeason.nameEnglish" />
-          </el-form-item>
-          <el-form-item :label="$t('tour.nameProvider')" prop="nameEspanish">
-            <el-input
-              placeholder="Please input"
-              v-model="listTours.providerName"
-              :disabled="true"
-            >
-            </el-input>
-          </el-form-item>
-          <el-form-item :label="$t('route.categoryProvider')" prop="nameEspanish">
-            <el-input
-              placeholder="Please input"
-              :disabled="true"
-              v-model="name_categories"
-            >
-            </el-input>
-          </el-form-item>
-            <el-checkbox v-model="checked">Valor por defecto</el-checkbox>
-        </el-form>
+
       </el-tab-pane>
       <el-tab-pane label="Date" name="second">
         <div v-if="tour != ''" style="margin: 15px 0">
