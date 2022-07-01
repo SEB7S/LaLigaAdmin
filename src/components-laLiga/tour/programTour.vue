@@ -18,6 +18,92 @@
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
 
+
+        <el-row :gutter="40">
+
+         <el-col v-for="(season, index) in seasons" :key="index" :span="6">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>{{season.label}}</span>
+                <el-switch style="float: right;" v-model="value1">
+                </el-switch>
+              </div>
+              <div>
+                  <div class="categoty-name">
+                    Plus
+                  </div>
+                  <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
+                     <el-form-item class="card-form-item">
+                        <el-select placeholder="Activity zone">
+                          <el-option label="Zone one" value="shanghai"></el-option>
+                          <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item class="card-form-item">
+                        <el-input></el-input>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
+                      </el-form-item>
+                  </el-form>
+                   <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
+                     <el-form-item class="card-form-item">
+                        <el-select placeholder="Activity zone">
+                          <el-option label="Zone one" value="shanghai"></el-option>
+                          <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item class="card-form-item">
+                        <el-input></el-input>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
+                      </el-form-item>
+                  </el-form>
+                  <el-button type="primary" round size="mini">Add</el-button>
+              </div>
+
+
+              <div>
+                  <div class="categoty-name">
+                    Clasica
+                  </div>
+                  <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
+                     <el-form-item class="card-form-item">
+                        <el-select placeholder="Activity zone">
+                          <el-option label="Zone one" value="shanghai"></el-option>
+                          <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item class="card-form-item">
+                        <el-input></el-input>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
+                      </el-form-item>
+                  </el-form>
+                   <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
+                     <el-form-item class="card-form-item">
+                        <el-select placeholder="Activity zone">
+                          <el-option label="Zone one" value="shanghai"></el-option>
+                          <el-option label="Zone two" value="beijing"></el-option>
+                        </el-select>
+                      </el-form-item>
+                      <el-form-item class="card-form-item">
+                        <el-input></el-input>
+                      </el-form-item>
+                      <el-form-item>
+                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
+                      </el-form-item>
+                  </el-form>
+                  <el-button type="primary" round size="mini">Add</el-button>
+              </div>
+            </el-card>
+         </el-col>
+
+        </el-row>
+
+
       </el-tab-pane>
       <el-tab-pane label="Date" name="second">
         <div v-if="tour != ''" style="margin: 15px 0">
@@ -682,6 +768,9 @@ export default {
           },
         ],
       },
+
+      //START DATA FOR SEASON TAB ------------------------------------------
+
       seasons: [
         {
           value: "Option1",
@@ -695,17 +784,24 @@ export default {
           value: "Option3",
           label: "Alta",
         },
-        {
-          value: "Option4",
-          label: "Custom",
-        },
-        {
-          value: false,
-          label: "new Season...",
-        },
+    //{
+      //    value: "Option4",
+         // label: "Custom",
+        //},
+        //{
+         // value: false,
+          //label: "new Season...",
+        //},
       ],
-      season: "",
+
+
+     
+
+      //season: [ "Baja", "Media", "Alta" ],
       name_categories: "",
+
+
+      //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
   created() {},
@@ -1584,5 +1680,15 @@ export default {
 .el-checkbox.is-bordered + .el-checkbox.is-bordered {
   margin: 3px !important;
 }
-
+.card-form-item{
+  width: 45%;
+}
+.card-form-container{
+  display: flex;
+}
+.categoty-name{
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  font-weight: bold;
+}
 </style>
