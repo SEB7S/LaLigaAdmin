@@ -214,7 +214,7 @@
       :close-on-click-modal = "false"
     >
       <el-steps :active="active" align-center finish-status="success">
-        <el-step title="General Data" /><el-step title="Room Type" />
+        <el-step title="General Data" /><!-- <el-step title="Room Type" /> -->
         <el-step title="Image / Description" />
       </el-steps>
       <div v-if="active == 0">
@@ -286,7 +286,7 @@
           </el-form-item>
         </el-form>
       </div>
-      <div v-if="active == 1">
+<!--       <div v-if="active == 1">
         <el-form
           ref="formRoomType"
           :rules="rules"
@@ -377,8 +377,8 @@
           </div>
         </el-form>
         <el-button type="primary" @click="addRoom">+</el-button>
-      </div>
-      <div v-if="active == 2">
+      </div> -->
+      <div v-if="active == 1">
         <el-form
           ref="formHotel"
           label-position="top"
@@ -867,16 +867,16 @@ export default {
           cityId: this.formHotel.cityId,
           providerCategoryId: this.formHotel.providerCategoryId,
           statusActive: this.formHotel.statusActive,
-          hotelRoomTypes: []
+/*           hotelRoomTypes: [] */
         }
-        this.formRoomType.forEach((element, index) => {
+/*         this.formRoomType.forEach((element, index) => {
           var roomType = {
             hotelId: 0,
             roomTypeId: element.id
           }
           hotel.hotelRoomTypes.push(roomType)
           console.log(hotel)
-        })
+        }) */
 
         axios
           .post(this.url + 'Hotel', hotel)
@@ -896,9 +896,8 @@ export default {
           .catch((error) => {
             console.error(error.response)
           })
-      } else if (this.active == 2) {
-        this.dialogFormVisible = false
-      }
+          this.dialogFormVisible = false
+      } 
     },
     /* UPDATE */
     handleUpdate(row) {
@@ -917,7 +916,7 @@ export default {
       this.formHotel.providerCategoryName = row.providerCategoryName
       this.formHotel.providerCategoryId = row.providerCategoryId
       this.formImageHotel.idHotel = row.id
-      this.getRoomTypeById()
+     /*  this.getRoomTypeById() */
       console.log(this.formRoomType)
     },
     updateData() {
@@ -935,10 +934,10 @@ export default {
           providerId: this.formHotel.providerId,
           providerCategoryId: this.formHotel.providerCategoryId,
           statusActive: this.formHotel.statusActive,
-          hotelRoomTypes: []
+/*           hotelRoomTypes: [] */
         }
         console.log(this.formRoomType)
-        this.formRoomType.forEach((element, index) => {
+/*         this.formRoomType.forEach((element, index) => {
           console.log('room', element)
           var roomType = {
             hotelId: this.formImageHotel.idHotel,
@@ -946,7 +945,7 @@ export default {
           }
           hotel.hotelRoomTypes.push(roomType)
           console.log(hotel)
-        })
+        }) */
         axios
           .put(this.url + 'Hotel', hotel)
           .then((response) => {
@@ -964,7 +963,6 @@ export default {
             console.error(error.response)
           })
         console.log(this.active)
-      } else if (this.active == 2) {
         this.dialogFormVisible = false
       }
     },

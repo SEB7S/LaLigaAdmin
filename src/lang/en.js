@@ -70,7 +70,7 @@ export default {
     hotel: 'Hotel',
     happyTourCategory: 'HappyTour Category',
     manageHotel: 'Manage Hotel',
-    manageRoom: 'Manage Room',
+    manageRoom: 'Manage Accommodation',
     match: 'Match',
     manageMatch: 'Manage Match',
     manageRates: 'Manage Rate',
@@ -99,7 +99,8 @@ export default {
     stepOneName: 'General Data',
     stepTwoName: 'Detail Days',
     image: 'Choose Image',
-    tourInstance: 'Children'
+    tourInstance: 'Children',
+
   },
   match: {
     nameClub: 'Club',

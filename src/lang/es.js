@@ -70,7 +70,7 @@ export default {
     hotel: 'Hotel',
     happyTourCategory: 'Categoría HappyTours',
     manageHotel: 'Gestionar Hotel',
-    manageRoom: 'Gestionar Habitación',
+    manageRoom: 'Gestionar Acomodación',
     match: 'Partido',
     manageMatch: 'Gestionar Partido',
     manageRates: 'Gestionar Tarifas',

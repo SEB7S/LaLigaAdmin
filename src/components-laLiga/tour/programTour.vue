@@ -18,11 +18,10 @@
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
 
-
-        <el-row :gutter="40">
-
+        <el-row v-if="tour != ''" :gutter="40">
+        <h4></h4>
          <el-col v-for="(season, index) in seasons" :key="index" :span="6">
-            <el-card class="box-card">
+            <el-card  class="box-card">
               <div slot="header" class="clearfix">
                 <span>{{season.label}}</span>
                 <el-switch style="float: right;" v-model="value1">
@@ -34,9 +33,9 @@
                   </div>
                   <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
                      <el-form-item class="card-form-item">
-                        <el-select placeholder="Activity zone">
-                          <el-option label="Zone one" value="shanghai"></el-option>
-                          <el-option label="Zone two" value="beijing"></el-option>
+                        <el-select placeholder="Accommodation">
+                          <el-option label="Single" value="shanghai"></el-option>
+                          <el-option label="Double" value="beijing"></el-option>
                         </el-select>
                       </el-form-item>
                       <el-form-item class="card-form-item">
@@ -48,9 +47,9 @@
                   </el-form>
                    <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
                      <el-form-item class="card-form-item">
-                        <el-select placeholder="Activity zone">
-                          <el-option label="Zone one" value="shanghai"></el-option>
-                          <el-option label="Zone two" value="beijing"></el-option>
+                        <el-select placeholder="Accommodation">
+                          <el-option label="Single" value="shanghai"></el-option>
+                          <el-option label="Double" value="beijing"></el-option>
                         </el-select>
                       </el-form-item>
                       <el-form-item class="card-form-item">
@@ -616,7 +615,6 @@ const calendarTypeOptions = [
   { key: "JP", display_name: "Japan" },
   { key: "EU", display_name: "Eurozone" },
 ];
-
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name;
@@ -701,7 +699,6 @@ export default {
         nameEnglish: "",
         nameEspanish: "",
       },
-
       aTourList: [],
       /* EndPoint */
       url: this.$store.getters.url,
@@ -768,9 +765,7 @@ export default {
           },
         ],
       },
-
       //START DATA FOR SEASON TAB ------------------------------------------
-
       seasons: [
         {
           value: "Option1",
@@ -793,14 +788,9 @@ export default {
           //label: "new Season...",
         //},
       ],
-
-
      
-
       //season: [ "Baja", "Media", "Alta" ],
       name_categories: "",
-
-
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
@@ -811,7 +801,6 @@ export default {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
         this.total = response.data.total;
-
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false;
@@ -922,7 +911,6 @@ export default {
         tourDayDescriptions: this.listTours.tourDayDescriptions,
         tourInstances: this.aListToursFinal,
       };
-
       axios
         .post(this.url + "Tour/AddTourInstanceFromTour", tour)
         .then((response) => {
@@ -1086,7 +1074,6 @@ export default {
             : links;
           cb(results);
         })
-
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
@@ -1114,7 +1101,6 @@ export default {
           this.orderList();
           console.log("me actualicé", this.list);
         })
-
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
@@ -1130,13 +1116,11 @@ export default {
           this.getTourForTable();
           this.caculateDate(this.listTours);
         })
-
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
         });
     },
-
     handleSelect(item) {
       this.tour = item.name;
       this.tourSelected = 52;
@@ -1413,7 +1397,6 @@ export default {
     },
     uploadFile(file) {
       console.log(this.formDayDetail, this.arrayPosition, file);
-
       this.formDayDetail[this.arrayPosition].images.push(file);
     },
     getImageByIdDay(day) {
@@ -1441,7 +1424,6 @@ export default {
       if (!isLt2M) {
         this.$message.error("La imagen excede los 2MB!");
       }
-
       return isJPG && isLt2M;
     },
     handleChange(val) {
@@ -1496,7 +1478,6 @@ export default {
         "Friday",
         "Saturday",
       ];
-
       console.log(this.start_date);
       const copyStartDate = new Date(this.start_date);
       this.formDayDetail = [];
@@ -1632,7 +1613,6 @@ export default {
     },
     concatenateTitle(index) {
       let result = "";
-
       this.formDayDetail[index].tourCities.length == 2 &&
       this.formDayDetail[index].tourCities[0] ===
         this.formDayDetail[index].tourCities[1]
@@ -1641,7 +1621,6 @@ export default {
       this.formDayDetail[index].tourCities.forEach((element) => {
         result = result.concat(element) + "/";
       });
-
       result = result.concat(this.formDayDetail[index].cityName.split(",")[0]);
       return result;
     },
@@ -1692,3 +1671,18 @@ export default {
   font-weight: bold;
 }
 </style>
+Footer
+© 2022 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+You have unread notifications
