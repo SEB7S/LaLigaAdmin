@@ -16,8 +16,50 @@
     </el-autocomplete>
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="Date" name="first">
-        <div v-show="tour != ''" style="margin: 15px 0">
+      <el-tab-pane label="Season" name="first">
+
+        <el-row :gutter="40">
+
+         <el-col v-for="(season, index) in seasons" :key="index" :span="6">
+            <el-card class="box-card box-card-container">
+              <div slot="header" class="clearfix">
+                <span>{{season.label}}</span>
+                <el-switch style="float: right;" v-model="value1">
+                </el-switch>
+              </div>
+
+              <div v-for="(category, index) in season.category" :key="index">
+                <div class="categoty-name">
+                  {{category.categoryName}}
+                </div>
+                <el-form v-for="(form, index) in category.categoryForms" :key="index" :inline="true" :model="form" class="card-form-container demo-form-inline" size="mini">
+                    <el-form-item class="card-form-item">
+                      <el-autocomplete
+                        class="inline-input"
+                        v-model="form.chooseProvider"
+                        :fetch-suggestions="querySearch"
+                        placeholder="Please Input"
+                        @select="handleSelect"
+                      ></el-autocomplete>
+                    </el-form-item>
+                    <el-form-item class="card-form-item">
+                      <el-input v-model="form.chooseNumber"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button circle type="danger" icon="el-icon-delete" @click="RemoveForm(category.categoryForms, index)"></el-button>
+                    </el-form-item>
+                </el-form>
+                <el-button type="primary" round size="mini" @click="AddForm(category.categoryForms)">Add</el-button>
+              </div>
+            </el-card>
+         </el-col>
+
+        </el-row>
+
+
+      </el-tab-pane>
+      <el-tab-pane label="Date" name="second">
+        <div v-if="tour != ''" style="margin: 15px 0">
           <el-checkbox
             v-model="checkAll"
             style="margin: 15px 0"
@@ -396,9 +438,88 @@ export default {
       /* checkbox */
       checkAll: false,
       checkedTours: [],
-      isIndeterminate: true
+
+
+
+
+      //START DATA FOR SEASON TAB ------------------------------------------
+
+      seasons: [
+        {
+          value: "Option1",
+          label: "Baja",
+          category: [
+            {
+              categoryName:"Plus",
+              categoryForms: [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0                   
+                },
+              ]
+            },
+            {
+            categoryName: "Clasica",
+            categoryForms: [
+              {
+                chooseProvider: "",
+                chooseNumber: 0 
+              }
+            ]
+            }
+          ]
+        },
+        {
+          value: "Option2",
+          label: "Media",
+          category: [
+            {
+              categoryName:"Plus",
+              categoryForms: [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0                   
+                },
+              ]
+            },
+            {
+            categoryName: "Clasica",
+            categoryForms: [
+              {
+                chooseProvider: "",
+                chooseNumber: 0                   
+              }
+            ]
+            }
+          ]
+        },
+        {
+          value: "Option3",
+          label: "Alta",
+        },
+    //{
+      //    value: "Option4",
+         // label: "Custom",
+        //},
+        //{
+         // value: false,
+          //label: "new Season...",
+        //},
+      ],
+
+
+     
+
+      season: [],
+      name_categories: "",
+
+
+      //END DATA FOR SEASON TAB ------------------------------------------------
     }
+
+
   },
+ 
   /* INPUT SEARCH */
   computed: {
     listTour() {
@@ -407,10 +528,81 @@ export default {
           return item.name.toLowerCase().includes(this.search.toLowerCase())
         })
       }
-    }
+    },
+      isIndeterminate: true,
+      active: 0,
+      formTour: {
+        name: "",
+        duration_in_days: 0,
+        status: false,
+        idProvider: 0,
+        providerName: "",
+        hotel_category: [],
+        options: [],
+      },
+      idTourCreated: 0,
+      formDayDetail: [],
+      getDayDescription: [],
+      arrayPosition: 0,
+      tourUpdate: [],
+      activeNames: [0],
+      start_date: new Date(),
+      formImageTour: {
+        MediaContentType: 0,
+        idTour: 0,
+      },
+      aTourCategory: [],
+      editTourDayDescription: false,
+      editFormTourDayDescription: [],
+      tourList: [],
+      sCity: "",
+      fileUploads: [],
+      dialogVisible: false,
+      dialogImageUrl: "",
+      formSeason: {
+        nameEnglish: "",
+        nameEspanish: "",
+        stadiumId: "",
+        stadiumName: "",
+      },
+      rules: {
+        nameEnglish: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+        nameEspanish: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+      },
+    
+      
   },
   created() {},
   methods: {
+
+
+    //----START METHODS FOR SEASON TAB----//
+
+    AddForm(list){
+      list.push({chooseProvider: "", chooseNumber: 0})
+    },
+
+    RemoveForm(list, n){
+      if(list.length >= 2){
+        list.splice(n, 1)
+      }
+    },
+
+
+    //----END METHODS FOR SEASON TAB----//
+
     /* TABLE */
     getList() {
       this.listLoading = true
@@ -741,6 +933,9 @@ export default {
 }
 </script>
 <style lang="scss">
+.card-form-container{
+  display: flex;
+}
 .el-message-box{
   width: 95%;
   max-width: 418px;
@@ -753,5 +948,8 @@ export default {
 }
 .el-checkbox.is-bordered + .el-checkbox.is-bordered {
   margin: 3px;
+}
+.box-card-container{
+  min-height: 363.781px;
 }
 </style>
