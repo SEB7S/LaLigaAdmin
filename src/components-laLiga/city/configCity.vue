@@ -499,7 +499,7 @@ export default {
             '0513e4a37fmsh5c1de65b72f3182p1ebac7jsn85844b4c6a0e'
         }
       }
-
+/* 'https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&languageCode=es&types=CITY&sort=-population&namePrefix=' */
       var url =
         'https://wft-geo-db.p.rapidapi.com/v1/geo/cities?limit=5&offset=0&types=CITY&sort=-population&namePrefix='
       if (queryString.length > 2) {
