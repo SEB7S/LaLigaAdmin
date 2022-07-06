@@ -24,7 +24,7 @@
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
                 <span>{{season.label}}</span>
-                <el-switch style="float: right;" v-model="value1">
+                <el-switch style="float: right;" v-model="season.status">
                 </el-switch>
               </div>
 
@@ -32,8 +32,8 @@
                 <div class="categoty-name">
                   {{category.categoryName}}
                 </div>
-                <el-form v-for="(form, index) in category.categoryForms" :key="index" :inline="true" :model="form" class="card-form-container demo-form-inline" size="mini">
-                    <el-form-item class="card-form-item">
+                <el-form v-for="(form, index) in category.categoryForms" :disabled="season.status == false"  :key="index" :inline="true" :model="form"  class="card-form-container demo-form-inline" size="mini">
+                    <el-form-item class="card-form-item" >
                       <el-autocomplete
                         class="inline-input"
                         v-model="form.chooseProvider"
@@ -46,10 +46,10 @@
                       <el-input v-model="form.chooseNumber"></el-input>
                     </el-form-item>
                     <el-form-item>
-                      <el-button circle type="danger" icon="el-icon-delete" @click="RemoveForm(category.categoryForms, index)"></el-button>
+                      <el-button circle type="danger" :disabled="category.categoryForms.length == 1" icon="el-icon-delete" @click="RemoveForm(category.categoryForms, index)"></el-button>
                     </el-form-item>
                 </el-form>
-                <el-button type="primary" round size="mini" @click="AddForm(category.categoryForms)">Add</el-button>
+                <el-button type="primary" round size="mini" @click="AddForm(category.categoryForms)"  :disabled="season.status == false" >Add</el-button>
               </div>
             </el-card>
          </el-col>
@@ -563,6 +563,7 @@ import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
 import i18n from "@/lang/index.js";
+import { forEach } from 'mock/user';
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -675,10 +676,21 @@ export default {
 
       //START DATA FOR SEASON TAB ------------------------------------------
 
+      listToursRaw: [
+        {
+          id: 0,
+          tourCategories:{
+            chooseProvider: "",
+            chooseNumber: 0    
+          }
+        }
+      ],
+      
       seasons: [
         {
           value: "Option1",
           label: "Baja",
+          status: true,
           category: [
             {
               categoryName:"Plus",
@@ -703,6 +715,7 @@ export default {
         {
           value: "Option2",
           label: "Media",
+          status: true,
           category: [
             {
               categoryName:"Plus",
@@ -727,6 +740,7 @@ export default {
         {
           value: "Option3",
           label: "Alta",
+          status: true,
         },
     //{
       //    value: "Option4",
@@ -747,7 +761,6 @@ export default {
 
       //END DATA FOR SEASON TAB ------------------------------------------------
     }
-
 
   },
  
@@ -817,7 +830,7 @@ export default {
   },
   created() {},
   methods: {
-
+    
 
     //----START METHODS FOR SEASON TAB----//
 
@@ -831,7 +844,8 @@ export default {
       }
     },
 
-
+    
+    },
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1157,6 +1171,7 @@ export default {
           console.log(this.listTours);
           this.getTourForTable();
           this.caculateDate(this.listTours);
+          //this.AddSeasonsCategories(this.listTours)
         })
 
         .catch((error) => {
@@ -1682,18 +1697,10 @@ export default {
         this.activeName = 'first'
       }
     }
-  },
+  
   /* INPUT SEARCH */
-  computed: {
-    listTour() {
-      if (this.list) {
-        return this.list.filter((item) => {
-          return item.name.toLowerCase().includes(this.search.toLowerCase());
-        });
-      }
-    },
-  },
-};
+
+}
 </script>
 <style lang="scss">
 @media (max-width: 600px) {
