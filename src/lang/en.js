@@ -126,7 +126,7 @@ export default {
     status: 'Status',
     image: 'Choose Image',
     description: 'Description',
-    max_pax: 'Max Pax',
+    max_pax: 'Ocupation',
   },
   provider: {
     nameProvider: 'Provider',
