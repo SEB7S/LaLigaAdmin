@@ -30,7 +30,7 @@
 
               <div v-for="(category, index) in season.category" :key="index">
                 <div class="categoty-name">
-                  {{category.categoryName}}
+                  {{category.tourName}}
                 </div>
                 <el-form v-for="(form, index) in category.categoryForms" :disabled="season.status == false"  :key="index" :inline="true" :model="form"  class="card-form-container demo-form-inline" size="mini">
                     <el-form-item class="card-form-item" >
@@ -563,7 +563,6 @@ import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
 import i18n from "@/lang/index.js";
-import { forEach } from 'mock/user';
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -671,6 +670,58 @@ export default {
       checkAll: false,
       checkedTours: [],
 
+      isIndeterminate: true,
+      active: 0,
+      formTour: {
+        name: "",
+        duration_in_days: 0,
+        status: false,
+        idProvider: 0,
+        providerName: "",
+        hotel_category: [],
+        options: [],
+      },
+      idTourCreated: 0,
+      formDayDetail: [],
+      getDayDescription: [],
+      arrayPosition: 0,
+      tourUpdate: [],
+      activeNames: [0],
+      start_date: new Date(),
+      formImageTour: {
+        MediaContentType: 0,
+        idTour: 0,
+      },
+      aTourCategory: [],
+      editTourDayDescription: false,
+      editFormTourDayDescription: [],
+      tourList: [],
+      sCity: "",
+      fileUploads: [],
+      dialogVisible: false,
+      dialogImageUrl: "",
+      formSeason: {
+        nameEnglish: "",
+        nameEspanish: "",
+        stadiumId: "",
+        stadiumName: "",
+      },
+      rules: {
+        nameEnglish: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+        nameEspanish: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+      },
 
 
 
@@ -758,6 +809,7 @@ export default {
       season: [],
       name_categories: "",
 
+      testList: {}
 
       //END DATA FOR SEASON TAB ------------------------------------------------
     }
@@ -773,60 +825,6 @@ export default {
         })
       }
     },
-      isIndeterminate: true,
-      active: 0,
-      formTour: {
-        name: "",
-        duration_in_days: 0,
-        status: false,
-        idProvider: 0,
-        providerName: "",
-        hotel_category: [],
-        options: [],
-      },
-      idTourCreated: 0,
-      formDayDetail: [],
-      getDayDescription: [],
-      arrayPosition: 0,
-      tourUpdate: [],
-      activeNames: [0],
-      start_date: new Date(),
-      formImageTour: {
-        MediaContentType: 0,
-        idTour: 0,
-      },
-      aTourCategory: [],
-      editTourDayDescription: false,
-      editFormTourDayDescription: [],
-      tourList: [],
-      sCity: "",
-      fileUploads: [],
-      dialogVisible: false,
-      dialogImageUrl: "",
-      formSeason: {
-        nameEnglish: "",
-        nameEspanish: "",
-        stadiumId: "",
-        stadiumName: "",
-      },
-      rules: {
-        nameEnglish: [
-          {
-            required: true,
-            message: i18n.t("forms.nameIncomplete"),
-            trigger: "blur",
-          },
-        ],
-        nameEspanish: [
-          {
-            required: true,
-            message: i18n.t("forms.nameIncomplete"),
-            trigger: "blur",
-          },
-        ],
-      },
-    
-      
   },
   created() {},
   methods: {
@@ -843,9 +841,22 @@ export default {
         list.splice(n, 1)
       }
     },
-
-    
+    AddSeasonsCategories(list){
+      this.seasons.forEach(season =>
+        {
+          season.category = list.tourCategories
+          season.category.forEach(e => {
+            this.$set(e, "categoryForms", 
+            {
+              chooseProvider: "",
+              chooseNumber: 0                   
+            })
+          })
+          
+        }
+      )
     },
+    
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1171,7 +1182,7 @@ export default {
           console.log(this.listTours);
           this.getTourForTable();
           this.caculateDate(this.listTours);
-          //this.AddSeasonsCategories(this.listTours)
+          
         })
 
         .catch((error) => {
@@ -1184,10 +1195,11 @@ export default {
       this.tour = item.name;
       this.tourSelected = 52;
       this.listTours = item;
+      this.AddSeasonsCategories(item)
       /* para listar los tours hijos */
       this.listLoading = false;
       this.caculateDate(item);
-      console.log(this.listTours);
+      console.log("En handle select", this.listTours);
       this.name_categories = this.listTours.tourCategories
         .map((u) => u.providerCategoryName)
         .join(", ");
@@ -1699,7 +1711,7 @@ export default {
     }
   
   /* INPUT SEARCH */
-
+  }
 }
 </script>
 <style lang="scss">
