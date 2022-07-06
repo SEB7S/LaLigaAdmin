@@ -18,84 +18,38 @@
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
 
-        <el-row v-if="tour != ''" :gutter="40">
-        <h4></h4>
+        <el-row :gutter="40">
+
          <el-col v-for="(season, index) in seasons" :key="index" :span="6">
-            <el-card  class="box-card">
+            <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
                 <span>{{season.label}}</span>
-                <el-switch style="float: right;" v-model="value1">
+                <el-switch style="float: right;" v-model="season.status">
                 </el-switch>
               </div>
-              <div>
-                  <div class="categoty-name">
-                    Plus
-                  </div>
-                  <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
-                     <el-form-item class="card-form-item">
-                        <el-select placeholder="Accommodation">
-                          <el-option label="Single" value="shanghai"></el-option>
-                          <el-option label="Double" value="beijing"></el-option>
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item class="card-form-item">
-                        <el-input></el-input>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
-                      </el-form-item>
-                  </el-form>
-                   <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
-                     <el-form-item class="card-form-item">
-                        <el-select placeholder="Accommodation">
-                          <el-option label="Single" value="shanghai"></el-option>
-                          <el-option label="Double" value="beijing"></el-option>
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item class="card-form-item">
-                        <el-input></el-input>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
-                      </el-form-item>
-                  </el-form>
-                  <el-button type="primary" round size="mini">Add</el-button>
-              </div>
 
-
-              <div>
-                  <div class="categoty-name">
-                    Clasica
-                  </div>
-                  <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
-                     <el-form-item class="card-form-item">
-                        <el-select placeholder="Activity zone">
-                          <el-option label="Zone one" value="shanghai"></el-option>
-                          <el-option label="Zone two" value="beijing"></el-option>
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item class="card-form-item">
-                        <el-input></el-input>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
-                      </el-form-item>
-                  </el-form>
-                   <el-form :inline="true" :model="formInline" class="card-form-container demo-form-inline" size="mini">
-                     <el-form-item class="card-form-item">
-                        <el-select placeholder="Activity zone">
-                          <el-option label="Zone one" value="shanghai"></el-option>
-                          <el-option label="Zone two" value="beijing"></el-option>
-                        </el-select>
-                      </el-form-item>
-                      <el-form-item class="card-form-item">
-                        <el-input></el-input>
-                      </el-form-item>
-                      <el-form-item>
-                        <el-button circle type="danger" icon="el-icon-delete"></el-button>
-                      </el-form-item>
-                  </el-form>
-                  <el-button type="primary" round size="mini">Add</el-button>
+              <div v-for="(category, index) in season.category" :key="index">
+                <div class="categoty-name">
+                  {{category.categoryName}}
+                </div>
+                <el-form v-for="(form, index) in category.categoryForms" :disabled="season.status == false"  :key="index" :inline="true" :model="form"  class="card-form-container demo-form-inline" size="mini">
+                    <el-form-item class="card-form-item" >
+                      <el-autocomplete
+                        class="inline-input"
+                        v-model="form.chooseProvider"
+                        :fetch-suggestions="querySearch"
+                        placeholder="Please Input"
+                        @select="handleSelect"
+                      ></el-autocomplete>
+                    </el-form-item>
+                    <el-form-item class="card-form-item">
+                      <el-input v-model="form.chooseNumber"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button circle type="danger" :disabled="category.categoryForms.length == 1" icon="el-icon-delete" @click="RemoveForm(category.categoryForms, index)"></el-button>
+                    </el-form-item>
+                </el-form>
+                <el-button type="primary" round size="mini" @click="AddForm(category.categoryForms)"  :disabled="season.status == false" >Add</el-button>
               </div>
             </el-card>
          </el-col>
@@ -615,6 +569,7 @@ const calendarTypeOptions = [
   { key: "JP", display_name: "Japan" },
   { key: "EU", display_name: "Eurozone" },
 ];
+
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name;
@@ -699,6 +654,7 @@ export default {
         nameEnglish: "",
         nameEspanish: "",
       },
+
       aTourList: [],
       /* EndPoint */
       url: this.$store.getters.url,
@@ -713,6 +669,109 @@ export default {
       /* checkbox */
       checkAll: false,
       checkedTours: [],
+
+
+
+
+      //START DATA FOR SEASON TAB ------------------------------------------
+
+      listToursRaw: [
+        {
+          id: 0,
+          tourCategories:{
+            chooseProvider: "",
+            chooseNumber: 0    
+          }
+        }
+      ],
+      
+      seasons: [
+        {
+          value: "Option1",
+          label: "Baja",
+          status: true,
+          category: [
+            {
+              categoryName:"Plus",
+              categoryForms: [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0                   
+                },
+              ]
+            },
+            {
+            categoryName: "Clasica",
+            categoryForms: [
+              {
+                chooseProvider: "",
+                chooseNumber: 0 
+              }
+            ]
+            }
+          ]
+        },
+        {
+          value: "Option2",
+          label: "Media",
+          status: true,
+          category: [
+            {
+              categoryName:"Plus",
+              categoryForms: [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0                   
+                },
+              ]
+            },
+            {
+            categoryName: "Clasica",
+            categoryForms: [
+              {
+                chooseProvider: "",
+                chooseNumber: 0                   
+              }
+            ]
+            }
+          ]
+        },
+        {
+          value: "Option3",
+          label: "Alta",
+          status: true,
+        },
+    //{
+      //    value: "Option4",
+         // label: "Custom",
+        //},
+        //{
+         // value: false,
+          //label: "new Season...",
+        //},
+      ],
+
+
+     
+
+      season: [],
+      name_categories: "",
+
+
+      //END DATA FOR SEASON TAB ------------------------------------------------
+    }
+
+  },
+ 
+  /* INPUT SEARCH */
+  computed: {
+    listTour() {
+      if (this.list) {
+        return this.list.filter((item) => {
+          return item.name.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
+    },
       isIndeterminate: true,
       active: 0,
       formTour: {
@@ -765,42 +824,35 @@ export default {
           },
         ],
       },
-      //START DATA FOR SEASON TAB ------------------------------------------
-      seasons: [
-        {
-          value: "Option1",
-          label: "Baja",
-        },
-        {
-          value: "Option2",
-          label: "Media",
-        },
-        {
-          value: "Option3",
-          label: "Alta",
-        },
-    //{
-      //    value: "Option4",
-         // label: "Custom",
-        //},
-        //{
-         // value: false,
-          //label: "new Season...",
-        //},
-      ],
-     
-      //season: [ "Baja", "Media", "Alta" ],
-      name_categories: "",
-      //END DATA FOR SEASON TAB ------------------------------------------------
-    };
+    
+      
   },
   created() {},
   methods: {
+    
+
+    //----START METHODS FOR SEASON TAB----//
+
+    AddForm(list){
+      list.push({chooseProvider: "", chooseNumber: 0})
+    },
+
+    RemoveForm(list, n){
+      if(list.length >= 2){
+        list.splice(n, 1)
+      }
+    },
+
+    
+    },
+    //----END METHODS FOR SEASON TAB----//
+
     /* TABLE */
     getList() {
       this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
         this.total = response.data.total;
+
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false;
@@ -911,6 +963,7 @@ export default {
         tourDayDescriptions: this.listTours.tourDayDescriptions,
         tourInstances: this.aListToursFinal,
       };
+
       axios
         .post(this.url + "Tour/AddTourInstanceFromTour", tour)
         .then((response) => {
@@ -1074,6 +1127,7 @@ export default {
             : links;
           cb(results);
         })
+
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
@@ -1101,6 +1155,7 @@ export default {
           this.orderList();
           console.log("me actualicé", this.list);
         })
+
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
@@ -1115,12 +1170,15 @@ export default {
           console.log(this.listTours);
           this.getTourForTable();
           this.caculateDate(this.listTours);
+          //this.AddSeasonsCategories(this.listTours)
         })
+
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
         });
     },
+
     handleSelect(item) {
       this.tour = item.name;
       this.tourSelected = 52;
@@ -1397,6 +1455,7 @@ export default {
     },
     uploadFile(file) {
       console.log(this.formDayDetail, this.arrayPosition, file);
+
       this.formDayDetail[this.arrayPosition].images.push(file);
     },
     getImageByIdDay(day) {
@@ -1424,6 +1483,7 @@ export default {
       if (!isLt2M) {
         this.$message.error("La imagen excede los 2MB!");
       }
+
       return isJPG && isLt2M;
     },
     handleChange(val) {
@@ -1478,6 +1538,7 @@ export default {
         "Friday",
         "Saturday",
       ];
+
       console.log(this.start_date);
       const copyStartDate = new Date(this.start_date);
       this.formDayDetail = [];
@@ -1613,6 +1674,7 @@ export default {
     },
     concatenateTitle(index) {
       let result = "";
+
       this.formDayDetail[index].tourCities.length == 2 &&
       this.formDayDetail[index].tourCities[0] ===
         this.formDayDetail[index].tourCities[1]
@@ -1621,6 +1683,7 @@ export default {
       this.formDayDetail[index].tourCities.forEach((element) => {
         result = result.concat(element) + "/";
       });
+
       result = result.concat(this.formDayDetail[index].cityName.split(",")[0]);
       return result;
     },
@@ -1633,18 +1696,10 @@ export default {
         this.activeName = 'first'
       }
     }
-  },
+  
   /* INPUT SEARCH */
-  computed: {
-    listTour() {
-      if (this.list) {
-        return this.list.filter((item) => {
-          return item.name.toLowerCase().includes(this.search.toLowerCase());
-        });
-      }
-    },
-  },
-};
+
+}
 </script>
 <style lang="scss">
 @media (max-width: 600px) {
@@ -1670,19 +1725,7 @@ export default {
   margin-top: 1.5rem;
   font-weight: bold;
 }
+.box-card-container{
+  min-height: 363.781px;
+}
 </style>
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-You have unread notifications
