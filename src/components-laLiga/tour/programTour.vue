@@ -24,7 +24,7 @@
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
                 <span>{{season.label}}</span>
-                <el-checkbox v-model="season.status" @change="SetDafault(index)">Set default</el-checkbox>
+                <el-checkbox v-model="season.status">Set default</el-checkbox>
                 <el-switch style="float: right;" v-model="season.status">
                 </el-switch>
               </div>
@@ -859,11 +859,19 @@ export default {
         }
       )
     },
-
-    SetDefault(index){
+    /*
+    SetDefault(n){
+      this.seasons.forEach((season , index)=>{
+        if(index == n){
+          season.status = true
+        }
+        else{
+          season.status = false
+        }
+      })
       
     },
-    
+    */
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
