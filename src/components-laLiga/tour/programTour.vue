@@ -22,19 +22,19 @@
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
                 <span>{{season.label}}</span>
-                <el-checkbox v-model="season.status">Set default</el-checkbox>
+                <el-checkbox :v-model="false">Set default</el-checkbox>
                 <el-switch style="float: right;" v-model="season.status">
                 </el-switch>
               </div>
 
-              <div v-for="(category, index) in season.category" :key="index">
+              <div v-for="(category, index2) in season.category" :key="index2">
                 <div class="categoty-name">
                   {{ category.providerCategoryName }}
                 </div>
                 <el-form
-                  v-for="(form, index) in category.categoryForms"
+                  v-for="(form, index3) in category.categoryForms"
                   :disabled="season.status == false"
-                  :key="index"
+                  :key="index3"
                   :inline="true"
                   :model="form"
                   class="card-form-container demo-form-inline"
@@ -798,6 +798,7 @@ export default {
 
     AddForm(list) {
       list.push({ chooseProvider: "", chooseNumber: 0 });
+      console.log(this.seasons)
     },
 
     RemoveForm(list, n) {
@@ -805,10 +806,10 @@ export default {
         list.splice(n, 1);
       }
     },
-    AddSeasonsCategories(list){
+    AddSeasonsCategories(){
       this.seasons.forEach(season =>
         {
-          season.category = list.tourCategories
+          season.category = this.listTours.tourCategories
           season.category.forEach(e => {
             this.$set(e, "categoryForms", [
                 {
@@ -821,6 +822,7 @@ export default {
           
         }
       )
+      console.log("seasons",this.seasons)
     },
     /*
     SetDefault(n){
