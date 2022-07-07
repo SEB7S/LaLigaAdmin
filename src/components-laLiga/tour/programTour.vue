@@ -798,7 +798,7 @@ export default {
 
     AddForm(list) {
       list.push({ chooseProvider: "", chooseNumber: 0 });
-      console.log(this.seasons)
+      console.log(list)
     },
 
     RemoveForm(list, n) {
