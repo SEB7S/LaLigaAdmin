@@ -21,8 +21,9 @@
           <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
-                <span>{{ season.label }}</span>
-                <el-switch style="float: right" v-model="season.status">
+                <span>{{season.label}}</span>
+                <el-checkbox v-model="season.status">Set default</el-checkbox>
+                <el-switch style="float: right;" v-model="season.status">
                 </el-switch>
               </div>
 
@@ -804,19 +805,36 @@ export default {
         list.splice(n, 1);
       }
     },
-    AddSeasonsCategories() {
-      this.seasons.forEach((season) => {
-        season.category = this.listTours.tourCategories;
-        season.category.forEach((e) => {
-          this.$set(e, "categoryForms", {
-            chooseProvider: "",
-            chooseNumber: 0,
-          });
-        });
-      });
-      console.log("hola",this.seasons)
+    AddSeasonsCategories(list){
+      this.seasons.forEach(season =>
+        {
+          season.category = list.tourCategories
+          season.category.forEach(e => {
+            this.$set(e, "categoryForms", [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0          
+                }
+              ]
+            )
+          })
+          
+        }
+      )
     },
-
+    /*
+    SetDefault(n){
+      this.seasons.forEach((season , index)=>{
+        if(index == n){
+          season.status = true
+        }
+        else{
+          season.status = false
+        }
+      })
+      
+    },
+    */
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
