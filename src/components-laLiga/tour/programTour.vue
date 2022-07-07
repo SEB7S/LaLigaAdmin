@@ -4,7 +4,7 @@
       v-model="tour"
       popper-class="my-autocomplete"
       :fetch-suggestions="getTour"
-      placeholder="Please input"
+      placeholder="Tour"
       @select="handleSelect"
     >
       <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -17,46 +17,64 @@
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
-
-        <el-row :gutter="40">
-
-         <el-col v-for="(season, index) in seasons" :key="index" :span="6">
+        <el-row v-if="tour != ''" :gutter="40">
+          <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
-                <span>{{season.label}}</span>
-                <el-switch style="float: right;" v-model="season.status">
+                <span>{{ season.label }}</span>
+                <el-switch style="float: right" v-model="season.status">
                 </el-switch>
               </div>
 
               <div v-for="(category, index) in season.category" :key="index">
                 <div class="categoty-name">
-                  {{category.tourName}}
+                  {{ category.providerCategoryName }}
                 </div>
-                <el-form v-for="(form, index) in category.categoryForms" :disabled="season.status == false"  :key="index" :inline="true" :model="form"  class="card-form-container demo-form-inline" size="mini">
-                    <el-form-item class="card-form-item" >
-                      <el-autocomplete
-                        class="inline-input"
-                        v-model="form.chooseProvider"
-                        :fetch-suggestions="querySearch"
-                        placeholder="Please Input"
-                        @select="handleSelect"
-                      ></el-autocomplete>
-                    </el-form-item>
-                    <el-form-item class="card-form-item">
-                      <el-input v-model="form.chooseNumber"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                      <el-button circle type="danger" :disabled="category.categoryForms.length == 1" icon="el-icon-delete" @click="RemoveForm(category.categoryForms, index)"></el-button>
-                    </el-form-item>
+                <el-form
+                  v-for="(form, index) in category.categoryForms"
+                  :disabled="season.status == false"
+                  :key="index"
+                  :inline="true"
+                  :model="form"
+                  class="card-form-container demo-form-inline"
+                  size="mini"
+                >
+                  <el-form-item class="card-form-item">
+                    <el-select v-model="form.chooseProvider" filterable placeholder="Accommodation">
+                      <el-option
+                        v-for="item in aAccommodation"
+                        :key="item.id"
+                        :label="item.nameEnglish"
+                        :value="item.id"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item class="card-form-item">
+                    <el-input v-model="form.chooseNumber"></el-input>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button
+                      circle
+                      type="danger"
+                      :disabled="category.categoryForms.length == 1"
+                      icon="el-icon-delete"
+                      @click="RemoveForm(category.categoryForms, index)"
+                    ></el-button>
+                  </el-form-item>
                 </el-form>
-                <el-button type="primary" round size="mini" @click="AddForm(category.categoryForms)"  :disabled="season.status == false" >Add</el-button>
+                <el-button
+                  type="primary"
+                  round
+                  size="mini"
+                  @click="AddForm(category.categoryForms)"
+                  :disabled="season.status == false"
+                  >Add</el-button
+                >
               </div>
             </el-card>
-         </el-col>
-
+          </el-col>
         </el-row>
-
-
       </el-tab-pane>
       <el-tab-pane label="Date" name="second">
         <div v-if="tour != ''" style="margin: 15px 0">
@@ -108,9 +126,7 @@
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
-
                     >
-                    
                     </el-option>
                   </el-select></div
               ></el-col>
@@ -723,140 +739,84 @@ export default {
         ],
       },
 
-
-
       //START DATA FOR SEASON TAB ------------------------------------------
 
       listToursRaw: [
         {
           id: 0,
-          tourCategories:{
+          tourCategories: {
             chooseProvider: "",
-            chooseNumber: 0    
-          }
-        }
+            chooseNumber: 0,
+          },
+        },
       ],
-      
+
       seasons: [
         {
           value: "Option1",
           label: "Baja",
           status: true,
-          category: [
-            {
-              categoryName:"Plus",
-              categoryForms: [
-                {
-                  chooseProvider: "",
-                  chooseNumber: 0                   
-                },
-              ]
-            },
-            {
-            categoryName: "Clasica",
-            categoryForms: [
-              {
-                chooseProvider: "",
-                chooseNumber: 0 
-              }
-            ]
-            }
-          ]
+          category: [],
         },
         {
           value: "Option2",
           label: "Media",
           status: true,
-          category: [
-            {
-              categoryName:"Plus",
-              categoryForms: [
-                {
-                  chooseProvider: "",
-                  chooseNumber: 0                   
-                },
-              ]
-            },
-            {
-            categoryName: "Clasica",
-            categoryForms: [
-              {
-                chooseProvider: "",
-                chooseNumber: 0                   
-              }
-            ]
-            }
-          ]
+          category: [],
         },
         {
           value: "Option3",
           label: "Alta",
           status: true,
+          category: [],
         },
-    //{
-      //    value: "Option4",
-         // label: "Custom",
-        //},
-        //{
-         // value: false,
-          //label: "new Season...",
-        //},
       ],
-
-
-     
 
       season: [],
       name_categories: "",
 
-      testList: {}
-
+      testList: {},
+      aAccommodation: [] //Select accomodation
       //END DATA FOR SEASON TAB ------------------------------------------------
-    }
-
+    };
   },
- 
+
   /* INPUT SEARCH */
   computed: {
     listTour() {
       if (this.list) {
         return this.list.filter((item) => {
-          return item.name.toLowerCase().includes(this.search.toLowerCase())
-        })
+          return item.name.toLowerCase().includes(this.search.toLowerCase());
+        });
       }
     },
   },
   created() {},
   methods: {
-    
-
     //----START METHODS FOR SEASON TAB----//
 
-    AddForm(list){
-      list.push({chooseProvider: "", chooseNumber: 0})
+    AddForm(list) {
+      list.push({ chooseProvider: "", chooseNumber: 0 });
     },
 
-    RemoveForm(list, n){
-      if(list.length >= 2){
-        list.splice(n, 1)
+    RemoveForm(list, n) {
+      if (list.length >= 2) {
+        list.splice(n, 1);
       }
     },
-    AddSeasonsCategories(list){
-      this.seasons.forEach(season =>
-        {
-          season.category = list.tourCategories
-          season.category.forEach(e => {
-            this.$set(e, "categoryForms", 
-            {
-              chooseProvider: "",
-              chooseNumber: 0                   
-            })
-          })
-          
-        }
-      )
+    AddSeasonsCategories() {
+      this.seasons.forEach((season) => {
+        season.category = this.listTours.tourCategories;
+        season.category.forEach((e) => {
+          this.$set(e, "categoryForms", {
+            chooseProvider: "",
+            chooseNumber: 0,
+          });
+        });
+      });
+      console.log("hola",this.seasons)
     },
-    
+
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1181,8 +1141,22 @@ export default {
           this.listTours = response.data[0];
           console.log(this.listTours);
           this.getTourForTable();
+          aAccommodation
           this.caculateDate(this.listTours);
-          
+        })
+
+        .catch((error) => {
+          this.status = "error";
+          console.error(error.response);
+        });
+    },
+    getAccommodation() {
+     axios
+        .get(this.url + "RoomType")
+        .then((response) => {
+
+          this.aAccommodation = response.data;
+
         })
 
         .catch((error) => {
@@ -1195,9 +1169,10 @@ export default {
       this.tour = item.name;
       this.tourSelected = 52;
       this.listTours = item;
-      this.AddSeasonsCategories(item)
+      this.AddSeasonsCategories();
       /* para listar los tours hijos */
       this.listLoading = false;
+      this.getAccommodation()
       this.caculateDate(item);
       console.log("En handle select", this.listTours);
       this.name_categories = this.listTours.tourCategories
@@ -1703,16 +1678,16 @@ export default {
     changeArrayPositions(array, x, y) {
       [array[x], array[y]] = [array[y], array[x]];
     },
-    itemSelected(item){
-      console.log(item)
-      if(item == false){
-        this.activeName = 'first'
+    itemSelected(item) {
+      console.log(item);
+      if (item == false) {
+        this.activeName = "first";
       }
-    }
-  
-  /* INPUT SEARCH */
-  }
-}
+    },
+
+    /* INPUT SEARCH */
+  },
+};
 </script>
 <style lang="scss">
 @media (max-width: 600px) {
@@ -1727,18 +1702,18 @@ export default {
 .el-checkbox.is-bordered + .el-checkbox.is-bordered {
   margin: 3px !important;
 }
-.card-form-item{
+.card-form-item {
   width: 45%;
 }
-.card-form-container{
+.card-form-container {
   display: flex;
 }
-.categoty-name{
+.categoty-name {
   margin-bottom: 1rem;
   margin-top: 1.5rem;
   font-weight: bold;
 }
-.box-card-container{
+.box-card-container {
   min-height: 363.781px;
 }
 </style>
