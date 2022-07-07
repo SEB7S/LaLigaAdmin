@@ -21,9 +21,11 @@
           <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
+                <el-tooltip class="item" effect="dark" content="Set as default" placement="top-start">
+                  <el-checkbox v-model="season.setDefault" @change="setDefault(index)"></el-checkbox>
+                </el-tooltip>
                 <span>{{season.label}}</span>
-                <el-checkbox :v-model="false">Set default</el-checkbox>
-                <el-switch style="float: right;" v-model="season.status">
+                <el-switch style="float: right;" :disabled="allDefault == false" v-model="season.status">
                 </el-switch>
               </div>
 
@@ -580,6 +582,7 @@ import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 import axios from "axios";
 import i18n from "@/lang/index.js";
+import { variance } from "@babel/types";
 const calendarTypeOptions = [
   { key: "CN", display_name: "China" },
   { key: "US", display_name: "USA" },
@@ -741,34 +744,28 @@ export default {
       },
 
       //START DATA FOR SEASON TAB ------------------------------------------
-
-      listToursRaw: [
-        {
-          id: 0,
-          tourCategories: {
-            chooseProvider: "",
-            chooseNumber: 0,
-          },
-        },
-      ],
+      allDefault : true,
 
       seasons: [
         {
           value: "Option1",
           label: "Baja",
           status: true,
+          setDefault: false,
           category: [],
         },
         {
           value: "Option2",
           label: "Media",
           status: true,
+          setDefault: false,
           category: [],
         },
         {
           value: "Option3",
           label: "Alta",
           status: true,
+          setDefault: false,
           category: [],
         },
       ],
@@ -778,6 +775,7 @@ export default {
 
       testList: {},
       aAccommodation: [] //Select accomodation
+
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
@@ -791,6 +789,8 @@ export default {
         });
       }
     },
+    
+
   },
   created() {},
   methods: {
@@ -824,19 +824,36 @@ export default {
       )
       console.log("seasons",this.seasons)
     },
-    /*
-    SetDefault(n){
+    
+    setDefault(n){
+      var allSelected = false
+
       this.seasons.forEach((season , index)=>{
         if(index == n){
-          season.status = true
-        }
+            season.status = true
+            this.allDefault = false;
+
+            if(season.setDefault == false){
+                allSelected = true
+            }
+          }
         else{
+          season.setDefault = false
           season.status = false
         }
+        
       })
+
+      if(allSelected){
+        this.seasons.forEach(season => {
+          season.setDefault = false
+          season.status = true
+          this.allDefault = true
+        });
+      }
       
     },
-    */
+    
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
