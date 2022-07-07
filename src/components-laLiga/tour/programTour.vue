@@ -24,6 +24,7 @@
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
                 <span>{{season.label}}</span>
+                <el-checkbox v-model="season.status" @change="SetDafault(index)">Set default</el-checkbox>
                 <el-switch style="float: right;" v-model="season.status">
                 </el-switch>
               </div>
@@ -769,12 +770,12 @@ export default {
           status: true,
           category: [
             {
-              categoryName:"Plus",
+              categoryName: "Clasica",
               categoryForms: [
-                {
-                  chooseProvider: "",
-                  chooseNumber: 0                   
-                },
+              {
+                chooseProvider: "",
+                chooseNumber: 0                   
+              }
               ]
             },
             {
@@ -846,15 +847,21 @@ export default {
         {
           season.category = list.tourCategories
           season.category.forEach(e => {
-            this.$set(e, "categoryForms", 
-            {
-              chooseProvider: "",
-              chooseNumber: 0                   
-            })
+            this.$set(e, "categoryForms", [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0          
+                }
+              ]
+            )
           })
           
         }
       )
+    },
+
+    SetDefault(index){
+      
     },
     
     //----END METHODS FOR SEASON TAB----//
