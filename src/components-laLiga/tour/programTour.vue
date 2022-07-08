@@ -78,6 +78,12 @@
               </div>
             </el-card>
           </el-col>
+          <el-col :span="6">
+            <div class="add-card" >
+                <el-button circle size="medium" type="primary" icon="el-icon-plus" @click="AddNewCard()">
+                </el-button>
+            </div>
+          </el-col>
         </el-row>
       </el-tab-pane>
       <el-tab-pane label="Date" name="second">
@@ -749,7 +755,6 @@ export default {
 
       seasons: [
         {
-          value: "Option1",
           label: "Baja",
           status: true,
           setDefault: false,
@@ -757,7 +762,6 @@ export default {
           category: [],
         },
         {
-          value: "Option2",
           label: "Media",
           status: true,
           setDefault: false,
@@ -765,7 +769,6 @@ export default {
           category: [],
         },
         {
-          value: "Option3",
           label: "Alta",
           status: true,
           setDefault: false,
@@ -845,6 +848,16 @@ export default {
         if(index != n){
            season.applyToTour = false
           }
+      })
+    },
+
+    AddNewCard(){
+      this.seasons.push({
+          label: "Custom",
+          status: true,
+          setDefault: false,
+          applyToTour: false,
+          category: this.listTours.tourCategories,
       })
     },
     
@@ -1749,6 +1762,14 @@ export default {
 }
 .card-checkbox-container{
   margin-top: 1rem;
+}
+
+.add-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 363.781px;
 }
 
 </style>
