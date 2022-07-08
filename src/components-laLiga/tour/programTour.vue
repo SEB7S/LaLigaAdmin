@@ -21,11 +21,23 @@
           <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
-                <el-tooltip class="item" effect="dark" content="Set as default" placement="top-start">
-                  <el-checkbox v-model="season.setDefault" @change="setDefault(index)"></el-checkbox>
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  content="Set as default"
+                  placement="top-start"
+                >
+                  <el-checkbox
+                    v-model="season.setDefault"
+                    @change="setDefault(index)"
+                  ></el-checkbox>
                 </el-tooltip>
-                <span>{{season.label}}</span>
-                <el-switch style="float: right;" :disabled="allDefault == false" v-model="season.status">
+                <span>{{ season.label }}</span>
+                <el-switch
+                  style="float: right"
+                  :disabled="allDefault == false"
+                  v-model="season.status"
+                >
                 </el-switch>
               </div>
 
@@ -34,37 +46,42 @@
                   {{ category.providerCategoryName }}
                 </div>
                 <el-form
-                  v-for="(form, index3) in category.categoryForms"
                   :disabled="season.status == false"
-                  :key="index3"
                   :inline="true"
-                  :model="form"
-                  class="card-form-container demo-form-inline"
                   size="mini"
                 >
-                  <el-form-item class="card-form-item">
-                    <el-select v-model="form.chooseProvider" filterable placeholder="Accommodation">
-                      <el-option
-                        v-for="item in aAccommodation"
-                        :key="item.id"
-                        :label="item.nameEnglish"
-                        :value="item.id"
+                  <div
+                    v-for="(acc, index3) in category.categoryForms"
+                    :key="index3"
+                    class="card-form-container demo-form-inline"
+                  >
+                    <el-form-item class="card-form-item">
+                      <el-select
+                        v-model="acc.chooseProvider"
+                        filterable
+                        placeholder="Accommodation"
                       >
-                      </el-option>
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item class="card-form-item">
-                    <el-input v-model="form.chooseNumber"></el-input>
-                  </el-form-item>
-                  <el-form-item>
-                    <el-button
-                      circle
-                      type="danger"
-                      :disabled="category.categoryForms.length == 1"
-                      icon="el-icon-delete"
-                      @click="RemoveForm(category.categoryForms, index)"
-                    ></el-button>
-                  </el-form-item>
+                        <el-option
+                          v-for="item in aAccommodation"
+                          :key="item.id"
+                          :label="item.nameEnglish"
+                          :value="item.id"
+                        >
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item class="card-form-item">
+                      <el-input v-model="acc.chooseNumber"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button
+                        circle
+                        type="danger"
+                        icon="el-icon-delete"
+                        @click="RemoveForm(category.categoryForms, index, acc)"
+                      ></el-button>
+                    </el-form-item>
+                  </div>
                 </el-form>
                 <el-button
                   type="primary"
@@ -744,7 +761,7 @@ export default {
       },
 
       //START DATA FOR SEASON TAB ------------------------------------------
-      allDefault : true,
+      allDefault: true,
 
       seasons: [
         {
@@ -774,7 +791,7 @@ export default {
       name_categories: "",
 
       testList: {},
-      aAccommodation: [] //Select accomodation
+      aAccommodation: [], //Select accomodation
 
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
@@ -789,8 +806,6 @@ export default {
         });
       }
     },
-    
-
   },
   created() {},
   methods: {
@@ -798,62 +813,62 @@ export default {
 
     AddForm(list) {
       list.push({ chooseProvider: "", chooseNumber: 0 });
-      console.log(list)
+      console.log(list, "item");
     },
 
-    RemoveForm(list, n) {
+    RemoveForm(list, n, item) {
       if (list.length >= 2) {
         list.splice(n, 1);
       }
+      /*  */ console.log(list, "item", item, this.seasons);
     },
-    AddSeasonsCategories(){
-      this.seasons.forEach(season =>
-        {
-          season.category = this.listTours.tourCategories
-          season.category.forEach(e => {
-            this.$set(e, "categoryForms", [
-                {
-                  chooseProvider: "",
-                  chooseNumber: 0          
-                }
-              ]
-            )
-          })
-          
-        }
-      )
-      console.log("seasons",this.seasons)
+    AddSeasonsCategories() {
+      this.seasons.forEach((season, index) => {
+        season.category = this.listTours.tourCategories;
+        season.category.forEach((e) => {
+          season.category[index].categoryForms = [
+            {
+              chooseProvider: "",
+              chooseNumber: 0,
+            },
+          ];
+          /*           this.$set(e, "categoryForms", [
+            {
+              chooseProvider: "",
+              chooseNumber: 0,
+            },
+          ]); */
+        });
+      });
+      console.log("seasons", this.seasons);
     },
-    
-    setDefault(n){
-      var allSelected = false
 
-      this.seasons.forEach((season , index)=>{
-        if(index == n){
-            season.status = true
-            this.allDefault = false;
+    setDefault(n) {
+      var allSelected = false;
 
-            if(season.setDefault == false){
-                allSelected = true
-            }
+      this.seasons.forEach((season, index) => {
+        if (index == n) {
+          season.status = true;
+          this.allDefault = false;
+
+          if (season.setDefault == false) {
+            allSelected = true;
           }
-        else{
-          season.setDefault = false
-          season.status = false
+        } else {
+          season.setDefault = false;
+          season.status = false;
         }
-        
-      })
+      });
 
-      if(allSelected){
-        this.seasons.forEach(season => {
-          season.setDefault = false
-          season.status = true
-          this.allDefault = true
+      if (allSelected) {
+        this.seasons.forEach((season) => {
+          season.setDefault = false;
+          season.status = true;
+          this.allDefault = true;
         });
       }
-      
     },
-    
+
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1178,7 +1193,6 @@ export default {
           this.listTours = response.data[0];
           console.log(this.listTours);
           this.getTourForTable();
-          aAccommodation
           this.caculateDate(this.listTours);
         })
 
@@ -1188,12 +1202,10 @@ export default {
         });
     },
     getAccommodation() {
-     axios
+      axios
         .get(this.url + "RoomType")
         .then((response) => {
-
           this.aAccommodation = response.data;
-
         })
 
         .catch((error) => {
@@ -1209,7 +1221,7 @@ export default {
       this.AddSeasonsCategories();
       /* para listar los tours hijos */
       this.listLoading = false;
-      this.getAccommodation()
+      this.getAccommodation();
       this.caculateDate(item);
       console.log("En handle select", this.listTours);
       this.name_categories = this.listTours.tourCategories
