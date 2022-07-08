@@ -21,24 +21,13 @@
           <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
               <div slot="header" class="clearfix">
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="Set as default"
-                  placement="top-start"
-                >
-                  <el-checkbox
-                    v-model="season.setDefault"
-                    @change="setDefault(index)"
-                  ></el-checkbox>
-                </el-tooltip>
-                <span>{{ season.label }}</span>
-                <el-switch
-                  style="float: right"
-                  :disabled="allDefault == false"
-                  v-model="season.status"
-                >
+                <span>{{season.label}}</span>
+                <el-switch style="float: right;" :disabled="allDefault == false" v-model="season.status">
                 </el-switch>
+                <div class="card-checkbox-container">
+                  <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">Set as default</el-checkbox>
+                  <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">Apply to tour father</el-checkbox>
+                </div>
               </div>
 
               <div v-for="(category, index2) in season.category" :key="index2">
@@ -769,6 +758,7 @@ export default {
           label: "Baja",
           status: true,
           setDefault: false,
+          applyToTour: false,
           category: [],
         },
         {
@@ -776,6 +766,7 @@ export default {
           label: "Media",
           status: true,
           setDefault: false,
+          applyToTOur: false,
           category: [],
         },
         {
@@ -783,6 +774,7 @@ export default {
           label: "Alta",
           status: true,
           setDefault: false,
+          applyToTour: false,
           category: [],
         },
       ],
@@ -842,33 +834,44 @@ export default {
       });
       console.log("seasons", this.seasons);
     },
-
-    setDefault(n) {
-      var allSelected = false;
-
-      this.seasons.forEach((season, index) => {
-        if (index == n) {
-          season.status = true;
-          this.allDefault = false;
-
-          if (season.setDefault == false) {
-            allSelected = true;
-          }
-        } else {
-          season.setDefault = false;
-          season.status = false;
+    AddSeasonsCategories(){
+      this.seasons.forEach(season =>
+        {
+          season.category = this.listTours.tourCategories
+          season.category.forEach(e => {
+            this.$set(e, "categoryForms", [
+                {
+                  chooseProvider: "",
+                  chooseNumber: 0          
+                }
+              ]
+            )
+          })
+          
         }
-      });
+      )
+      console.log("seasons",this.seasons)
+    },
+    
+    setDefault(n){
 
-      if (allSelected) {
-        this.seasons.forEach((season) => {
-          season.setDefault = false;
-          season.status = true;
-          this.allDefault = true;
-        });
-      }
+      this.seasons.forEach((season , index)=>{
+        if(index != n){
+           season.setDefault = false
+          }
+      })
+
+      
     },
 
+    applyToTour(n){
+      this.seasons.forEach((season , index)=>{
+        if(index != n){
+           season.applyToTour = false
+          }
+      })
+    },
+    
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1765,4 +1768,8 @@ export default {
 .box-card-container {
   min-height: 363.781px;
 }
+.card-checkbox-container{
+  margin-top: 1rem;
+}
+
 </style>
