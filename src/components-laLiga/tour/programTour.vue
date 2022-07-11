@@ -20,14 +20,22 @@
         <el-row v-if="tour != ''" :gutter="40">
           <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
-              <div slot="header" class="clearfix">
-                <span>{{season.label}}</span>
-                <el-switch style="float: right;" :disabled="allDefault == false" v-model="season.status">
-                </el-switch>
-                <div class="card-checkbox-container">
-                  <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">Set as default</el-checkbox>
-                  <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">Apply to tour father</el-checkbox>
+              <div class="box-card-header" slot="header">
+                <div class="delete-card-button">
+                  <div class="card-checkbox-container">
+                    <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">Set as default</el-checkbox>
+                    <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">Apply to tour father</el-checkbox>
+                  </div>
+                  <el-button circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
                 </div>
+                <span class="card-name">
+                  <el-input :readonly="season.changeName" v-model="season.label" @keyup.enter="season.changeName = true"/>
+                  <el-button icon="el-icon-edit" @click="season.changeName = !season.changeName"></el-button>
+                  
+                </span> 
+                <el-switch style="float: right; vertical-align: middle;" :disabled="allDefault == false" v-model="season.status">
+                </el-switch>
+                
               </div>
 
               <div v-for="(category, index2) in season.category" :key="index2">
@@ -762,6 +770,7 @@ export default {
         {
           label: "Baja",
           status: true,
+          changeName: true,
           setDefault: false,
           applyToTour: false,
           category: [],
@@ -770,6 +779,7 @@ export default {
           label: "Media",
           status: true,
           setDefault: false,
+          changeName: true,
           applyToTOur: false,
           category: [],
         },
@@ -777,6 +787,7 @@ export default {
           label: "Alta",
           status: true,
           setDefault: false,
+          changeName: true,
           applyToTour: false,
           category: [],
         },
@@ -880,9 +891,16 @@ export default {
           label: "Custom",
           status: true,
           setDefault: false,
+          changeName: false,
           applyToTour: false,
           category: this.listTours.tourCategories,
       })
+    },
+
+    DeleteCard(n){
+      if(n > 2){
+        this.seasons.splice(n, 1)
+      }
     },
     
     //----END METHODS FOR SEASON TAB----//
@@ -1792,5 +1810,38 @@ export default {
   width: 100%;
   min-height: 363.781px;
 }
+.card-name{
+  display: flex;
+  max-width: 60%;
+}
+.card-name input{
+  display: inline-block;
+  flex-basis: 1;
+  padding: 0 .4rem;
+}
+.card-name input:read-only{
+  border: none;
+  width: fit-content;
+  flex-basis: 0;
+}
 
+.delete-card-button{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: .5rem;
+}
+.header-checkbox label{
+  font-size: .9rem;
+}
+.box-card-header{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.card-checkbox-container{
+  width: 100%;
+  margin-bottom: 1rem
+}
 </style>
