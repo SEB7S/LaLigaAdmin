@@ -29,9 +29,8 @@
                   <el-button circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
                 </div>
                 <span class="card-name">
+                  <el-button icon="el-icon-edit" type="text" size="small" @click="season.changeName = !season.changeName"></el-button>
                   <el-input :readonly="season.changeName" v-model="season.label" @keyup.enter="season.changeName = true"/>
-                  <el-button icon="el-icon-edit" @click="season.changeName = !season.changeName"></el-button>
-                  
                 </span> 
                 <el-switch style="float: right; vertical-align: middle;" :disabled="allDefault == false" v-model="season.status">
                 </el-switch>
@@ -40,7 +39,7 @@
 
               <div v-for="(category, index2) in season.category" :key="index2">
                 <div class="categoty-name">
-                  {{ category.providerCategoryName }}
+                  {{ category.categoryName }}
                 </div>
                 <el-form
                   :disabled="season.status == false"
@@ -75,7 +74,7 @@
                         circle
                         type="danger"
                         icon="el-icon-delete"
-                        @click="RemoveForm(category.categoryForms, index, acc)"
+                        @click="RemoveForm(category.categoryForms, index3, acc)"
                       ></el-button>
                     </el-form-item>
                   </div>
@@ -828,40 +827,22 @@ export default {
       }
       /*  */ console.log(list, "item", item, this.seasons);
     },
-    AddSeasonsCategories() {
-      this.seasons.forEach((season, index) => {
-        season.category = this.listTours.tourCategories;
-        season.category.forEach((e) => {
-          season.category[index].categoryForms = [
-            {
-              chooseProvider: "",
-              chooseNumber: 0,
-            },
-          ];
-          /*           this.$set(e, "categoryForms", [
-            {
-              chooseProvider: "",
-              chooseNumber: 0,
-            },
-          ]); */
-        });
-      });
-      console.log("seasons", this.seasons);
-    },
+  
     AddSeasonsCategories(){
       this.seasons.forEach(season =>
         {
-          season.category = this.listTours.tourCategories
-          season.category.forEach(e => {
-            this.$set(e, "categoryForms", [
-                {
-                  chooseProvider: "",
-                  chooseNumber: 0          
-                }
-              ]
-            )
-          })
-          
+
+          this.listTours.tourCategories.forEach(tourCategory => {
+            
+            season.category.push({categoryName: tourCategory.providerCategoryName, categoryForms: [
+              {
+                chooseProvider: "",
+                chooseNumber: 0          
+              }
+            ]})
+
+          });
+
         }
       )
       console.log("seasons",this.seasons)
@@ -893,8 +874,28 @@ export default {
           setDefault: false,
           changeName: false,
           applyToTour: false,
-          category: this.listTours.tourCategories,
+          category: this.AddCategoriesInNewCard()
       })
+
+    },
+
+    AddCategoriesInNewCard(){
+      var categorylist = [] 
+
+      this.listTours.tourCategories.forEach(tourCategory => {
+
+        categorylist.push({
+
+          categoryName: tourCategory.providerCategoryName,
+          categoryForms: [
+            {
+              chooseProvider: "",
+              chooseNumber: 0          
+            }
+          ]
+        })
+      })
+      return categorylist
     },
 
     DeleteCard(n){
@@ -1802,6 +1803,9 @@ export default {
 .card-checkbox-container{
   margin-top: 1rem;
 }
+.card-checkbox-container label{
+  font-size: .9rem;
+}
 
 .add-card {
   display: flex;
@@ -1816,12 +1820,11 @@ export default {
 }
 .card-name input{
   display: inline-block;
-  flex-basis: 1;
   padding: 0 .4rem;
+  flex-basis: 1;
 }
 .card-name input:read-only{
   border: none;
-  width: fit-content;
   flex-basis: 0;
 }
 
@@ -1832,8 +1835,8 @@ export default {
     width: 100%;
     margin-bottom: .5rem;
 }
-.header-checkbox label{
-  font-size: .9rem;
+.header-checkbox{
+  font-size: .8rem;
 }
 .box-card-header{
   display: flex;
