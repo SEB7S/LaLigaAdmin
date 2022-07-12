@@ -23,19 +23,43 @@
               <div class="box-card-header" slot="header">
                 <div class="delete-card-button">
                   <div class="card-checkbox-container">
-                    <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">Set as default</el-checkbox>
-                    <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">Apply to tour father</el-checkbox>
+                    <el-checkbox
+                      class="header-checkbox"
+                      v-model="season.setDefault"
+                      @change="setDefault(index)"
+                      >Set as default</el-checkbox
+                    >
+                    <el-checkbox
+                      class="header-checkbox"
+                      v-model="season.applyToTour"
+                      @change="applyToTour(index)"
+                      >Apply to tour father</el-checkbox
+                    >
                   </div>
-                  <el-button circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
+                  <el-button
+                    circle
+                    icon="el-icon-close"
+                    size="small"
+                    @click="DeleteCard(index)"
+                  ></el-button>
                 </div>
                 <span class="card-name">
-                  <el-input :readonly="season.changeName" v-model="season.label" @keyup.enter="season.changeName = true"/>
-                  <el-button icon="el-icon-edit" @click="season.changeName = !season.changeName"></el-button>
-                  
-                </span> 
-                <el-switch style="float: right; vertical-align: middle;" :disabled="allDefault == false" v-model="season.status">
+                  <el-input
+                    :readonly="season.changeName"
+                    v-model="season.label"
+                    @keyup.enter="season.changeName = true"
+                  />
+                  <el-button
+                    icon="el-icon-edit"
+                    @click="season.changeName = !season.changeName"
+                  ></el-button>
+                </span>
+                <el-switch
+                  style="float: right; vertical-align: middle"
+                  :disabled="allDefault == false"
+                  v-model="season.status"
+                >
                 </el-switch>
-                
               </div>
 
               <div v-for="(category, index2) in season.category" :key="index2">
@@ -75,7 +99,7 @@
                         circle
                         type="danger"
                         icon="el-icon-delete"
-                        @click="RemoveForm(category.categoryForms, index, acc)"
+                        @click="RemoveForm(category.categoryForms, index)"
                       ></el-button>
                     </el-form-item>
                   </div>
@@ -92,9 +116,15 @@
             </el-card>
           </el-col>
           <el-col :span="6">
-            <div class="add-card" >
-                <el-button circle size="medium" type="primary" icon="el-icon-plus" @click="AddNewCard()">
-                </el-button>
+            <div class="add-card">
+              <el-button
+                circle
+                size="medium"
+                type="primary"
+                icon="el-icon-plus"
+                @click="AddNewCard()"
+              >
+              </el-button>
             </div>
           </el-col>
         </el-row>
@@ -798,7 +828,7 @@ export default {
 
       testList: {},
       aAccommodation: [], //Select accomodation
-
+      formAcco: [{}],
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
@@ -831,78 +861,63 @@ export default {
     AddSeasonsCategories() {
       this.seasons.forEach((season, index) => {
         season.category = this.listTours.tourCategories;
+        season.category.forEach((e, index2) => {
+          e.categoryForms = [];
+          e.categoryForms.push({ chooseProvider: "", chooseNumber: 0 });
+        });
+      });
+
+      console.log("seasons", this.seasons);
+    },
+
+    /* AddSeasonsCategories() {
+      this.seasons.forEach((season) => {
+        season.category = this.listTours.tourCategories;
         season.category.forEach((e) => {
-          season.category[index].categoryForms = [
+          this.$set(e, "categoryForms", [
             {
-              chooseProvider: "",
+              chooseProvider: "ss",
               chooseNumber: 0,
             },
-          ];
-          /*           this.$set(e, "categoryForms", [
-            {
-              chooseProvider: "",
-              chooseNumber: 0,
-            },
-          ]); */
+          ]);
         });
       });
       console.log("seasons", this.seasons);
-    },
-    AddSeasonsCategories(){
-      this.seasons.forEach(season =>
-        {
-          season.category = this.listTours.tourCategories
-          season.category.forEach(e => {
-            this.$set(e, "categoryForms", [
-                {
-                  chooseProvider: "",
-                  chooseNumber: 0          
-                }
-              ]
-            )
-          })
-          
+    }, */
+
+    setDefault(n) {
+      this.seasons.forEach((season, index) => {
+        if (index != n) {
+          season.setDefault = false;
         }
-      )
-      console.log("seasons",this.seasons)
-    },
-    
-    setDefault(n){
-
-      this.seasons.forEach((season , index)=>{
-        if(index != n){
-           season.setDefault = false
-          }
-      })
-
-      
+      });
     },
 
-    applyToTour(n){
-      this.seasons.forEach((season , index)=>{
-        if(index != n){
-           season.applyToTour = false
-          }
-      })
+    applyToTour(n) {
+      this.seasons.forEach((season, index) => {
+        if (index != n) {
+          season.applyToTour = false;
+        }
+      });
     },
 
-    AddNewCard(){
+    AddNewCard() {
       this.seasons.push({
-          label: "Custom",
-          status: true,
-          setDefault: false,
-          changeName: false,
-          applyToTour: false,
-          category: this.listTours.tourCategories,
-      })
+        label: "Custom",
+        status: true,
+        setDefault: false,
+        changeName: false,
+        applyToTour: false,
+        category: this.listTours.tourCategories,
+      });
     },
 
-    DeleteCard(n){
-      if(n > 2){
-        this.seasons.splice(n, 1)
+    DeleteCard(n) {
+      if (n > 2) {
+        this.seasons.splice(n, 1);
       }
     },
-    
+
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1799,7 +1814,7 @@ export default {
 .box-card-container {
   min-height: 363.781px;
 }
-.card-checkbox-container{
+.card-checkbox-container {
   margin-top: 1rem;
 }
 
@@ -1810,38 +1825,38 @@ export default {
   width: 100%;
   min-height: 363.781px;
 }
-.card-name{
+.card-name {
   display: flex;
   max-width: 60%;
 }
-.card-name input{
+.card-name input {
   display: inline-block;
   flex-basis: 1;
-  padding: 0 .4rem;
+  padding: 0 0.4rem;
 }
-.card-name input:read-only{
+.card-name input:read-only {
   border: none;
   width: fit-content;
   flex-basis: 0;
 }
 
-.delete-card-button{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: .5rem;
+.delete-card-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
-.header-checkbox label{
-  font-size: .9rem;
+.header-checkbox label {
+  font-size: 0.9rem;
 }
-.box-card-header{
+.box-card-header {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
 }
-.card-checkbox-container{
+.card-checkbox-container {
   width: 100%;
-  margin-bottom: 1rem
+  margin-bottom: 1rem;
 }
 </style>
