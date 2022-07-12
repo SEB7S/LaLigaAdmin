@@ -72,7 +72,7 @@
                   size="mini"
                 >
                   <div
-                    v-for="(acc, index3) in category.categoryForms"
+                    v-for="(acc, index3) in category.categoryFormsw"
                     :key="index3"
                     class="card-form-container demo-form-inline"
                   >
