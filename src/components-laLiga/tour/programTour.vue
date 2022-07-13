@@ -18,6 +18,9 @@
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
         <el-row v-if="tour != ''" :gutter="40">
+           <el-col :span="24">
+            <el-button type="primary">Next</el-button>
+           </el-col>
           <el-col v-for="(season, index) in seasons" :key="index" :span="6">
             <el-card class="box-card box-card-container">
               <div class="box-card-header" slot="header">
@@ -44,15 +47,17 @@
                   ></el-button>
                 </div>
                 <span class="card-name">
+                  <el-button
+                    icon="el-icon-edit"
+                    type="text"
+                    size="small"
+                    @click="season.changeName = !season.changeName"
+                  ></el-button>
                   <el-input
                     :readonly="season.changeName"
                     v-model="season.label"
                     @keyup.enter="season.changeName = true"
                   />
-                  <el-button
-                    icon="el-icon-edit"
-                    @click="season.changeName = !season.changeName"
-                  ></el-button>
                 </span>
                 <el-switch
                   style="float: right; vertical-align: middle"
@@ -64,7 +69,7 @@
 
               <div v-for="(category, index2) in season.category" :key="index2">
                 <div class="categoty-name">
-                  {{ category.providerCategoryName }}
+                  {{ category.categoryName }}
                 </div>
                 <el-form
                   :disabled="season.status == false"
@@ -72,7 +77,7 @@
                   size="mini"
                 >
                   <div
-                    v-for="(acc, index3) in category.categoryFormsw"
+                    v-for="(acc, index3) in category.categoryForms"
                     :key="index3"
                     class="card-form-container demo-form-inline"
                   >
@@ -99,7 +104,7 @@
                         circle
                         type="danger"
                         icon="el-icon-delete"
-                        @click="RemoveForm(category.categoryForms, index)"
+                        @click="RemoveForm(category.categoryForms, index3, acc)"
                       ></el-button>
                     </el-form-item>
                   </div>
@@ -828,7 +833,7 @@ export default {
 
       testList: {},
       aAccommodation: [], //Select accomodation
-      formAcco: [{}],
+
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
@@ -858,32 +863,23 @@ export default {
       }
       /*  */ console.log(list, "item", item, this.seasons);
     },
+
     AddSeasonsCategories() {
-      this.seasons.forEach((season, index) => {
-        season.category = this.listTours.tourCategories;
-        season.category.forEach((e, index2) => {
-          e.categoryForms = [];
-          e.categoryForms.push({ chooseProvider: "", chooseNumber: 0 });
+      this.seasons.forEach((season) => {
+        this.listTours.tourCategories.forEach((tourCategory) => {
+          season.category.push({
+            categoryName: tourCategory.providerCategoryName,
+            categoryForms: [
+              {
+                chooseProvider: "",
+                chooseNumber: 0,
+              },
+            ],
+          });
         });
       });
-
       console.log("seasons", this.seasons);
     },
-
-    /* AddSeasonsCategories() {
-      this.seasons.forEach((season) => {
-        season.category = this.listTours.tourCategories;
-        season.category.forEach((e) => {
-          this.$set(e, "categoryForms", [
-            {
-              chooseProvider: "ss",
-              chooseNumber: 0,
-            },
-          ]);
-        });
-      });
-      console.log("seasons", this.seasons);
-    }, */
 
     setDefault(n) {
       this.seasons.forEach((season, index) => {
@@ -908,8 +904,25 @@ export default {
         setDefault: false,
         changeName: false,
         applyToTour: false,
-        category: this.listTours.tourCategories,
+        category: this.AddCategoriesInNewCard(),
       });
+    },
+
+    AddCategoriesInNewCard() {
+      var categorylist = [];
+
+      this.listTours.tourCategories.forEach((tourCategory) => {
+        categorylist.push({
+          categoryName: tourCategory.providerCategoryName,
+          categoryForms: [
+            {
+              chooseProvider: "",
+              chooseNumber: 0,
+            },
+          ],
+        });
+      });
+      return categorylist;
     },
 
     DeleteCard(n) {
@@ -1817,6 +1830,9 @@ export default {
 .card-checkbox-container {
   margin-top: 1rem;
 }
+.card-checkbox-container label {
+  font-size: 0.9rem;
+}
 
 .add-card {
   display: flex;
@@ -1831,12 +1847,11 @@ export default {
 }
 .card-name input {
   display: inline-block;
-  flex-basis: 1;
   padding: 0 0.4rem;
+  flex-basis: 1;
 }
 .card-name input:read-only {
   border: none;
-  width: fit-content;
   flex-basis: 0;
 }
 
@@ -1847,8 +1862,8 @@ export default {
   width: 100%;
   margin-bottom: 0.5rem;
 }
-.header-checkbox label {
-  font-size: 0.9rem;
+.header-checkbox {
+  font-size: 0.8rem;
 }
 .box-card-header {
   display: flex;
