@@ -18,7 +18,7 @@
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane label="Season" name="first">
         <el-row v-if="tour != ''" :gutter="40">
-          <el-col v-for="(season, index) in seasons" :key="index" :xs="24"  :sm="12" :md="6" :xl="3">
+          <el-col v-for="(season, index) in seasons" :key="index" :xs="24"  :sm="12" :md="6">
             <el-card class="box-card box-card-container">
               <div class="box-card-header" slot="header">
                 <div class="delete-card-button">
@@ -90,7 +90,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :xs="24"  :sm="12" :md="6" :xl="3">
+          <el-col :xs="24"  :sm="12" :md="6">
             <div class="add-card box-card-container" >
                 <el-tooltip content="Add new card" placement="top">
                   <el-button class="add-card-button" circle size="medium" type="primary" icon="el-icon-plus" @click="AddNewCard()">
