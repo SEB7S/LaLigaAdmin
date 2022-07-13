@@ -23,45 +23,18 @@
               <div class="box-card-header" slot="header">
                 <div class="delete-card-button">
                   <div class="card-checkbox-container">
-                    <el-checkbox
-                      class="header-checkbox"
-                      v-model="season.setDefault"
-                      @change="setDefault(index)"
-                      >Set as default</el-checkbox
-                    >
-                    <el-checkbox
-                      class="header-checkbox"
-                      v-model="season.applyToTour"
-                      @change="applyToTour(index)"
-                      >Apply to tour father</el-checkbox
-                    >
+                    <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">Set as default</el-checkbox>
+                    <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">Apply to tour father</el-checkbox>
                   </div>
-                  <el-button
-                    circle
-                    icon="el-icon-close"
-                    size="small"
-                    @click="DeleteCard(index)"
-                  ></el-button>
+                  <el-button type="text" circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
                 </div>
                 <span class="card-name">
-                  <el-button
-                    icon="el-icon-edit"
-                    type="text"
-                    size="small"
-                    @click="season.changeName = !season.changeName"
-                  ></el-button>
-                  <el-input
-                    :readonly="season.changeName"
-                    v-model="season.label"
-                    @keyup.enter="season.changeName = true"
-                  />
-                </span>
-                <el-switch
-                  style="float: right; vertical-align: middle"
-                  :disabled="allDefault == false"
-                  v-model="season.status"
-                >
+                   <el-button icon="el-icon-edit" type="text" size="small" @click="season.changeName = !season.changeName"></el-button>
+                  <el-input :readonly="season.changeName" v-model="season.label" @keyup.enter="season.changeName = !season.changeName"/>
+                </span> 
+                <el-switch style="float: right; vertical-align: middle; margin: .3rem" :disabled="allDefault == false" v-model="season.status">
                 </el-switch>
+                
               </div>
 
               <div v-for="(category, index2) in season.category" :key="index2">
@@ -856,74 +829,83 @@ export default {
       }
       /*  */ console.log(list, "item", item, this.seasons);
     },
+  
+    AddSeasonsCategories(){
+      this.seasons.forEach(season =>
+        {
 
-    AddSeasonsCategories() {
-      this.seasons.forEach((season) => {
-        this.listTours.tourCategories.forEach((tourCategory) => {
-          season.category.push({
-            categoryName: tourCategory.providerCategoryName,
-            categoryForms: [
+          this.listTours.tourCategories.forEach(tourCategory => {
+            
+            season.category.push({categoryName: tourCategory.providerCategoryName, categoryForms: [
               {
                 chooseProvider: "",
-                chooseNumber: 0,
-              },
-            ],
+                chooseNumber: 0          
+              }
+            ]})
+
           });
-        });
-      });
-      console.log("seasons", this.seasons);
-    },
 
-    setDefault(n) {
-      this.seasons.forEach((season, index) => {
-        if (index != n) {
-          season.setDefault = false;
         }
-      });
+      )
+      console.log("seasons",this.seasons)
+    },
+    
+    setDefault(n){
+
+      this.seasons.forEach((season , index)=>{
+        if(index != n){
+           season.setDefault = false
+          }
+      })
+
+      
     },
 
-    applyToTour(n) {
-      this.seasons.forEach((season, index) => {
-        if (index != n) {
-          season.applyToTour = false;
-        }
-      });
+    applyToTour(n){
+      this.seasons.forEach((season , index)=>{
+        if(index != n){
+           season.applyToTour = false
+          }
+      })
     },
 
-    AddNewCard() {
+    AddNewCard(){
       this.seasons.push({
-        label: "Custom",
-        status: true,
-        setDefault: false,
-        changeName: false,
-        applyToTour: false,
-        category: this.AddCategoriesInNewCard(),
-      });
+          label: "Custom",
+          status: true,
+          setDefault: false,
+          changeName: false,
+          applyToTour: false,
+          category: this.AddCategoriesInNewCard()
+      })
+
     },
 
-    AddCategoriesInNewCard() {
-      var categorylist = [];
+    AddCategoriesInNewCard(){
+      var categorylist = [] 
 
-      this.listTours.tourCategories.forEach((tourCategory) => {
+      this.listTours.tourCategories.forEach(tourCategory => {
+
         categorylist.push({
+
           categoryName: tourCategory.providerCategoryName,
           categoryForms: [
             {
               chooseProvider: "",
-              chooseNumber: 0,
-            },
-          ],
-        });
-      });
-      return categorylist;
+              chooseNumber: 0          
+            }
+          ]
+        })
+      })
+      return categorylist
     },
 
-    DeleteCard(n) {
-      if (n > 2) {
-        this.seasons.splice(n, 1);
+    DeleteCard(n){
+      if(n > 2){
+        this.seasons.splice(n, 1)
       }
     },
-
+    
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1816,55 +1798,96 @@ export default {
   margin-bottom: 1rem;
   margin-top: 1.5rem;
   font-weight: bold;
+  font-size: 1.1rem;
 }
 .box-card-container {
-  min-height: 363.781px;
+  margin: 1.3rem 0;
 }
-.card-checkbox-container {
+.card-checkbox-container{
   margin-top: 1rem;
 }
-.card-checkbox-container label {
-  font-size: 0.9rem;
+.card-checkbox-container label{
+  font-size: .9rem;
 }
 
 .add-card {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  min-height: 363.781px;
 }
-.card-name {
+.card-name{
   display: flex;
   max-width: 60%;
 }
-.card-name input {
+.card-name input{
   display: inline-block;
-  padding: 0 0.4rem;
+  padding: 0 .4rem;
   flex-basis: 1;
-}
-.card-name input:read-only {
-  border: none;
-  flex-basis: 0;
+  font-weight: bold;
+  color:rgb(31, 31, 31);
+  font-size: 1.05rem;
 }
 
-.delete-card-button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 0.5rem;
+.card-name input:read-only{
+  border: none;
+  flex-basis: 0;
+  font-weight: bold;
+  color:rgb(31, 31, 31);
+  font-size: 1.05rem;
 }
-.header-checkbox {
-  font-size: 0.8rem;
+
+.delete-card-button{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: .5rem;
 }
-.box-card-header {
+.header-checkbox{
+  font-size: .8rem;
+}
+.box-card-header{
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
 }
-.card-checkbox-container {
+.card-checkbox-container{
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem
 }
+.el-card__body{
+  height: 450px;
+  overflow-y: auto;
+}
+.el-card__body::-webkit-scrollbar{
+  box-sizing: border-box;
+  width: 15px;
+  border: 5px solid #fff;
+}
+.el-card__body::-webkit-scrollbar-thumb{
+  background: rgb(240, 240, 240);
+  border: 5px solid #fff;
+  border-radius: 20px;
+}
+.add-card{
+  height: 584px;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  background-color: #f7f7f7;
+  border-radius: 5px;
+  border: 1px solid #e9e9e9;
+
+  -webkit-box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+}
+.add-card-button{
+  width: 50px;
+  height: 50px;
+  -webkit-box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.82); 
+  box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.82);
+}
+
 </style>
