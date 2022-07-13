@@ -26,18 +26,18 @@
                     <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">Set as default</el-checkbox>
                     <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">Apply to tour father</el-checkbox>
                   </div>
-                  <el-button type="text" circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
+                  <el-button v-if="index > 2" type="text" circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
                 </div>
-                <span class="card-name">
-                   <el-button icon="el-icon-edit" type="text" size="small" @click="season.changeName = !season.changeName"></el-button>
-                  <el-input :readonly="season.changeName" v-model="season.label" @keyup.enter="season.changeName = !season.changeName"/>
+                <span class="card-name" @keyup.enter="verifyCardName(index)">
+                   <el-button icon="el-icon-edit" type="text" size="small" @click="verifyCardName(index)"></el-button>
+                  <el-input :readonly="season.changeName" v-model="season.label" />
                 </span> 
-                <el-switch style="float: right; vertical-align: middle; margin: .3rem" :disabled="allDefault == false" v-model="season.status">
+                <el-switch style="float: right; vertical-align: middle; margin: .3rem" :disabled="season.changeName == false" v-model="season.status">
                 </el-switch>
                 
               </div>
 
-              <div v-for="(category, index2) in season.category" :key="index2">
+              <div v-for="(category, index2) in season.category"  :key="index2">
                 <div class="categoty-name">
                   {{ category.categoryName }}
                 </div>
@@ -597,6 +597,7 @@
   </div>
 </template>
 <script>
+import Vue from "vue";
 import { fetchList, fetchPv } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
@@ -610,6 +611,8 @@ const calendarTypeOptions = [
   { key: "JP", display_name: "Japan" },
   { key: "EU", display_name: "Eurozone" },
 ];
+
+
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
@@ -872,7 +875,7 @@ export default {
     AddNewCard(){
       this.seasons.push({
           label: "Custom",
-          status: true,
+          status: false,
           setDefault: false,
           changeName: false,
           applyToTour: false,
@@ -903,6 +906,17 @@ export default {
     DeleteCard(n){
       if(n > 2){
         this.seasons.splice(n, 1)
+      }
+    },
+
+    verifyCardName(n){
+      if(this.seasons[n].label != ""){
+        this.seasons[n].changeName =  !this.seasons[n].changeName
+        if(this.seasons[n].changeName){
+          this.seasons[n].status = true
+        }else{
+          this.seasons[n].status = false
+        }
       }
     },
     
@@ -1797,8 +1811,10 @@ export default {
 .categoty-name {
   margin-bottom: 1rem;
   margin-top: 1.5rem;
-  font-weight: bold;
-  font-size: 1.1rem;
+  font-weight: 400;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgb(88, 88, 88);
 }
 .box-card-container {
   margin: 1.3rem 0;
