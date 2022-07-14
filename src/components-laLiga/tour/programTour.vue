@@ -29,8 +29,10 @@
                   <el-button v-if="index > 2" type="text" circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
                 </div>
                 <span class="card-name" @keyup.enter="verifyCardName(index)">
-                   <el-button icon="el-icon-edit" type="text" size="small" @click="verifyCardName(index)"></el-button>
-                  <el-input :readonly="season.changeName" v-model="season.label" />
+                  <el-button icon="el-icon-edit" type="text" size="small" @click="verifyCardName(index)"></el-button>
+                  <span  @focusout="verifyCardName(index)">
+                    <el-input :readonly="season.changeName" v-model="season.label" />
+                  </span>
                 </span> 
                 <el-switch style="float: right; vertical-align: middle; margin: .3rem" :disabled="season.changeName == false" v-model="season.status">
                 </el-switch>
