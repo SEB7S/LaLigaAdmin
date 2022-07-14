@@ -67,7 +67,7 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item class="card-form-item">
-                      <el-input v-model="acc.chooseNumber"></el-input>
+                      <el-input type="number"  v-model="acc.chooseNumber">{{ acc.chooseNumber | toThousandFilter}}</el-input>
                     </el-form-item>
                     <el-form-item>
                       <el-button
