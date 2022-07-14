@@ -29,8 +29,10 @@
                   <el-button v-if="index > 2" type="text" circle icon="el-icon-close" size="small" @click="DeleteCard(index)"></el-button>
                 </div>
                 <span class="card-name" @keyup.enter="verifyCardName(index)">
-                   <el-button icon="el-icon-edit" type="text" size="small" @click="verifyCardName(index)"></el-button>
-                  <el-input :readonly="season.changeName" v-model="season.label" />
+                  <el-button icon="el-icon-edit" type="text" size="small" @click="verifyCardName(index)"></el-button>
+                  <span  @focusout="verifyCardName(index)">
+                    <el-input :readonly="season.changeName" v-model="season.label" />
+                  </span>
                 </span> 
                 <el-switch style="float: right; vertical-align: middle; margin: .3rem" :disabled="season.changeName == false" v-model="season.status">
                 </el-switch>
@@ -612,7 +614,21 @@ const calendarTypeOptions = [
   { key: "EU", display_name: "Eurozone" },
 ];
 
-
+/*Vue.directive('click-outside', {
+  bind: function (el, binding, vnode) {
+    el.clickOutsideEvent = function (event) {
+      // here I check that click was outside the el and his children
+      if (!(el == event.target || el.contains(event.target))) {
+        // and if it did, call method provided in attribute value
+        vnode.context[binding.expression](event);
+      }
+    };
+    document.body.addEventListener('click', el.clickOutsideEvent)
+  },
+  unbind: function (el) {
+    document.body.removeEventListener('click', el.clickOutsideEvent)
+  },
+});*/
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
@@ -843,6 +859,10 @@ export default {
               {
                 chooseProvider: "",
                 chooseNumber: 0          
+              },
+              {
+                chooseProvider: "",
+                chooseNumber: 0          
               }
             ]})
 
@@ -893,6 +913,10 @@ export default {
 
           categoryName: tourCategory.providerCategoryName,
           categoryForms: [
+            {
+              chooseProvider: "",
+              chooseNumber: 0          
+            },
             {
               chooseProvider: "",
               chooseNumber: 0          
@@ -1872,7 +1896,7 @@ export default {
   margin-bottom: 1rem
 }
 .el-card__body{
-  height: 450px;
+  height: 600px;
   overflow-y: auto;
 }
 .el-card__body::-webkit-scrollbar{
@@ -1886,7 +1910,7 @@ export default {
   border-radius: 20px;
 }
 .add-card{
-  height: 584px;
+  height: 732px;
   width: 100%;
 
   display: flex;
