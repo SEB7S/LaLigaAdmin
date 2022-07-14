@@ -612,7 +612,21 @@ const calendarTypeOptions = [
   { key: "EU", display_name: "Eurozone" },
 ];
 
-
+/*Vue.directive('click-outside', {
+  bind: function (el, binding, vnode) {
+    el.clickOutsideEvent = function (event) {
+      // here I check that click was outside the el and his children
+      if (!(el == event.target || el.contains(event.target))) {
+        // and if it did, call method provided in attribute value
+        vnode.context[binding.expression](event);
+      }
+    };
+    document.body.addEventListener('click', el.clickOutsideEvent)
+  },
+  unbind: function (el) {
+    document.body.removeEventListener('click', el.clickOutsideEvent)
+  },
+});*/
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
@@ -843,6 +857,10 @@ export default {
               {
                 chooseProvider: "",
                 chooseNumber: 0          
+              },
+              {
+                chooseProvider: "",
+                chooseNumber: 0          
               }
             ]})
 
@@ -893,6 +911,10 @@ export default {
 
           categoryName: tourCategory.providerCategoryName,
           categoryForms: [
+            {
+              chooseProvider: "",
+              chooseNumber: 0          
+            },
             {
               chooseProvider: "",
               chooseNumber: 0          
@@ -1872,7 +1894,7 @@ export default {
   margin-bottom: 1rem
 }
 .el-card__body{
-  height: 450px;
+  height: 600px;
   overflow-y: auto;
 }
 .el-card__body::-webkit-scrollbar{
@@ -1886,7 +1908,7 @@ export default {
   border-radius: 20px;
 }
 .add-card{
-  height: 584px;
+  height: 732px;
   width: 100%;
 
   display: flex;
