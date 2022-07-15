@@ -100,6 +100,13 @@ export default {
     stepTwoName: 'Detail Days',
     image: 'Choose Image',
     tourInstance: 'Children',
+    season: "Season",
+    date: "Date",
+    config: "Config",
+    setDefault: "Set as default",
+    applyToFather: "Apply to tour father",
+    clickToEdit: "Click to edit name"
+  
 
   },
   match: {
