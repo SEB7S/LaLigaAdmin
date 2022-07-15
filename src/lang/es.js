@@ -97,7 +97,13 @@ export default {
     stepOneName: 'Datos Generales',
     stepTwoName: 'Detalle de Días',
     image: 'Cargar Imágen',
-    tourInstance: 'Hijos'
+    tourInstance: 'Hijos',
+    season: "Temporada",
+    date: "Fecha",
+    config: "Configuracion",
+    setDefault: "Seleccionar como predeterminado",
+    applyToFather: "Aplicar al tour padre",
+    clickToEdit: "Presiona para editar el nombre"
   },
   match: {
     nameClub: 'Club',

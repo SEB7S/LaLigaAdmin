@@ -16,8 +16,8 @@
     </el-autocomplete>
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="Season" name="first">
-        <el-button type="primary">Next</el-button>
+      <el-tab-pane :label="$t('tour.season')" name="first">
+      <el-button v-if="tour != ''" type="primary" round>Next</el-button>
         <el-row v-if="tour != ''" :gutter="40">
           <el-col
             v-for="(season, index) in seasons"
@@ -30,18 +30,8 @@
               <div class="box-card-header" slot="header">
                 <div class="delete-card-button">
                   <div class="card-checkbox-container">
-                    <el-checkbox
-                      class="header-checkbox"
-                      v-model="season.setDefault"
-                      @change="setDefault(index)"
-                      >Set as default</el-checkbox
-                    >
-                    <el-checkbox
-                      class="header-checkbox"
-                      v-model="season.applyToTour"
-                      @change="applyToTour(index)"
-                      >Apply to tour father</el-checkbox
-                    >
+                    <el-checkbox class="header-checkbox" v-model="season.setDefault" @change="setDefault(index)">{{ $t("tour.setDefault") }}</el-checkbox>
+                    <el-checkbox class="header-checkbox" v-model="season.applyToTour" @change="applyToTour(index)">{{ $t("tour.applyToFather") }}</el-checkbox>
                   </div>
                   <el-button
                     v-if="index > 2"
@@ -52,25 +42,15 @@
                     @click="DeleteCard(index)"
                   ></el-button>
                 </div>
-                <span class="card-name" @keyup.enter="verifyCardName(index)">
-                  <el-button
-                    icon="el-icon-edit"
-                    type="text"
-                    size="small"
-                    @click="verifyCardName(index)"
-                  ></el-button>
-                  <span @focusout="verifyCardName(index)">
-                    <el-input
-                      :readonly="season.changeName"
-                      v-model="season.label"
-                    />
-                  </span>
-                </span>
-                <el-switch
-                  style="float: right; vertical-align: middle; margin: 0.3rem"
-                  :disabled="season.changeName == false"
-                  v-model="season.status"
-                >
+                <el-tooltip class="item" effect="dark" :content="$t('tour.clickToEdit')" placement="top">
+                  <span class="card-name" @keyup.enter="verifyCardName(index)" @focusout="NamefocusOut(index)" @click="verifyCardName(index)">
+                    <span  >
+                      <el-input :ref=" 'name' + index" :readonly="season.changeName" v-model="season.label" />
+                    </span>
+                    <el-button icon="el-icon-edit" type="text" size="small" ></el-button>
+                  </span> 
+                 </el-tooltip>
+                <el-switch style="float: right; vertical-align: middle; margin: .3rem" :disabled="season.changeName == false" v-model="season.status">
                 </el-switch>
               </div>
 
@@ -122,7 +102,7 @@
                   size="mini"
                   @click="AddForm(category.categoryForms)"
                   :disabled="season.status == false"
-                  >Add</el-button
+                  >{{ $t("tour.add") }}</el-button
                 >
               </div>
             </el-card>
@@ -144,7 +124,7 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="Date" name="second">
+      <el-tab-pane :label="$t('tour.date')" name="second">
         <div v-if="tour != ''" style="margin: 15px 0">
           <el-checkbox
             style="margin: 15px 0"
@@ -205,7 +185,7 @@
           >Confirmar</el-button
         >
       </el-tab-pane>
-      <el-tab-pane label="Config" name="third">
+      <el-tab-pane :label="$t('tour.config')" name="third">
         <div class="filter-container">
           <el-input
             placeholder="Search"
@@ -922,11 +902,11 @@ export default {
           categoryName: tourCategory.providerCategoryName,
           categoryForms: [
             {
-              chooseProvider: "",
+              chooseProvider: "Single",
               chooseNumber: 0,
             },
             {
-              chooseProvider: "",
+              chooseProvider: "Double",
               chooseNumber: 0,
             },
           ],
@@ -952,6 +932,13 @@ export default {
       }
     },
 
+    NamefocusOut(n){
+      if(this.seasons[n].label != ""){
+        this.seasons[n].changeName = true
+        this.seasons[n].status = true
+      }
+    },
+    
     //----END METHODS FOR SEASON TAB----//
 
     /* TABLE */
@@ -1890,6 +1877,15 @@ export default {
 .card-name {
   display: flex;
   max-width: 60%;
+  box-sizing: border-box;
+  border-radius: 5px;
+  transition: .2s ease;
+}
+.card-name:hover{
+  border: 1px solid #e6e6e6;
+  -webkit-box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.2); 
+  box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.2);
+  transform: translateY(-5px);
 }
 .card-name input {
   display: inline-block;
@@ -1908,12 +1904,23 @@ export default {
   font-size: 1.05rem;
 }
 
-.delete-card-button {
+.card-name button{
+  opacity: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 0.5rem;
+  justify-content: center;
+  width: 50px;
+}
+
+.card-name:hover button{
+  opacity: 1;
+}
+
+.delete-card-button{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: .5rem;
 }
 .header-checkbox {
   font-size: 0.8rem;
