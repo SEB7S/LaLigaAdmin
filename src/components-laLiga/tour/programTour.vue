@@ -1310,6 +1310,7 @@ export default {
     },
 
     handleSelect(item) {
+      this.seasons = []
       this.getSeason();
       this.tour = item.name;
       this.tourSelected = 52;
