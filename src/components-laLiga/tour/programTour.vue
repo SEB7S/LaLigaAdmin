@@ -43,9 +43,9 @@
                   ></el-button>
                 </div>
                 <el-tooltip class="item" effect="dark" :content="$t('tour.clickToEdit')" placement="top">
-                  <span class="card-name" @keyup.enter="verifyCardName(index)" @focusout="NamefocusOut(index)" @click="verifyCardName(index)">
+                  <span class="card-name" :class="{'card-name-onfocus' : season.changeName == false}" :ref=" 'name' + index" @keyup.enter="verifyCardName(index, $event)" @focusout="verifyCardName(index, $event)" @click="verifyCardName(index, $event)">
                     <span  >
-                      <el-input :ref=" 'name' + index" :readonly="season.changeName" v-model="season.label" />
+                      <el-input :readonly="season.changeName" v-model="season.label" />
                     </span>
                     <el-button icon="el-icon-edit" type="text" size="small" ></el-button>
                   </span> 
@@ -636,22 +636,6 @@ const calendarTypeOptions = [
   { key: "EU", display_name: "Eurozone" },
 ];
 
-/*Vue.directive('click-outside', {
-  bind: function (el, binding, vnode) {
-    el.clickOutsideEvent = function (event) {
-      // here I check that click was outside the el and his children
-      if (!(el == event.target || el.contains(event.target))) {
-        // and if it did, call method provided in attribute value
-        vnode.context[binding.expression](event);
-      }
-    };
-    document.body.addEventListener('click', el.clickOutsideEvent)
-  },
-  unbind: function (el) {
-    document.body.removeEventListener('click', el.clickOutsideEvent)
-  },
-});*/
-
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name;
@@ -921,21 +905,37 @@ export default {
       }
     },
 
-    verifyCardName(n) {
+    verifyCardName(n, event) {
+
       if (this.seasons[n].label != "") {
-        this.seasons[n].changeName = !this.seasons[n].changeName;
+        switch (event.type) {
+          case 'click':
+
+            this.seasons[n].changeName = false
+            break;
+          case 'keyup': 
+
+            this.seasons[n].changeName = true;
+            break;
+
+          case 'focusout':
+
+            this.seasons[n].changeName = true
+            break;
+
+          default:
+
+            this.seasons[n].changeName = true;
+            break;
+
+        }
+
         if (this.seasons[n].changeName) {
-          this.seasons[n].status = true;
+        this.seasons[n].status = true;
         } else {
           this.seasons[n].status = false;
         }
-      }
-    },
 
-    NamefocusOut(n){
-      if(this.seasons[n].label != ""){
-        this.seasons[n].changeName = true
-        this.seasons[n].status = true
       }
     },
     
@@ -1865,8 +1865,8 @@ export default {
 .card-checkbox-container {
   margin-top: 1rem;
 }
-.card-checkbox-container label {
-  font-size: 0.9rem;
+.card-checkbox-container .el-checkbox__label {
+  font-size: 0.76rem;
 }
 
 .add-card {
@@ -1881,7 +1881,7 @@ export default {
   border-radius: 5px;
   transition: .2s ease;
 }
-.card-name:hover{
+.card-name:hover, .card-name-onfocus{
   border: 1px solid #e6e6e6;
   -webkit-box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.2); 
   box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.2);
@@ -1894,6 +1894,8 @@ export default {
   font-weight: bold;
   color: rgb(31, 31, 31);
   font-size: 1.05rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .card-name input:read-only {
@@ -1911,8 +1913,18 @@ export default {
   width: 50px;
 }
 
-.card-name:hover button{
+.card-name:hover button, .card-name-onfocus button{
   opacity: 1;
+}
+
+.card-name-onfocus button{
+  background: #455BA0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.card-name-onfocus button i{
+  color: #fff;
 }
 
 .delete-card-button{
