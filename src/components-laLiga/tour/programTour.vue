@@ -17,7 +17,7 @@
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane :label="$t('tour.season')" name="first">
-        <el-button type="primary">Next</el-button>
+      <el-button v-if="tour != ''" type="primary" round>Next</el-button>
         <el-row v-if="tour != ''" :gutter="40">
           <el-col
             v-for="(season, index) in seasons"
@@ -886,11 +886,11 @@ export default {
           categoryName: tourCategory.providerCategoryName,
           categoryForms: [
             {
-              chooseProvider: "",
+              chooseProvider: "Single",
               chooseNumber: 0,
             },
             {
-              chooseProvider: "",
+              chooseProvider: "Double",
               chooseNumber: 0,
             },
           ],
