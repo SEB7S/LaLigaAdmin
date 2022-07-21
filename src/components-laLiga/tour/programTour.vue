@@ -57,9 +57,11 @@
               <div v-for="(category, index2) in season.category" :key="index2">
                 <div class="categoty-name">
                   {{ category.categoryName }}
+                  <el-switch style="float: right; vertical-align: middle;" :disabled="season.status == false" v-model="category.disableCategory">
+                </el-switch>
                 </div>
                 <el-form
-                  :disabled="season.status == false"
+                  :disabled="DisableButton(category.disableCategory, season.status)"
                   :inline="true"
                   size="mini"
                 >
@@ -813,10 +815,14 @@ export default {
         });
       }
     },
+    
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
+    DisableButton: function(condition1, condition2){
+      return condition1 == false || condition2 == false;
+    },
 
     AddForm(list) {
       list.push({ chooseProvider: "", chooseNumber: 0 });
@@ -835,6 +841,7 @@ export default {
         this.listTours.tourCategories.forEach((tourCategory) => {
           season.category.push({
             categoryName: tourCategory.providerCategoryName,
+            disableCategory: true,
             categoryForms: [
               {
                 chooseProvider: "Single",
@@ -884,6 +891,7 @@ export default {
       this.listTours.tourCategories.forEach((tourCategory) => {
         categorylist.push({
           categoryName: tourCategory.providerCategoryName,
+          disableCategory: true,
           categoryForms: [
             {
               chooseProvider: "Single",
@@ -1881,13 +1889,16 @@ export default {
   box-sizing: border-box;
   border-radius: 5px;
   transition: .2s ease;
+  border: 1px solid transparent;
+
 }
 .card-name:hover, .card-name-onfocus{
-  border: 1px solid #e6e6e6;
+  border-color: #e6e6e6;
   -webkit-box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.2); 
   box-shadow: -1px 3px 12px 2px rgba(173,173,173,0.2);
   transform: translateY(-5px);
 }
+
 .card-name input {
   display: inline-block;
   padding: 0 0.4rem;
@@ -1897,10 +1908,10 @@ export default {
   font-size: 1.05rem;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  border-color: transparent;
 }
 
 .card-name input:read-only {
-  border: none;
   flex-basis: 0;
   font-weight: bold;
   color: rgb(31, 31, 31);
