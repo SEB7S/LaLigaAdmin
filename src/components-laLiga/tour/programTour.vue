@@ -1026,15 +1026,15 @@ export default {
             (element) => element.tourId == this.listTours.id
           );
 
-          let result = temp.reduce(function (r, a) {
+/*           let result = temp.reduce(function (r, a) {
             r[a.tourSeasonName] = r[a.tourSeasonName] || [];
             r[a.tourSeasonName].push(a);
             return r;
           }, Object.create(null));
+           */
           
-          var result2 =  _.groupBy(response.data, season => season.tourSeasonName);
           
-          console.log("esto", result, result2);
+          console.log("esto", result);
         })
 
         .catch((error) => {
