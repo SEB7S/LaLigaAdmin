@@ -103,7 +103,7 @@ export default {
     season: "Season",
     date: "Date",
     config: "Config",
-    setDefault: "Set as default",
+    priority: "Set as default",
     applyToFather: "Apply to tour father",
     clickToEdit: "Click to edit name"
   
