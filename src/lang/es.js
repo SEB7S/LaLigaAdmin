@@ -101,7 +101,7 @@ export default {
     season: "Temporada",
     date: "Fecha",
     config: "Configuracion",
-    setDefault: "Seleccionar como predeterminado",
+    priority: "Seleccionar como predeterminado",
     applyToFather: "Aplicar al tour padre",
     clickToEdit: "Presiona para editar el nombre"
   },

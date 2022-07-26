@@ -19,7 +19,8 @@ import './permission' // permission control
 import './utils/error-log' // error log
 import moment from 'moment'
 import * as filters from './filters' // global filters
-
+import VueLodash from 'vue-lodash'
+import lodash from 'lodash'
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -32,6 +33,8 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+
+Vue.use(VueLodash, { name: 'custom' , lodash: lodash })
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
