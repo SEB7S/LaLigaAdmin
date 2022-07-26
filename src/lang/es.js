@@ -329,6 +329,8 @@ export default {
     paxIncomplete: "Please input max pax",
 
     imageIncorrectFormat: "La imagen debe estar en formato JPG",
-    imageOutOfSize: "La imagen excede los 2MB"
+    imageOutOfSize: "La imagen excede los 2MB",
+    invalidPrice: "Por favor ingrese un precio valido.",
+    invalidFormat: "El valor debe ser numerico"
   }
 }

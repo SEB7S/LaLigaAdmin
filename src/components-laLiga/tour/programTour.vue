@@ -61,14 +61,14 @@
                 </el-switch>
                 </div>
                 <el-form
+                  v-for="(acc, index3) in category.categoryForms" :key="index3"
                   :disabled="DisableButton(category.disableCategory, season.status)"
                   :inline="true"
                   size="mini"
-                >
-                  <div
-                    v-for="(acc, index3) in category.categoryForms"
-                    :key="index3"
-                    class="card-form-container demo-form-inline"
+                  ref="acc"
+                  :model="acc"
+                  
+                  class="card-form-container demo-form-inline"
                   >
                     <el-form-item class="card-form-item">
                       <el-select
@@ -85,8 +85,13 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item class="card-form-item">
-                      <el-input type="transaction-currency" v-model="acc.chooseNumber"></el-input>
+                    <el-form-item class="card-form-item" prop="chooseNumber" 
+                    :rules="formRules.price[0]"
+                    >
+                      <el-input 
+                        v-model="acc.chooseNumber"
+                        >
+                      </el-input>
                     </el-form-item>
                     <el-form-item>
                       <el-button
@@ -96,7 +101,6 @@
                         @click="RemoveForm(category.categoryForms, index3, acc)"
                       ></el-button>
                     </el-form-item>
-                  </div>
                 </el-form>
                 <el-button
                   type="primary"
@@ -661,6 +665,23 @@ export default {
     },
   },
   data() {
+
+    var priceValidator = (rule, value, callback) => {
+      console.log(value, rule, "En input")
+      var n = parseInt(value);
+      if(!value){
+        callback(new Error(i18n.t('forms.incompleteInput')));
+      }
+      else if(!Number.isInteger(n)){
+        callback(new Error(i18n.t('forms.invalidFormat')));
+      }
+      else if(n < 100){
+        callback(new Error(i18n.t('forms.invalidPrice')));
+      }else{
+        callback()
+      }
+    }
+
     return {
       tableKey: 0,
       listTours: null,
@@ -802,9 +823,19 @@ export default {
       testList: {},
       aAccommodation: [], //Select accomodation
 
+      validatorOne : this.priceValidator,
+
+      formRules: {
+        price:[
+            { validator: priceValidator, trigger: 'blur'},
+        ]
+      }
+
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
+
+  
 
   /* INPUT SEARCH */
   computed: {
@@ -820,6 +851,8 @@ export default {
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
+
+    
     DisableButton: function(condition1, condition2){
       return condition1 == false || condition2 == false;
     },
