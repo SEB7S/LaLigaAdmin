@@ -95,7 +95,7 @@
               >
                 <div class="categoty-name">
                   {{ category.categoryName }}
-                  <el-switch style="float: right; vertical-align: middle; margin-right: .5rem;" width="40" :disabled="season.status == false" v-model="category.disableCategory">
+                  <el-switch style="float: right; vertical-align: middle; margin-right: .5rem; width: 30px" :disabled="season.status == false" v-model="category.disableCategory">
                   </el-switch>
                 </div>
                 <el-form
