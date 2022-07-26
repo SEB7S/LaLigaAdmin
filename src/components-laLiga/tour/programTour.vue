@@ -1025,9 +1025,200 @@ export default {
           var temp = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
+          let category = [
+            {
+              categoryId: 3,
+              categoryName: "Turista",
+              accomodations: [
+                {
+                  accommodationId: 16,
+                  chooseProvider: "Single",
+                  price: 0,
+                },
+                {
+                  accommodationId: 17,
+                  chooseProvider: "Double",
+                  price: 0,
+                },
+              ],
+            },
+          ];
+          let accomodation = [];
+          let alta = temp.filter((season) => season.tourSeasonName == "ALTA");
+          let plusAlta = alta.filter((category) => category.label == "Plus");
+          plusAlta.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              category.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                accomodations: accomodation,
+              });
+            }
+          });
+          accomodation = [];
+          let clasicaAlta = alta.filter(
+            (category) => category.label == "Clasica"
+          );
+          clasicaAlta.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              category.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                accomodations: accomodation,
+              });
+              this.seasons.push({
+                seasonId: element.tourSeasonId,
+                label: element.tourSeasonName,
+                tourId: element.tourId,
+                status: true,
+                changeName: true,
+                priority: element.priority,
+                applyToTourParent: false,
+                categories: category,
+              });
+            }
+          });
 
+          category = [
+            {
+              categoryId: 3,
+              categoryName: "Turista",
+              accomodations: [
+                {
+                  accommodationId: 16,
+                  chooseProvider: "Single",
+                  price: 0,
+                },
+                {
+                  accommodationId: 17,
+                  chooseProvider: "Double",
+                  price: 0,
+                },
+              ],
+            },
+          ];
+          accomodation = [];
+          let media = temp.filter((season) => season.tourSeasonName == "MEDIA");
+          let plusMedia = media.filter((category) => category.label == "Plus");
+          plusMedia.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              category.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                accomodations: accomodation,
+              });
+            }
+          });
+          let clasicaMedia = media.filter(
+            (category) => category.label == "Clasica"
+          );
+          accomodation = [];
+          clasicaMedia.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              category.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                accomodations: accomodation,
+              });
+              this.seasons.push({
+                seasonId: element.tourSeasonId,
+                label: element.tourSeasonName,
+                tourId: element.tourId,
+                status: true,
+                changeName: true,
+                priority: element.priority,
+                applyToTourParent: false,
+                categories: category,
+              });
+            }
+          });
+
+          category = [
+            {
+              categoryId: 3,
+              categoryName: "Turista",
+              accomodations: [
+                {
+                  accommodationId: 16,
+                  chooseProvider: "Single",
+                  price: 0,
+                },
+                {
+                  accommodationId: 17,
+                  chooseProvider: "Double",
+                  price: 0,
+                },
+              ],
+            },
+          ];
+          accomodation = [];
+          let baja = temp.filter((season) => season.tourSeasonName == "BAJA");
+          let plusBaja = baja.filter((category) => category.label == "Plus");
+          let clasicaBaja = baja.filter(
+            (category) => category.label == "Clasica"
+          );
+          plusBaja.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              category.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                accomodations: accomodation,
+              });
+            }
+          });
+          accomodation = [];
+          clasicaBaja.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              category.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                accomodations: accomodation,
+              });
+              this.seasons.push({
+                seasonId: element.tourSeasonId,
+                label: element.tourSeasonName,
+                tourId: element.tourId,
+                status: true,
+                changeName: true,
+                priority: element.priority,
+                applyToTourParent: false,
+                categories: category,
+              });
+            }
+          });
+
+          console.log(this.seasons);
         })
-
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
@@ -1419,7 +1610,7 @@ export default {
     },
     handleSelect(item) {
       this.seasons = [];
-      this.getSeasonDefault();
+      /* this.getSeasonDefault(); */
       this.tour = item.name;
       this.tourSelected = 52;
       this.listTours = item;
