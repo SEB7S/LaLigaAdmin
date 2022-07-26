@@ -95,7 +95,7 @@
               >
                 <div class="categoty-name">
                   {{ category.categoryName }}
-                  <el-switch style="float: right; vertical-align: middle;" :disabled="season.status == false" v-model="category.disableCategory">
+                  <el-switch style="float: right; vertical-align: middle; margin-right: .5rem;" width="40" :disabled="season.status == false" v-model="category.disableCategory">
                   </el-switch>
                 </div>
                 <el-form
@@ -2031,7 +2031,7 @@ export default {
 }
 .card-name:hover,
 .card-name-onfocus {
-  border: 1px solid #e6e6e6;
+  border-color: #e6e6e6;
   -webkit-box-shadow: -1px 3px 12px 2px rgba(173, 173, 173, 0.2);
   box-shadow: -1px 3px 12px 2px rgba(173, 173, 173, 0.2);
   transform: translateY(-5px);
@@ -2045,10 +2045,10 @@ export default {
   font-size: 1.05rem;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  border-color: transparent;
 }
 
 .card-name input:read-only {
-  border: none;
   flex-basis: 0;
   font-weight: bold;
   color: rgb(31, 31, 31);
