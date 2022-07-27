@@ -90,29 +90,23 @@
               </div>
 
               <div
-                v-for="(categories, index2) in season.categories"
+                v-for="(category, index2) in season.categories"
                 :key="index2"
               >
                 <div class="categoty-name">
-                  {{ categories.categoryName }}
-                  <el-switch
-                    style="float: right; vertical-align: middle"
-                    :disabled="season.status == false"
-                    v-model="categories.disableCategory"
-                  >
+                  {{ category.categoryName }}
+                  <el-switch style="float: right; vertical-align: middle; margin-right: .5rem; width: 30px" :disabled="season.status == false" v-model="category.disableCategory">
                   </el-switch>
                 </div>
                 <el-form
-                  :disabled="
-                    DisableButton(categories.disableCategory, season.status)
-                  "
+                  v-for="(acc, index3) in category.accomodations" :key="index3"
+                  :disabled="DisableButton(category.disableCategory, season.status)"
                   :inline="true"
                   size="mini"
-                >
-                  <div
-                    v-for="(acc, index3) in categories.accomodations"
-                    :key="index3"
-                    class="card-form-container demo-form-inline"
+                  ref="acc"
+                  :model="acc"
+                  
+                  class="card-form-container demo-form-inline"
                   >
                     <el-form-item class="card-form-item">
                       <el-select
@@ -129,11 +123,13 @@
                         </el-option>
                       </el-select>
                     </el-form-item>
-                    <el-form-item class="card-form-item">
-                      <el-input
-                        type="transaction-currency"
+                    <el-form-item class="card-form-item" prop="price" 
+                    :rules="formRules.price[0]"
+                    >
+                      <el-input 
                         v-model="acc.price"
-                      ></el-input>
+                        >
+                      </el-input>
                     </el-form-item>
                     <el-form-item>
                       <el-button
@@ -141,17 +137,16 @@
                         type="danger"
                         icon="el-icon-delete"
                         @click="
-                          RemoveForm(categories.accomodations, index3, acc)
+                          RemoveForm(category.accomodations, index3, acc)
                         "
                       ></el-button>
                     </el-form-item>
-                  </div>
                 </el-form>
                 <el-button
                   type="primary"
                   round
                   size="mini"
-                  @click="AddForm(categories.accomodations)"
+                  @click="AddForm(category.accomodations)"
                   :disabled="season.status == false"
                   >{{ $t("tour.add") }}</el-button
                 >
@@ -722,6 +717,23 @@ export default {
     },
   },
   data() {
+
+    var priceValidator = (rule, value, callback) => {
+      console.log(value, rule, "En input")
+      var n = parseInt(value);
+      if(!value){
+        callback(new Error(i18n.t('forms.incompleteInput')));
+      }
+      else if(!Number.isInteger(n)){
+        callback(new Error(i18n.t('forms.invalidFormat')));
+      }
+      else if(n < 100){
+        callback(new Error(i18n.t('forms.invalidPrice')));
+      }else{
+        callback()
+      }
+    }
+
     return {
       tableKey: 0,
       listTours: null,
@@ -863,9 +875,20 @@ export default {
       testList: {},
       aAccommodation: [], //Select accomodation
 
+      validatorOne : this.priceValidator,
+
+      formRules: {
+        price:[
+            { validator: priceValidator, trigger: 'blur'},
+        ]
+      },
+
+      prioritySelect: "",
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
+
+  
 
   /* INPUT SEARCH */
   computed: {
@@ -881,6 +904,11 @@ export default {
   methods: {
     //----START METHODS FOR SEASON TAB----//
     DisableButton: function (condition1, condition2) {
+      return condition1 == false || condition2 == false;
+    },
+
+    
+    DisableButton: function(condition1, condition2){
       return condition1 == false || condition2 == false;
     },
 

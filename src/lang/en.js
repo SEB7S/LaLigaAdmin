@@ -105,7 +105,8 @@ export default {
     config: "Config",
     priority: "Set as default",
     applyToFather: "Apply to tour father",
-    clickToEdit: "Click to edit name"
+    clickToEdit: "Click to edit name",
+
   
 
   },
@@ -332,6 +333,8 @@ export default {
     paxIncomplete: "Please input max pax",
 
     imageIncorrectFormat: "The image must be in JPG format",
-    imageOutOfSize: "Image exceeds 2MB"
+    imageOutOfSize: "Image exceeds 2MB",
+    invalidPrice: "Please enter a valid price.",
+    invalidFormat: "The value must be a number"
   }
 }
