@@ -17,7 +17,7 @@
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane :label="$t('tour.season')" name="first">
-        <el-button v-if="tour != ''" type="primary" @click="postSeason"
+        <el-button v-if="tour != ''" type="primary" round @click="postSeason"
           >Next</el-button
         >
         <el-row v-if="tour != ''" :gutter="40">
@@ -34,14 +34,14 @@
                   <div class="card-checkbox-container">
                     <el-checkbox
                       class="header-checkbox"
-                      v-model="season.priority"
-                      @change="priority(index, season)"
+                      v-model="season.setDefault"
+                      @change="setDefault(index)"
                       >{{ $t("tour.priority") }}</el-checkbox
                     >
                     <el-checkbox
                       class="header-checkbox"
-                      v-model="season.applyToTourParent"
-                      @change="applyToTourParent(index)"
+                      v-model="season.applyToTour"
+                      @change="applyToTour(index)"
                       >{{ $t("tour.applyToFather") }}</el-checkbox
                     >
                   </div>
@@ -177,6 +177,13 @@
         :label="$t('tour.date')"
         name="second"
       >
+        <el-button
+          v-show="tour != ''"
+          type="primary"
+          round
+          @click="postTourInstance"
+          >Next</el-button
+        >
         <div v-if="tour != ''" style="margin: 15px 0">
           <el-checkbox
             style="margin: 15px 0"
@@ -233,9 +240,6 @@
             </el-row>
           </el-checkbox-group>
         </div>
-        <el-button v-show="tour != ''" type="primary" @click="postTourInstance"
-          >Confirmar</el-button
-        >
       </el-tab-pane>
       <el-tab-pane
         :disabled="activeName == 'first'"
@@ -793,7 +797,7 @@ export default {
         nameEnglish: "",
         nameEspanish: "",
       },
-      enable_step: "1",
+
       aTourList: [],
       /* EndPoint */
       url: this.$store.getters.url,
@@ -901,6 +905,9 @@ export default {
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
+    DisableButton: function (condition1, condition2) {
+      return condition1 == false || condition2 == false;
+    },
 
     
     DisableButton: function(condition1, condition2){
@@ -944,32 +951,29 @@ export default {
       console.log("seasons", this.seasons);
     },
 
-    priority(n, season) {
-      this.prioritySelect = season.label;
+    setDefault(n) {
       this.seasons.forEach((season, index) => {
         if (index != n) {
-          season.priority = false;
+          season.setDefault = false;
         }
       });
     },
 
-    applyToTourParent(n) {
+    applyToTour(n) {
       this.seasons.forEach((season, index) => {
         if (index != n) {
-          season.applyToTourParent = false;
+          season.applyToTour = false;
         }
       });
     },
 
     AddNewCard() {
       this.seasons.push({
-        seasonId: 0,
-        tourId: this.listTours.id,
         label: "Custom",
         status: false,
-        priority: false,
+        setDefault: false,
         changeName: false,
-        applyToTourParent: false,
+        applyToTour: false,
         categories: this.AddCategoriesInNewCard(),
       });
     },
@@ -981,6 +985,7 @@ export default {
         categorylist.push({
           categoryId: tourCategory.id,
           categoryName: tourCategory.providerCategoryName,
+          disableCategory: true,
           accomodations: [
             {
               accommodationId: 16,
@@ -1043,20 +1048,6 @@ export default {
           console.error(error.response);
         });
     },
-
-    getAccommodation() {
-      axios
-        .get(this.url + "RoomType")
-        .then((response) => {
-          this.aAccommodation = response.data;
-        })
-
-        .catch((error) => {
-          this.status = "error";
-          console.error(error.response);
-        });
-    },
-
     getSeason() {
       axios
         .get(this.url + "TourCategorySeason")
@@ -1064,9 +1055,219 @@ export default {
           var temp = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
+          let categories = [];
+          let accomodation = [];
+          let alta = temp.filter((season) => season.tourSeasonName == "ALTA");
+          let plusAlta = alta.filter(
+            (categories) => categories.label == "Plus"
+          );
+          plusAlta.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+            }
+          });
+          accomodation = [];
+          let clasicaAlta = alta.filter(
+            (categories) => categories.label == "Clasica"
+          );
+          clasicaAlta.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+            }
+          });
+          accomodation = [];
+          let turistaAlta = alta.filter(
+            (categories) => categories.label == "Turista"
+          );
+          turistaAlta.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.push({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+              this.seasons.push({
+                seasonId: element.tourSeasonId,
+                label: element.tourSeasonName,
+                tourId: element.tourId,
+                status: true,
+                changeName: true,
+                priority: element.priority,
+                applyToTourParent: false,
+                categories: categories,
+              });
+            }
+          });
 
+          categories = [];
+          accomodation = [];
+          let media = temp.filter((season) => season.tourSeasonName == "MEDIA");
+          let plusMedia = media.filter(
+            (categories) => categories.label == "Plus"
+          );
+          plusMedia.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+            }
+          });
+          let clasicaMedia = media.filter(
+            (categories) => categories.label == "Clasica"
+          );
+          accomodation = [];
+          clasicaMedia.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+            }
+          });
+          accomodation = [];
+          let turistaMedia = media.filter(
+            (categories) => categories.label == "Turista"
+          );
+          turistaMedia.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.push({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+              this.seasons.push({
+                seasonId: element.tourSeasonId,
+                label: element.tourSeasonName,
+                tourId: element.tourId,
+                status: true,
+                changeName: true,
+                priority: element.priority,
+                applyToTourParent: false,
+                categories: categories,
+              });
+            }
+          });
+
+          categories = [];
+          accomodation = [];
+          let baja = temp.filter((season) => season.tourSeasonName == "BAJA");
+          let plusBaja = baja.filter(
+            (categories) => categories.label == "Plus"
+          );
+          let clasicaBaja = baja.filter(
+            (categories) => categories.label == "Clasica"
+          );
+          plusBaja.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+            }
+          });
+          accomodation = [];
+          clasicaBaja.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.unshift({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+            }
+          });
+
+          accomodation = [];
+          let turistaBaja = baja.filter(
+            (categories) => categories.label == "Turista"
+          );
+          turistaBaja.forEach((element, index) => {
+            accomodation.push({
+              accommodationId: element.roomTypeId,
+              chooseProvider: element.roomTypeNameEnglish,
+              price: element.price,
+            });
+            if (index == 1) {
+              categories.push({
+                categoryId: element.tourCategoryId,
+                categoryName: element.label,
+                disableCategory: true,
+                accomodations: accomodation,
+              });
+              this.seasons.push({
+                seasonId: element.tourSeasonId,
+                label: element.tourSeasonName,
+                tourId: element.tourId,
+                status: true,
+                changeName: true,
+                priority: element.priority,
+                applyToTourParent: false,
+                categories: categories,
+              });
+            }
+          });
+
+          console.log(this.seasons);
         })
-
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
@@ -1105,6 +1306,8 @@ export default {
     },
 
     postSeason() {
+      /* this.activeName = "second";
+          this.caculateDate(this.listTours); */
       axios
         .post(this.url + "TourCategorySeason/AddHappyTourSeasson", this.seasons)
         .then((response) => {
@@ -1123,6 +1326,20 @@ export default {
           console.error(error.response);
         });
       this.dialogFormVisible = false;
+    },
+    handleSelect(item) {
+      this.seasons = [];
+      /* this.getSeasonDefault(); */
+      this.tour = item.name;
+      this.tourSelected = 52;
+      this.listTours = item;
+      /* para listar los tours hijos */
+      this.listLoading = false;
+      this.getAccommodation();
+      this.name_categories = this.listTours.tourCategories
+        .map((u) => u.providerCategoryName)
+        .join(", ");
+      this.getSeason();
     },
     //----END METHODS FOR SEASON TAB----//
 
@@ -1456,20 +1673,6 @@ export default {
           console.error(error.response);
         });
     },
-    handleSelect(item) {
-      this.seasons = [];
-      this.getSeasonDefault();
-      this.tour = item.name;
-      this.tourSelected = 52;
-      this.listTours = item;
-      /* para listar los tours hijos */
-      this.listLoading = false;
-      this.getAccommodation();
-      this.name_categories = this.listTours.tourCategories
-        .map((u) => u.providerCategoryName)
-        .join(", ");
-      this.getSeason();
-    },
     handleIconClick(ev) {
       console.log(ev);
     },
@@ -1492,7 +1695,6 @@ export default {
               tourId: element2.tourId,
               nameInstance: element2.nameInstance,
               startDate: element2.startDate,
-              season: "Baja",
             });
           }
         });
@@ -1517,7 +1719,7 @@ export default {
       console.log(tab, event);
     },
     caculateDate(tour) {
-      console.log("entré", this.prioritySelect);
+      console.log("entré");
       let date = new Date(tour.tourDayDescriptions[0].startTime);
       this.aListTours = [];
       for (let index = 0; index < 52; index++) {
@@ -1526,7 +1728,6 @@ export default {
           nameInstance: index + 1 + ". " + tour.name,
           startDate: new Date(date.setDate(date.getDate() + 7)),
           disabled: false,
-          season: this.prioritySelect,
         });
       }
       this.checkTour(tour);
@@ -2030,6 +2231,7 @@ export default {
   box-sizing: border-box;
   border-radius: 5px;
   transition: 0.2s ease;
+  border: 1px solid transparent;
 }
 .card-name:hover,
 .card-name-onfocus {
@@ -2038,6 +2240,7 @@ export default {
   box-shadow: -1px 3px 12px 2px rgba(173, 173, 173, 0.2);
   transform: translateY(-5px);
 }
+
 .card-name input {
   display: inline-block;
   padding: 0 0.4rem;
