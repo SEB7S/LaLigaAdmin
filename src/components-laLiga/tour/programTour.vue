@@ -68,12 +68,14 @@
                     @focusout="verifyCardName(index, $event)"
                     @click="verifyCardName(index, $event)"
                   >
-                    <span>
-                      <el-input
-                        :readonly="season.changeName"
-                        v-model="season.label"
-                      />
-                    </span>
+                    <el-form>
+                      <el-form-item style="margin: 0;">
+                        <el-input
+                          :readonly="season.changeName"
+                          v-model="season.label"
+                        />
+                      </el-form-item>
+                    </el-form>
                     <el-button
                       icon="el-icon-edit"
                       type="text"
