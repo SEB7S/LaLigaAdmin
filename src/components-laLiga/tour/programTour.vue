@@ -68,8 +68,8 @@
                     @focusout="verifyCardName(index, $event)"
                     @click="verifyCardName(index, $event)"
                   >
-                    <el-form>
-                      <el-form-item style="margin: 0;">
+                    <el-form :model="season" ref="season" >
+                      <el-form-item style="margin: 0;" prop="label" :rules="formRules.name[0]">
                         <el-input
                           :readonly="season.changeName"
                           v-model="season.label"
@@ -880,6 +880,9 @@ export default {
       validatorOne : this.priceValidator,
 
       formRules: {
+        name:[
+          {required: true, message: i18n.t('forms.nameIncomplete'), trigger: 'blur'}
+        ],
         price:[
             { validator: priceValidator, trigger: 'blur'},
         ]
@@ -915,7 +918,7 @@ export default {
     },
 
     AddForm(list) {
-      list.push({ chooseProvider: "", price: 0 });
+      list.push({ chooseProvider: "Double", price: 0 });
       console.log(list, "item");
     },
 
