@@ -908,14 +908,7 @@ export default {
         });
       }
     },
-    ApplyToTour(n) {
-      this.seasons.forEach((season, index) => {
-        if (index != n) {
-          return season.applyToTour = false;
-        }
-        
-      });
-    },
+    
   },
   created() {},
   methods: {
@@ -975,7 +968,14 @@ export default {
           }
         });
     },
-    
+    ApplyToTour(n) {
+      this.seasons.forEach((season, index) => {
+        if (index != n) {
+          return season.applyToTour = false;
+        }
+        
+      });
+    },
     AddNewCard() {
       this.seasons.push({
         label: "Custom",
