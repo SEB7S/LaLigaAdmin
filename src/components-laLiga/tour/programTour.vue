@@ -68,12 +68,14 @@
                     @focusout="verifyCardName(index, $event)"
                     @click="verifyCardName(index, $event)"
                   >
-                    <span>
-                      <el-input
-                        :readonly="season.changeName"
-                        v-model="season.label"
-                      />
-                    </span>
+                    <el-form :model="season" ref="season" >
+                      <el-form-item style="margin: 0;" prop="label" :rules="formRules.name[0]">
+                        <el-input
+                          :readonly="season.changeName"
+                          v-model="season.label"
+                        />
+                      </el-form-item>
+                    </el-form>
                     <el-button
                       icon="el-icon-edit"
                       type="text"
@@ -883,7 +885,12 @@ export default {
       validatorOne: this.priceValidator,
 
       formRules: {
-        price: [{ validator: priceValidator, trigger: "blur" }],
+        name:[
+          {required: true, message: i18n.t('forms.nameIncomplete'), trigger: 'blur'}
+        ],
+        price:[
+            { validator: priceValidator, trigger: 'blur'},
+        ]
       },
 
       //END DATA FOR SEASON TAB ------------------------------------------------
@@ -910,11 +917,7 @@ export default {
       return condition1 == false || condition2 == false;
     },
     AddForm(list) {
-      list.push({
-        accommodationId: 0,
-        chooseProvider: "",
-        price: 0,
-      });
+      list.push({ chooseProvider: "Double", price: 0 });
       console.log(list, "item");
     },
     RemoveForm(list, n, item) {
