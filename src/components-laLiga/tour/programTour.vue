@@ -34,14 +34,14 @@
                   <div class="card-checkbox-container">
                     <el-checkbox
                       class="header-checkbox"
-                      v-model="season.setDefault"
+                      v-model="season.priority"
                       @change="setDefault(index)"
                       >{{ $t("tour.priority") }}</el-checkbox
                     >
                     <el-checkbox
                       class="header-checkbox"
                       v-model="season.applyToTour"
-                      @change="applyToTour(index)"
+                      @change="ApplyToTour(index)"
                       >{{ $t("tour.applyToFather") }}</el-checkbox
                     >
                   </div>
@@ -97,52 +97,61 @@
               >
                 <div class="categoty-name">
                   {{ category.categoryName }}
-                  <el-switch style="float: right; vertical-align: middle; margin-right: .5rem; width: 30px" :disabled="season.status == false" v-model="category.disableCategory">
+                  <el-switch
+                    style="
+                      float: right;
+                      vertical-align: middle;
+                      margin-right: 0.5rem;
+                      width: 30px;
+                    "
+                    :disabled="season.status == false"
+                    v-model="category.disableCategory"
+                  >
                   </el-switch>
                 </div>
                 <el-form
-                  v-for="(acc, index3) in category.accomodations" :key="index3"
-                  :disabled="DisableButton(category.disableCategory, season.status)"
+                  v-for="(acc, index3) in category.accomodations"
+                  :key="index3"
+                  :disabled="
+                    DisableButton(category.disableCategory, season.status)
+                  "
                   :inline="true"
                   size="mini"
                   ref="acc"
                   :model="acc"
-                  
                   class="card-form-container demo-form-inline"
-                  >
-                    <el-form-item class="card-form-item">
-                      <el-select
-                        v-model="acc.chooseProvider"
-                        filterable
-                        placeholder="Accommodation"
-                      >
-                        <el-option
-                          v-for="item in aAccommodation"
-                          :key="item.id"
-                          :label="item.nameEnglish"
-                          :value="item.id"
-                        >
-                        </el-option>
-                      </el-select>
-                    </el-form-item>
-                    <el-form-item class="card-form-item" prop="price" 
-                    :rules="formRules.price[0]"
+                >
+                  <el-form-item class="card-form-item">
+                    <el-select
+                      v-model="acc.chooseProvider"
+                      filterable
+                      placeholder="Accommodation"
+                      @change="HandleAccoSelect($event, category.accomodations[index3])"
                     >
-                      <el-input 
-                        v-model="acc.price"
-                        >
-                      </el-input>
-                    </el-form-item>
-                    <el-form-item>
-                      <el-button
-                        circle
-                        type="danger"
-                        icon="el-icon-delete"
-                        @click="
-                          RemoveForm(category.accomodations, index3, acc)
-                        "
-                      ></el-button>
-                    </el-form-item>
+                      <el-option
+                        v-for="item in aAccommodation"
+                        :key="item.id"
+                        :label="item.nameEnglish"
+                        :value="{id: item.id, accoType: item.nameEnglish}"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item
+                    class="card-form-item"
+                    prop="price"
+                    :rules="formRules.price[0]"
+                  >
+                    <el-input v-model="acc.price"> </el-input>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button
+                      circle
+                      type="danger"
+                      icon="el-icon-delete"
+                      @click="RemoveForm(category.accomodations, index3, acc)"
+                    ></el-button>
+                  </el-form-item>
                 </el-form>
                 <el-button
                   type="primary"
@@ -222,7 +231,7 @@
                   :key="index"
                 >
                   <el-select
-                    v-model="tourDay.season"
+                    v-model="tourDay.seasonName"
                     placeholder="Select"
                     :disabled="tourDay.disabled"
                     style="margin: 3px"
@@ -230,13 +239,14 @@
                   >
                     <el-option
                       v-for="item in seasons"
-                      :key="item.value"
+                      :key="item.seasonId"
                       :label="item.label"
-                      :value="item.value"
+                      :value="item.label"
                     >
                     </el-option>
-                  </el-select></div
-              ></el-col>
+                  </el-select>
+                </div>
+              </el-col>
             </el-row>
           </el-checkbox-group>
         </div>
@@ -719,22 +729,19 @@ export default {
     },
   },
   data() {
-
     var priceValidator = (rule, value, callback) => {
-      console.log(value, rule, "En input")
+      console.log(value, rule, "En input");
       var n = parseInt(value);
-      if(!value){
-        callback(new Error(i18n.t('forms.incompleteInput')));
+      if (!value) {
+        callback(new Error(i18n.t("forms.incompleteInput")));
+      } else if (!Number.isInteger(n)) {
+        callback(new Error(i18n.t("forms.invalidFormat")));
+      } else if (n < 100) {
+        callback(new Error(i18n.t("forms.invalidPrice")));
+      } else {
+        callback();
       }
-      else if(!Number.isInteger(n)){
-        callback(new Error(i18n.t('forms.invalidFormat')));
-      }
-      else if(n < 100){
-        callback(new Error(i18n.t('forms.invalidPrice')));
-      }else{
-        callback()
-      }
-    }
+    };
 
     return {
       tableKey: 0,
@@ -870,14 +877,13 @@ export default {
       allDefault: true,
 
       seasons: [],
-
-      season: [],
       name_categories: "",
-
+      categoryDefault: "",
+      categoryIdDefault: 0,
       testList: {},
       aAccommodation: [], //Select accomodation
 
-      validatorOne : this.priceValidator,
+      validatorOne: this.priceValidator,
 
       formRules: {
         name:[
@@ -893,8 +899,6 @@ export default {
     };
   },
 
-  
-
   /* INPUT SEARCH */
   computed: {
     listTour() {
@@ -904,31 +908,39 @@ export default {
         });
       }
     },
+    ApplyToTour(n) {
+      this.seasons.forEach((season, index) => {
+        if (index != n) {
+          return season.applyToTour = false;
+        }
+        
+      });
+    },
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
+    HandleAccoSelect(event, item){
+      item.chooseProvider =  event.accoType,
+      item.accommodationId =  event.id;
+    },
     DisableButton: function (condition1, condition2) {
       return condition1 == false || condition2 == false;
     },
-
-    
-    DisableButton: function(condition1, condition2){
-      return condition1 == false || condition2 == false;
-    },
-
     AddForm(list) {
-      list.push({ chooseProvider: "Double", price: 0 });
+      list.push({
+        accommodationId: 0,
+        chooseProvider: "",
+        price: 0,
+      });
       console.log(list, "item");
     },
-
     RemoveForm(list, n, item) {
       if (list.length >= 2) {
         list.splice(n, 1);
       }
       /*  */ console.log(list, "item", item, this.seasons);
     },
-
     AddSeasonsCategories() {
       this.seasons.forEach((season) => {
         this.listTours.tourCategories.forEach((tourCategory) => {
@@ -953,34 +965,27 @@ export default {
       });
       console.log("seasons", this.seasons);
     },
-
     setDefault(n) {
-      this.seasons.forEach((season, index) => {
-        if (index != n) {
-          season.setDefault = false;
-        }
-      });
+      this.categoryDefault = this.seasons[n].label;
+      this.categoryIdDefault = this.seasons[n].seasonId;
+      console.log(this.seasons[n], n, this.aListTours),
+        this.seasons.forEach((season, index) => {
+          if (index != n) {
+            season.priority = false;
+          }
+        });
     },
-
-    applyToTour(n) {
-      this.seasons.forEach((season, index) => {
-        if (index != n) {
-          season.applyToTour = false;
-        }
-      });
-    },
-
+    
     AddNewCard() {
       this.seasons.push({
         label: "Custom",
         status: false,
-        setDefault: false,
+        priority: false,
         changeName: false,
         applyToTour: false,
         categories: this.AddCategoriesInNewCard(),
       });
     },
-
     AddCategoriesInNewCard() {
       var categorylist = [];
 
@@ -1005,13 +1010,11 @@ export default {
       });
       return categorylist;
     },
-
     DeleteCard(n) {
       if (n > 2) {
         this.seasons.splice(n, 1);
       }
     },
-
     verifyCardName(n, event) {
       if (this.seasons[n].label != "") {
         switch (event.type) {
@@ -1038,7 +1041,6 @@ export default {
         }
       }
     },
-
     getAccommodation() {
       axios
         .get(this.url + "RoomType")
@@ -1058,8 +1060,88 @@ export default {
           var temp = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
+          console.log("esto", temp);
+          let aSeasons = [];
+          if (temp.length > 0) {
+            /* AGRUPAR RESPONSE POR SEASON */
+            const groupByCategory = temp.reduce((group, product) => {
+              const { tourSeasonName } = product;
+              group[tourSeasonName] = group[tourSeasonName] ?? [];
+              group[tourSeasonName].push(product);
+              return group;
+            }, {});
+            /* ALMACENAR SEASONS AGRUPADOS  EN ARRAY */
+            for (var clave in groupByCategory) {
+              // Controlando que json realmente tenga esa propiedad
+              if (groupByCategory.hasOwnProperty(clave)) {
+                // Mostrando en pantalla la clave junto a su valor
+                console.log(groupByCategory[clave]);
+                aSeasons.push(groupByCategory[clave]);
+              }
+            }
+            /* RECORRIENDO SEASONS */
+            console.log(aSeasons);
+            let accomodations = [];
+            let categories = [];
+            let seasonInfo;
+            aSeasons.forEach((season, indexsea) => {
+              /* RECORRIENDO CAT DE TOUR PARA COMPARARLAS CON LAS SEASONS DE LA PETICION */
+              this.listTours.tourCategories.forEach((category, indexcat) => {
+                /* FILTRANDO CATEGORIAS POR CADA TEMPORADA */
+                let cat = season.filter(
+                  (categ) => categ.label == category.providerCategoryName
+                );
+                /* RECORRIENDO CATEGORIAS */
+                cat.forEach((acc, indexacc) => {
+                  /* se alamcenan las accomodations de cada categoria en un array (accomodations) */
+                  accomodations.push({
+                    accommodationId: acc.roomTypeId,
+                    chooseProvider: acc.roomTypeNameEnglish,
+                    price: acc.price,
+                  });
+                  console.log("cat", acc);
+                  /* cuando el array filtrado de la categoria termine, se almacena la accomodacion en un nuevo array (categories) */
+                  if (indexacc == cat.length - 1) {
+                    categories.push({
+                      categoryId: acc.tourCategoryId,
+                      categoryName: acc.label,
+                      disableCategory: true,
+                      accomodations: accomodations,
+                    });
+                    accomodations = [];
+                  }
+                  console.log(this.seasons);
+                  seasonInfo = acc;
+                });
+                /* cuando todas las categorias de una temporada sean recorridas, se alamcena en un nuevo array (seasons) */
+                if (indexcat == this.listTours.tourCategories.length - 1) {
+                  seasonInfo.priority
+                    ? (this.categoryDefault = seasonInfo.tourSeasonName)
+                    : seasonInfo.priority
+                    ? (this.categoryIdDefault = seasonInfo.seasonId)
+                    : console.log("funciona", this.categoryDefault);
+                  this.seasons.push({
+                    seasonId: seasonInfo.tourSeasonId,
+                    label: seasonInfo.tourSeasonName,
+                    tourId: seasonInfo.tourId,
+                    status: true,
+                    changeName: true,
+                    priority: seasonInfo.priority,
+                    applyToTourParent: false,
+                    categories: categories,
+                  });
+                  categories = [];
+                }
+                console.log("cat2", this.seasons, seasonInfo);
+              });
+            });
+          } else {
+            this.getSeasonDefault();
+          }
+          /* 
           let categories = [];
           let accomodation = [];
+
           let alta = temp.filter((season) => season.tourSeasonName == "ALTA");
           let plusAlta = alta.filter(
             (categories) => categories.label == "Plus"
@@ -1267,7 +1349,7 @@ export default {
                 categories: categories,
               });
             }
-          });
+          }); */
 
           console.log(this.seasons);
         })
@@ -1307,11 +1389,10 @@ export default {
           console.error(error.response);
         });
     },
-
     postSeason() {
       /* this.activeName = "second";
-          this.caculateDate(this.listTours); */
-      axios
+      this.caculateDate(this.listTours); */
+       axios
         .post(this.url + "TourCategorySeason/AddHappyTourSeasson", this.seasons)
         .then((response) => {
           console.log(response);
@@ -1343,6 +1424,7 @@ export default {
         .map((u) => u.providerCategoryName)
         .join(", ");
       this.getSeason();
+      console.log("Season", this.seasons);
     },
     //----END METHODS FOR SEASON TAB----//
 
@@ -1722,7 +1804,6 @@ export default {
       console.log(tab, event);
     },
     caculateDate(tour) {
-      console.log("entré");
       let date = new Date(tour.tourDayDescriptions[0].startTime);
       this.aListTours = [];
       for (let index = 0; index < 52; index++) {
@@ -1731,12 +1812,15 @@ export default {
           nameInstance: index + 1 + ". " + tour.name,
           startDate: new Date(date.setDate(date.getDate() + 7)),
           disabled: false,
+          seasonName: this.categoryDefault,
+          seasonId: this.categoryIdDefault,
         });
       }
       this.checkTour(tour);
       this.orderList();
       this.aListToursFinal = this.aListTours;
       console.log(this.aListTours, this.checkedTours);
+      console.log("entré", this.aListTours);
     },
     checkTour(tour) {
       this.checkedTours = [];
@@ -2176,12 +2260,8 @@ export default {
       [array[x], array[y]] = [array[y], array[x]];
     },
     itemSelected(item) {
-      console.log(item);
-      if (item == false) {
-        this.activeName = "first";
-      }
+      console.log("seleccionar", item, this.aListTours);
     },
-
     /* INPUT SEARCH */
   },
 };
