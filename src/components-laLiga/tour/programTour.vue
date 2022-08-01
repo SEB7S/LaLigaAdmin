@@ -126,12 +126,13 @@
                       v-model="acc.chooseProvider"
                       filterable
                       placeholder="Accommodation"
+                      @change="HandleAccoSelect($event, category.accomodations[index3])"
                     >
                       <el-option
                         v-for="item in aAccommodation"
                         :key="item.id"
                         :label="item.nameEnglish"
-                        :value="item.id"
+                        :value="{id: item.id, accoType: item.nameEnglish}"
                       >
                       </el-option>
                     </el-select>
@@ -906,18 +907,24 @@ export default {
         });
       }
     },
+    
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
-    DisableButton: function (condition1, condition2) {
-      return condition1 == false || condition2 == false;
+    HandleAccoSelect(event, item){
+      item.chooseProvider =  event.accoType,
+      item.accommodationId =  event.id;
     },
     DisableButton: function (condition1, condition2) {
       return condition1 == false || condition2 == false;
     },
     AddForm(list) {
-      list.push({ chooseProvider: "Double", price: 0 });
+      list.push({
+        accommodationId: 0,
+        chooseProvider: "",
+        price: 0,
+      });
       console.log(list, "item");
     },
     RemoveForm(list, n, item) {
@@ -965,6 +972,7 @@ export default {
         if (index != n) {
           season.applyToTourParent = false;
         }
+        
       });
     },
     AddNewCard() {
@@ -1980,9 +1988,6 @@ export default {
             message: "Delete canceled",
           });
         });
-    },
-    handleClick(tab, event) {
-      console.log(tab, event);
     },
     deleteTourInstance(id) {
       this.listTours.tourInstances.forEach((element, index) => {
