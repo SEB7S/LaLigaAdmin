@@ -129,7 +129,7 @@
                       @change="HandleAccoSelect($event, category.accomodations[index3])"
                     >
                       <el-option
-                        v-for="item in aAccommodation"
+                        v-for="item in FilterAccoList(category.accomodations , aAccommodation)"
                         :key="item.id"
                         :label="item.nameEnglish"
                         :value="{id: item.id, accoType: item.nameEnglish}"
@@ -882,7 +882,6 @@ export default {
       categoryIdDefault: 0,
       testList: {},
       aAccommodation: [], //Select accomodation
-
       validatorOne: this.priceValidator,
 
       formRules: {
@@ -890,7 +889,10 @@ export default {
           {required: true, message: i18n.t('forms.nameIncomplete'), trigger: 'blur'}
         ],
         price:[
-            { validator: priceValidator, trigger: 'blur'},
+          { validator: priceValidator, trigger: 'blur'},
+        ],
+        accoType:[
+          { }
         ]
       },
 
@@ -909,10 +911,19 @@ export default {
       }
     },
     
+    
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
+    FilterAccoList(usedAccomodatios, accoList){
+      var filterList = accoList.filter(acco => {
+        return !usedAccomodatios.some(usedAcco => {
+          return acco.nameEnglish == usedAcco.chooseProvider
+        })
+      });
+      return filterList
+    },
     HandleAccoSelect(event, item){
       item.chooseProvider =  event.accoType,
       item.accommodationId =  event.id;
