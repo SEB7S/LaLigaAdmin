@@ -135,7 +135,7 @@
                       "
                     >
                       <el-option
-                        v-for="item in aAccommodation"
+                        v-for="item in FilterAccoList(category.accomodations , aAccommodation)"
                         :key="item.id"
                         :label="item.nameEnglish"
                         :value="{ id: item.id, accoType: item.nameEnglish }"
@@ -899,7 +899,12 @@ export default {
             trigger: "blur",
           },
         ],
-        price: [{ validator: priceValidator, trigger: "blur" }],
+        price:[
+          { validator: priceValidator, trigger: 'blur'},
+        ],
+        accoType:[
+          { }
+        ]
       },
 
       //END DATA FOR SEASON TAB ------------------------------------------------
@@ -915,12 +920,23 @@ export default {
         });
       }
     },
+    
+    
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
-    HandleAccoSelect(event, item) {
-      (item.chooseProvider = event.accoType), (item.accommodationId = event.id);
+    FilterAccoList(usedAccomodatios, accoList){
+      var filterList = accoList.filter(acco => {
+        return !usedAccomodatios.some(usedAcco => {
+          return acco.nameEnglish == usedAcco.chooseProvider
+        })
+      });
+      return filterList
+    },
+    HandleAccoSelect(event, item){
+      item.chooseProvider =  event.accoType,
+      item.accommodationId =  event.id;
     },
     DisableButton: function (condition1, condition2) {
       return condition1 == false || condition2 == false;
