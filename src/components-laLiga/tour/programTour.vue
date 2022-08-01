@@ -40,8 +40,8 @@
                     >
                     <el-checkbox
                       class="header-checkbox"
-                      v-model="season.applyToTour"
-                      @change="ApplyToTour(index)"
+                      v-model="season.applyToTourParent"
+                      @change="applyToTourParent(index)"
                       >{{ $t("tour.applyToFather") }}</el-checkbox
                     >
                   </div>
@@ -882,6 +882,7 @@ export default {
       categoryIdDefault: 0,
       testList: {},
       aAccommodation: [], //Select accomodation
+      getSeasons: [],
       validatorOne: this.priceValidator,
 
       formRules: {
@@ -896,7 +897,6 @@ export default {
         ]
       },
 
-      prioritySelect: "",
       //END DATA FOR SEASON TAB ------------------------------------------------
     };
   },
@@ -979,10 +979,10 @@ export default {
           }
         });
     },
-    ApplyToTour(n) {
+    applyToTourParent(n) {
       this.seasons.forEach((season, index) => {
         if (index != n) {
-          return season.applyToTour = false;
+          season.applyToTourParent = false;
         }
         
       });
@@ -993,7 +993,7 @@ export default {
         status: false,
         priority: false,
         changeName: false,
-        applyToTour: false,
+        applyToTourParent: false,
         categories: this.AddCategoriesInNewCard(),
       });
     },
@@ -1068,14 +1068,16 @@ export default {
       axios
         .get(this.url + "TourCategorySeason")
         .then((response) => {
-          var temp = response.data.filter(
+          this.seasons = [];
+          this.getSeason = [];
+          this.getSeasons = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
-          console.log("esto", temp);
+          console.log("esto", this.getSeasons);
           let aSeasons = [];
-          if (temp.length > 0) {
+          if (this.getSeasons.length > 0) {
             /* AGRUPAR RESPONSE POR SEASON */
-            const groupByCategory = temp.reduce((group, product) => {
+            const groupByCategory = this.getSeasons.reduce((group, product) => {
               const { tourSeasonName } = product;
               group[tourSeasonName] = group[tourSeasonName] ?? [];
               group[tourSeasonName].push(product);
@@ -1115,6 +1117,7 @@ export default {
                   if (indexacc == cat.length - 1) {
                     categories.push({
                       categoryId: acc.tourCategoryId,
+                      disableCategory: acc.disableCategory,
                       categoryName: acc.label,
                       disableCategory: true,
                       accomodations: accomodations,
@@ -1138,7 +1141,7 @@ export default {
                     status: true,
                     changeName: true,
                     priority: seasonInfo.priority,
-                    applyToTourParent: false,
+                    applyToTourParent: seasonInfo.applyToTourParent,
                     categories: categories,
                   });
                   categories = [];
@@ -1153,7 +1156,7 @@ export default {
           let categories = [];
           let accomodation = [];
 
-          let alta = temp.filter((season) => season.tourSeasonName == "ALTA");
+          let alta = getSeasons.filter((season) => season.tourSeasonName == "ALTA");
           let plusAlta = alta.filter(
             (categories) => categories.label == "Plus"
           );
@@ -1223,7 +1226,7 @@ export default {
 
           categories = [];
           accomodation = [];
-          let media = temp.filter((season) => season.tourSeasonName == "MEDIA");
+          let media = getSeasons.filter((season) => season.tourSeasonName == "MEDIA");
           let plusMedia = media.filter(
             (categories) => categories.label == "Plus"
           );
@@ -1293,7 +1296,7 @@ export default {
 
           categories = [];
           accomodation = [];
-          let baja = temp.filter((season) => season.tourSeasonName == "BAJA");
+          let baja = applyToTourParent.filter((season) => season.tourSeasonName == "BAJA");
           let plusBaja = baja.filter(
             (categories) => categories.label == "Plus"
           );
@@ -1377,8 +1380,10 @@ export default {
           /* this.aAccommodation = response.data; */
 
           response.data.forEach((season, index) => {
-            this.prioritySelect = index == 0 ? season.name : "";
             if (season.isdefault) {
+              if (index == 0) {
+                this.categoryDefault = season.name;
+              }
               this.seasons.push({
                 seasonId: season.id,
                 label: season.name,
@@ -1403,23 +1408,31 @@ export default {
     postSeason() {
       /* this.activeName = "second";
       this.caculateDate(this.listTours); */
-       axios
-        .post(this.url + "TourCategorySeason/AddHappyTourSeasson", this.seasons)
-        .then((response) => {
-          console.log(response);
+      if (this.getSeasons.length == 0) {
+        axios
+          .post(
+            this.url + "TourCategorySeason/AddHappyTourSeasson",
+            this.seasons
+          )
+          .then((response) => {
+            console.log(response);
 
-          this.$notify({
-            title: i18n.t("notifications.success"),
-            message: i18n.t("notifications.hotelAddedSuccess"),
-            type: "success",
-            duration: 2000,
+            this.$notify({
+              title: i18n.t("notifications.success"),
+              message: i18n.t("notifications.hotelAddedSuccess"),
+              type: "success",
+              duration: 2000,
+            });
+            this.activeName = "second";
+            this.getSeason();
+            this.caculateDate(this.listTours);
+          })
+          .catch((error) => {
+            console.error(error.response);
           });
-          this.activeName = "second";
-          this.caculateDate(this.listTours);
-        })
-        .catch((error) => {
-          console.error(error.response);
-        });
+      }
+      this.caculateDate(this.listTours);
+      this.activeName = "second";
       this.dialogFormVisible = false;
     },
     handleSelect(item) {
@@ -1987,9 +2000,6 @@ export default {
             message: "Delete canceled",
           });
         });
-    },
-    handleClick(tab, event) {
-      console.log(tab, event);
     },
     deleteTourInstance(id) {
       this.listTours.tourInstances.forEach((element, index) => {
