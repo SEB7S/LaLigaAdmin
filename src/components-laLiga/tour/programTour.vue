@@ -68,8 +68,12 @@
                     @focusout="verifyCardName(index, $event)"
                     @click="verifyCardName(index, $event)"
                   >
-                    <el-form :model="season" ref="season" >
-                      <el-form-item style="margin: 0;" prop="label" :rules="formRules.name[0]">
+                    <el-form :model="season" ref="season">
+                      <el-form-item
+                        style="margin: 0"
+                        prop="label"
+                        :rules="formRules.name[0]"
+                      >
                         <el-input
                           :readonly="season.changeName"
                           v-model="season.label"
@@ -126,13 +130,15 @@
                       v-model="acc.chooseProvider"
                       filterable
                       placeholder="Accommodation"
-                      @change="HandleAccoSelect($event, category.accomodations[index3])"
+                      @change="
+                        HandleAccoSelect($event, category.accomodations[index3])
+                      "
                     >
                       <el-option
                         v-for="item in aAccommodation"
                         :key="item.id"
                         :label="item.nameEnglish"
-                        :value="{id: item.id, accoType: item.nameEnglish}"
+                        :value="{ id: item.id, accoType: item.nameEnglish }"
                       >
                       </el-option>
                     </el-select>
@@ -886,12 +892,14 @@ export default {
       validatorOne: this.priceValidator,
 
       formRules: {
-        name:[
-          {required: true, message: i18n.t('forms.nameIncomplete'), trigger: 'blur'}
+        name: [
+          {
+            required: true,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
         ],
-        price:[
-            { validator: priceValidator, trigger: 'blur'},
-        ]
+        price: [{ validator: priceValidator, trigger: "blur" }],
       },
 
       //END DATA FOR SEASON TAB ------------------------------------------------
@@ -907,14 +915,12 @@ export default {
         });
       }
     },
-    
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
-    HandleAccoSelect(event, item){
-      item.chooseProvider =  event.accoType,
-      item.accommodationId =  event.id;
+    HandleAccoSelect(event, item) {
+      (item.chooseProvider = event.accoType), (item.accommodationId = event.id);
     },
     DisableButton: function (condition1, condition2) {
       return condition1 == false || condition2 == false;
@@ -972,7 +978,6 @@ export default {
         if (index != n) {
           season.applyToTourParent = false;
         }
-        
       });
     },
     AddNewCard() {
@@ -1394,9 +1399,10 @@ export default {
         });
     },
     postSeason() {
+
       /* this.activeName = "second";
       this.caculateDate(this.listTours); */
-      if (this.getSeasons.length == 0) {
+    /*   if (this.getSeasons.length == 0) {
         axios
           .post(
             this.url + "TourCategorySeason/AddHappyTourSeasson",
@@ -1418,7 +1424,8 @@ export default {
           .catch((error) => {
             console.error(error.response);
           });
-      }
+      } */
+      console.log(this.seasons);
       this.caculateDate(this.listTours);
       this.activeName = "second";
       this.dialogFormVisible = false;
