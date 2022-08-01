@@ -135,7 +135,10 @@
                       "
                     >
                       <el-option
-                        v-for="item in FilterAccoList(category.accomodations , aAccommodation)"
+                        v-for="item in FilterAccoList(
+                          category.accomodations,
+                          aAccommodation
+                        )"
                         :key="item.id"
                         :label="item.nameEnglish"
                         :value="{ id: item.id, accoType: item.nameEnglish }"
@@ -164,7 +167,13 @@
                   round
                   size="mini"
                   @click="AddForm(category.accomodations)"
-                  :disabled="DisableAddFormBtn(category.accomodations, aAccommodation, season.status)"
+                  :disabled="
+                    DisableAddFormBtn(
+                      category.accomodations,
+                      aAccommodation,
+                      season.status
+                    )
+                  "
                   >{{ $t("tour.add") }}</el-button
                 >
               </div>
@@ -899,12 +908,8 @@ export default {
             trigger: "blur",
           },
         ],
-        price:[
-          { validator: priceValidator, trigger: 'blur'},
-        ],
-        accoType:[
-          { }
-        ]
+        price: [{ validator: priceValidator, trigger: "blur" }],
+        accoType: [{}],
       },
 
       //END DATA FOR SEASON TAB ------------------------------------------------
@@ -920,23 +925,20 @@ export default {
         });
       }
     },
-    
-    
   },
   created() {},
   methods: {
     //----START METHODS FOR SEASON TAB----//
-    FilterAccoList(usedAccomodatios, accoList){
-      var filterList = accoList.filter(acco => {
-        return !usedAccomodatios.some(usedAcco => {
-          return acco.nameEnglish == usedAcco.chooseProvider
-        })
+    FilterAccoList(usedAccomodatios, accoList) {
+      var filterList = accoList.filter((acco) => {
+        return !usedAccomodatios.some((usedAcco) => {
+          return acco.nameEnglish == usedAcco.chooseProvider;
+        });
       });
-      return filterList
+      return filterList;
     },
-    HandleAccoSelect(event, item){
-      item.chooseProvider =  event.accoType,
-      item.accommodationId =  event.id;
+    HandleAccoSelect(event, item) {
+      (item.chooseProvider = event.accoType), (item.accommodationId = event.id);
     },
     DisableButton: function (condition1, condition2) {
       return condition1 == false || condition2 == false;
@@ -949,8 +951,12 @@ export default {
       });
       console.log(list, "item");
     },
-    DisableAddFormBtn: function(usedAccomodatios, accoList, condition){
-      return this.FilterAccoList(usedAccomodatios, accoList).length == 0 || usedAccomodatios.length == accoList.length || condition == false
+    DisableAddFormBtn: function (usedAccomodatios, accoList, condition) {
+      return (
+        this.FilterAccoList(usedAccomodatios, accoList).length == 0 ||
+        usedAccomodatios.length == accoList.length ||
+        condition == false
+      );
     },
     RemoveForm(list, n, item) {
       if (list.length >= 2) {
@@ -1418,10 +1424,9 @@ export default {
         });
     },
     postSeason() {
-
       /* this.activeName = "second";
       this.caculateDate(this.listTours); */
-    /*   if (this.getSeasons.length == 0) {
+        if (this.getSeasons.length == 0) {
         axios
           .post(
             this.url + "TourCategorySeason/AddHappyTourSeasson",
@@ -1443,7 +1448,7 @@ export default {
           .catch((error) => {
             console.error(error.response);
           });
-      } */
+      }
       console.log(this.seasons);
       this.caculateDate(this.listTours);
       this.activeName = "second";
