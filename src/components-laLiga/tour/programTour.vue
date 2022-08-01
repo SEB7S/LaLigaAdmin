@@ -158,7 +158,7 @@
                   round
                   size="mini"
                   @click="AddForm(category.accomodations)"
-                  :disabled="season.status == false"
+                  :disabled="DisableAddFormBtn(category.accomodations, aAccommodation, season.status)"
                   >{{ $t("tour.add") }}</el-button
                 >
               </div>
@@ -938,6 +938,9 @@ export default {
         price: 0,
       });
       console.log(list, "item");
+    },
+    DisableAddFormBtn: function(usedAccomodatios, accoList, condition){
+      return this.FilterAccoList(usedAccomodatios, accoList).length == 0 || usedAccomodatios.length == accoList.length || condition == false
     },
     RemoveForm(list, n, item) {
       if (list.length >= 2) {
