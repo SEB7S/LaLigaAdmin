@@ -294,6 +294,7 @@ export default {
   notifications: {
     changeLanguajeSuccess: "Lenguaje cambiado con éxito",
     success: "Éxito",
+    error: "Error",
     updateSuccess: "Actualizado exitosamente",
     addedSuccessfully: "Item añadido exitosamente",
     deleteComplete: "Eliminación completada",
@@ -311,7 +312,8 @@ export default {
     stadiumAddedSuccess: "Estadio agregado con éxito",
     unableDelete: "No es posible eliminar por que se está usando en otros módulos",
     createSuccess: "Creado con éxito",
-    cityAddedSuccess: "Ciudad agregada con éxito"
+    cityAddedSuccess: "Ciudad agregada con éxito",
+    incompleteInputs: "Por favor rellene todos los datos"
   },
   forms:{
     incompleteInput: "Por favor rellene este campo.",

@@ -298,6 +298,7 @@ export default {
   notifications: {
     changeLanguajeSuccess: "Switch language success",
     success: "Success",
+    error: "Error",
     updateSuccess: "Update Successfully",
     addedSuccessfully: "Item added successfully",
     deleteComplete: "Delete complete",
@@ -315,7 +316,8 @@ export default {
     cathegoryAddedSuccess: "Category added successfully",
     unableDelete: "It is not possible to delete because it is being used in other modules",
     createSuccess: "Created Successfully",
-    cityAddedSuccess: "City added successfully"
+    cityAddedSuccess: "City added successfully",
+    incompleteInputs: "Please enter all the required information"
   },
   forms:{
     incompleteInput: "Please, complete this input",
