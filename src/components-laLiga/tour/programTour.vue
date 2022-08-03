@@ -1087,7 +1087,7 @@ export default {
         .get(this.url + "TourCategorySeason")
         .then((response) => {
           this.seasons = [];
-          this.getSeason = [];
+          this.getSeasons = [];
           this.getSeasons = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
@@ -1115,6 +1115,7 @@ export default {
             let accomodations = [];
             let categories = [];
             let seasonInfo;
+            let idSeasons = [];
             aSeasons.forEach((season, indexsea) => {
               /* RECORRIENDO CAT DE TOUR PARA COMPARARLAS CON LAS SEASONS DE LA PETICION */
               this.listTours.tourCategories.forEach((category, indexcat) => {
@@ -1137,16 +1138,17 @@ export default {
                       categoryId: acc.tourCategoryId,
                       disableCategory: acc.disableCategory,
                       categoryName: acc.label,
-                      disableCategory: true,
                       accomodations: accomodations,
                     });
                     accomodations = [];
                   }
                   console.log(this.seasons);
                   seasonInfo = acc;
+                  idSeasons.push(acc.id)
                 });
                 /* cuando todas las categorias de una temporada sean recorridas, se alamcena en un nuevo array (seasons) */
                 if (indexcat == this.listTours.tourCategories.length - 1) {
+                  
                   seasonInfo.priority
                     ? (this.categoryDefault = seasonInfo.tourSeasonName)
                     : seasonInfo.priority
@@ -1156,6 +1158,7 @@ export default {
                     seasonId: seasonInfo.tourSeasonId,
                     label: seasonInfo.tourSeasonName,
                     tourId: seasonInfo.tourId,
+                    idSeasons:idSeasons,
                     status: true,
                     changeName: true,
                     priority: seasonInfo.priority,
@@ -1163,6 +1166,7 @@ export default {
                     categories: categories,
                   });
                   categories = [];
+                  idSeasons = [];
                 }
                 console.log("cat2", this.seasons, seasonInfo);
               });
@@ -1170,219 +1174,6 @@ export default {
           } else {
             this.getSeasonDefault();
           }
-          /* 
-          let categories = [];
-          let accomodation = [];
-
-          let alta = getSeasons.filter((season) => season.tourSeasonName == "ALTA");
-          let plusAlta = alta.filter(
-            (categories) => categories.label == "Plus"
-          );
-          plusAlta.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.unshift({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-            }
-          });
-          accomodation = [];
-          let clasicaAlta = alta.filter(
-            (categories) => categories.label == "Clasica"
-          );
-          clasicaAlta.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.unshift({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-            }
-          });
-          accomodation = [];
-          let turistaAlta = alta.filter(
-            (categories) => categories.label == "Turista"
-          );
-          turistaAlta.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.push({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-              this.seasons.push({
-                seasonId: element.tourSeasonId,
-                label: element.tourSeasonName,
-                tourId: element.tourId,
-                status: true,
-                changeName: true,
-                priority: element.priority,
-                applyToTourParent: false,
-                categories: categories,
-              });
-            }
-          });
-
-          categories = [];
-          accomodation = [];
-          let media = getSeasons.filter((season) => season.tourSeasonName == "MEDIA");
-          let plusMedia = media.filter(
-            (categories) => categories.label == "Plus"
-          );
-          plusMedia.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.unshift({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-            }
-          });
-          let clasicaMedia = media.filter(
-            (categories) => categories.label == "Clasica"
-          );
-          accomodation = [];
-          clasicaMedia.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.unshift({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-            }
-          });
-          accomodation = [];
-          let turistaMedia = media.filter(
-            (categories) => categories.label == "Turista"
-          );
-          turistaMedia.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.push({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-              this.seasons.push({
-                seasonId: element.tourSeasonId,
-                label: element.tourSeasonName,
-                tourId: element.tourId,
-                status: true,
-                changeName: true,
-                priority: element.priority,
-                applyToTourParent: false,
-                categories: categories,
-              });
-            }
-          });
-
-          categories = [];
-          accomodation = [];
-          let baja = applyToTourParent.filter((season) => season.tourSeasonName == "BAJA");
-          let plusBaja = baja.filter(
-            (categories) => categories.label == "Plus"
-          );
-          let clasicaBaja = baja.filter(
-            (categories) => categories.label == "Clasica"
-          );
-          plusBaja.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.unshift({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-            }
-          });
-          accomodation = [];
-          clasicaBaja.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.unshift({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-            }
-          });
-
-          accomodation = [];
-          let turistaBaja = baja.filter(
-            (categories) => categories.label == "Turista"
-          );
-          turistaBaja.forEach((element, index) => {
-            accomodation.push({
-              accommodationId: element.roomTypeId,
-              chooseProvider: element.roomTypeNameEnglish,
-              price: element.price,
-            });
-            if (index == 1) {
-              categories.push({
-                categoryId: element.tourCategoryId,
-                categoryName: element.label,
-                disableCategory: true,
-                accomodations: accomodation,
-              });
-              this.seasons.push({
-                seasonId: element.tourSeasonId,
-                label: element.tourSeasonName,
-                tourId: element.tourId,
-                status: true,
-                changeName: true,
-                priority: element.priority,
-                applyToTourParent: false,
-                categories: categories,
-              });
-            }
-          }); */
-
           console.log(this.seasons);
         })
         .catch((error) => {
