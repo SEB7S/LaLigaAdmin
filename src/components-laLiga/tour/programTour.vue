@@ -20,7 +20,7 @@
         <el-button v-if="tour != ''" type="primary" round @click="postSeason"
           >Next</el-button
         >
-        <el-row v-if="tour != ''" :gutter="40">
+        <el-row v-if="tour != ''" :gutter="40" ref="seasons">
           <el-col
             v-for="(season, index) in seasons"
             :key="index"
@@ -68,7 +68,7 @@
                     @focusout="verifyCardName(index, $event)"
                     @click="verifyCardName(index, $event)"
                   >
-                    <el-form :model="season" ref="season">
+                    <el-form :model="season" ref="seasonForm">
                       <el-form-item
                         style="margin: 0"
                         prop="label"
@@ -1217,7 +1217,47 @@ export default {
     postSeason() {
       /* this.activeName = "second";
       this.caculateDate(this.listTours); */
-        if (this.getSeasons.length == 0) {
+      var validator = true  
+
+      this.$refs.seasons.$children.forEach(card => {
+        console.log(card.$children[0], "card children")
+
+        card.$children[0].$children.forEach(cardItems => {
+          if(cardItems.$vnode.tag == "vue-component-43-ElForm"){
+            cardItems.validate(valid =>{
+              if(!valid){
+                console.log("Validation Error")
+                validator = false
+              }
+            })
+          }
+          if(cardItems.$vnode.tag == "vue-component-40-ElTooltip"){
+          cardItems.$children[0].validate(valid => {
+            if(!valid){
+              console.log("Validation Error")
+              validator = false
+            }
+          })
+        }
+        });
+        
+
+        /*console.log(card.$children[0].$children[2], "Card item tooltip")
+        card.$children[0].$children[2].forEach(child =>{
+          console.log(child, "Hijo de tooltip")
+        })
+        card.$children[0].$children[2].$children[0].validate(valid =>{
+          if(!valid){
+            validator = false
+          }
+        })*/
+      })
+
+
+
+      if(validator){
+
+      if (this.getSeasons.length == 0) {
         axios
           .post(
             this.url + "TourCategorySeason/AddHappyTourSeasson",
@@ -1232,7 +1272,6 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.activeName = "second";
             this.getSeason();
             this.caculateDate(this.listTours);
           })
@@ -1244,6 +1283,15 @@ export default {
       this.caculateDate(this.listTours);
       this.activeName = "second";
       this.dialogFormVisible = false;
+
+      }else{
+        this.$notify({
+          title: i18n.t("notifications.error"),
+          message: i18n.t("notifications.incompleteInputs"),
+          type: "error",
+          duration: 2000,
+        });
+      }
     },
     handleSelect(item) {
       this.seasons = [];
