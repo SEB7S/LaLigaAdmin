@@ -1430,6 +1430,7 @@ export default {
 
       this.$refs.seasons.$children.forEach(card => {
         console.log(card.$children[0], "card children")
+
         card.$children[0].$children.forEach(cardItems => {
           if(cardItems.$vnode.tag == "vue-component-43-ElForm"){
             cardItems.validate(valid =>{
@@ -1439,9 +1440,30 @@ export default {
               }
             })
           }
+          if(cardItems.$vnode.tag == "vue-component-40-ElTooltip"){
+          cardItems.$children[0].validate(valid => {
+            if(!valid){
+              console.log("Validation Error")
+              validator = false
+            }
+          })
+        }
         });
+        
+
+        /*console.log(card.$children[0].$children[2], "Card item tooltip")
+        card.$children[0].$children[2].forEach(child =>{
+          console.log(child, "Hijo de tooltip")
+        })
+        card.$children[0].$children[2].$children[0].validate(valid =>{
+          if(!valid){
+            validator = false
+          }
+        })*/
       })
-      
+
+
+
       if(validator){
 
       if (this.getSeasons.length == 0) {
