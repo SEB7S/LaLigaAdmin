@@ -1144,11 +1144,10 @@ export default {
                   }
                   console.log(this.seasons);
                   seasonInfo = acc;
-                  idSeasons.push(acc.id)
+                  idSeasons.push(acc.id);
                 });
                 /* cuando todas las categorias de una temporada sean recorridas, se alamcena en un nuevo array (seasons) */
                 if (indexcat == this.listTours.tourCategories.length - 1) {
-                  
                   seasonInfo.priority
                     ? (this.categoryDefault = seasonInfo.tourSeasonName)
                     : seasonInfo.priority
@@ -1158,7 +1157,7 @@ export default {
                     seasonId: seasonInfo.tourSeasonId,
                     label: seasonInfo.tourSeasonName,
                     tourId: seasonInfo.tourId,
-                    idSeasons:idSeasons,
+                    idSeasons: idSeasons,
                     status: true,
                     changeName: true,
                     priority: seasonInfo.priority,
@@ -1217,30 +1216,29 @@ export default {
     postSeason() {
       /* this.activeName = "second";
       this.caculateDate(this.listTours); */
-      var validator = true  
+      var validator = true;
 
-      this.$refs.seasons.$children.forEach(card => {
-        console.log(card.$children[0], "card children")
+      this.$refs.seasons.$children.forEach((card) => {
+        console.log(card.$children[0], "card children");
 
-        card.$children[0].$children.forEach(cardItems => {
-          if(cardItems.$vnode.tag == "vue-component-43-ElForm"){
-            cardItems.validate(valid =>{
-              if(!valid){
-                console.log("Validation Error")
-                validator = false
+        card.$children[0].$children.forEach((cardItems) => {
+          if (cardItems.$vnode.tag == "vue-component-43-ElForm") {
+            cardItems.validate((valid) => {
+              if (!valid) {
+                console.log("Validation Error");
+                validator = false;
               }
-            })
+            });
           }
-          if(cardItems.$vnode.tag == "vue-component-40-ElTooltip"){
-          cardItems.$children[0].validate(valid => {
-            if(!valid){
-              console.log("Validation Error")
-              validator = false
-            }
-          })
-        }
+          if (cardItems.$vnode.tag == "vue-component-40-ElTooltip") {
+            cardItems.$children[0].validate((valid) => {
+              if (!valid) {
+                console.log("Validation Error");
+                validator = false;
+              }
+            });
+          }
         });
-        
 
         /*console.log(card.$children[0].$children[2], "Card item tooltip")
         card.$children[0].$children[2].forEach(child =>{
@@ -1251,40 +1249,47 @@ export default {
             validator = false
           }
         })*/
-      })
+      });
 
+      if (validator) {
+        if (this.getSeasons.length == 0) {
+          axios
+            .post(
+              this.url + "TourCategorySeason/AddHappyTourSeasson",
+              this.seasons
+            )
+            .then((response) => {
+              console.log(response);
 
-
-      if(validator){
-
-      if (this.getSeasons.length == 0) {
-        axios
-          .post(
-            this.url + "TourCategorySeason/AddHappyTourSeasson",
-            this.seasons
-          )
-          .then((response) => {
-            console.log(response);
-
-            this.$notify({
-              title: i18n.t("notifications.success"),
-              message: i18n.t("notifications.hotelAddedSuccess"),
-              type: "success",
-              duration: 2000,
+              this.$notify({
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.hotelAddedSuccess"),
+                type: "success",
+                duration: 2000,
+              });
+              this.getSeason();
+              this.caculateDate(this.listTours);
+            })
+            .catch((error) => {
+              console.error(error.response);
             });
-            this.getSeason();
-            this.caculateDate(this.listTours);
-          })
-          .catch((error) => {
-            console.error(error.response);
-          });
-      }
-      console.log(this.seasons);
-      this.caculateDate(this.listTours);
-      this.activeName = "second";
-      this.dialogFormVisible = false;
+        } else {
+          console.log("entre", this.seasons)
+          axios
+            .put(this.url + "TourCategorySeason", this.seasons)
+            .then((response) => {
+              this.getSeason();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
 
-      }else{
+        console.log(this.seasons);
+        this.caculateDate(this.listTours);
+        this.activeName = "second";
+        this.dialogFormVisible = false;
+      } else {
         this.$notify({
           title: i18n.t("notifications.error"),
           message: i18n.t("notifications.incompleteInputs"),
