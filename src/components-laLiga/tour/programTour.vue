@@ -51,7 +51,7 @@
                     circle
                     icon="el-icon-close"
                     size="small"
-                    @click="DeleteCard(index)"
+                    @click="DeleteCard(index, season)"
                   ></el-button>
                 </div>
                 <el-tooltip
@@ -166,7 +166,7 @@
                   type="primary"
                   round
                   size="mini"
-                  @click="AddForm(category.accomodations)"
+                  @click="AddForm(category.accomodations, category, season)"
                   :disabled="
                     DisableAddFormBtn(
                       category.accomodations,
@@ -755,6 +755,12 @@ export default {
         callback(new Error(i18n.t("forms.invalidPrice")));
       } else {
         callback();
+
+        console.log(this.newAccommodation);
+        if (this.getSeasons.length > 0) {
+          this.newAccommodation.price = value;
+          this.PostNewAcc();
+        }
       }
     };
 
@@ -899,7 +905,9 @@ export default {
       aAccommodation: [], //Select accomodation
       getSeasons: [],
       validatorOne: this.priceValidator,
-
+      newAccommodation: {},
+      isNewSeason: false,
+      isEditAcc: false,
       formRules: {
         name: [
           {
@@ -939,17 +947,60 @@ export default {
     },
     HandleAccoSelect(event, item) {
       (item.chooseProvider = event.accoType), (item.accommodationId = event.id);
+      this.newAccommodation.accommodationId = item.accommodationId;
     },
     DisableButton: function (condition1, condition2) {
       return condition1 == false || condition2 == false;
     },
-    AddForm(list) {
+    AddForm(list, category, season) {
+      if (season.seasonId) {
+        this.isEditAcc = true;
+        this.newAccommodation = season;
+        this.newAccommodation.categoryId = category.categoryId;
+      }
+      console.log("lista", list, category, season);
       list.push({
         accommodationId: 0,
         chooseProvider: "",
         price: 0,
       });
       console.log(list, "item");
+    },
+    /* Añadiendo una nueva acco */
+    PostNewAcc() {
+      console.log(this.isEmptyObject(this.newAccommodation));
+      if (this.isEditAcc) {
+        let acc = {
+          priority: true,
+          tourCategoryId: this.newAccommodation.categoryId,
+          tourSeasonId: this.newAccommodation.seasonId,
+          roomTypeId: this.newAccommodation.accommodationId,
+          price: this.newAccommodation.price,
+          disableCategory: true,
+        };
+        axios
+          .post(this.url + "TourCategorySeason", acc)
+          .then((response) => {
+            this.$notify({
+              title: i18n.t("notifications.success"),
+              message: i18n.t("notifications.cathegoryAddedSuccess"),
+              type: "success",
+              duration: 2000,
+            });
+            this.newAccommodation = {};
+            this.isEditAcc = false;
+            if (!this.isNewSeason) {
+              this.getSeason();
+            }
+          })
+          .catch((error) => {
+            console.error(error.response);
+          });
+      }
+    },
+    /* Validar que un objeto este vacio */
+    isEmptyObject(obj) {
+      return JSON.stringify(obj) === "{}";
     },
     DisableAddFormBtn: function (usedAccomodatios, accoList, condition) {
       return (
@@ -959,10 +1010,32 @@ export default {
       );
     },
     RemoveForm(list, n, item) {
+      console.log("ss", list, item.idCatSeason, n);
       if (list.length >= 2) {
         list.splice(n, 1);
+        /* ELIMINANDO CATSEASON DE BD  */
+        if (item.idCatSeason) {
+          this.HandleDeleteAcc(item.idCatSeason);
+        }
       }
       /*  */ console.log(list, "item", item, this.seasons);
+    },
+
+    HandleDeleteAcc(id) {
+      axios
+        .delete(this.url + "TourCategorySeason/" + id)
+        .then((response) => {
+          this.$notify({
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
+          this.getSeason();
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
     },
     AddSeasonsCategories() {
       this.seasons.forEach((season) => {
@@ -1006,9 +1079,13 @@ export default {
       });
     },
     AddNewCard() {
+      this.isNewSeason = true;
       this.seasons.push({
         label: "Custom",
+        seasonId: 0,
+        idSeasons: [],
         status: false,
+        isActive: false,
         priority: false,
         changeName: false,
         applyToTourParent: false,
@@ -1017,7 +1094,6 @@ export default {
     },
     AddCategoriesInNewCard() {
       var categorylist = [];
-
       this.listTours.tourCategories.forEach((tourCategory) => {
         categorylist.push({
           categoryId: tourCategory.id,
@@ -1039,10 +1115,30 @@ export default {
       });
       return categorylist;
     },
-    DeleteCard(n) {
+    DeleteCard(n, season) {
+      console.log(season);
       if (n > 2) {
         this.seasons.splice(n, 1);
       }
+      if (season.seasonId != 0) {
+        this.HandleDeleteSeason(season.seasonId)
+      }
+    },
+    HandleDeleteSeason(id) {
+      axios
+        .delete(this.url + "TourCategorySeason/DeleteIdSeason?Id=" + id)
+        .then((response) => {
+          this.$notify({
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
+          this.getSeason();
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
     },
     verifyCardName(n, event) {
       if (this.seasons[n].label != "") {
@@ -1130,6 +1226,7 @@ export default {
                     accommodationId: acc.roomTypeId,
                     chooseProvider: acc.roomTypeNameEnglish,
                     price: acc.price,
+                    idCatSeason: acc.id,
                   });
                   console.log("cat", acc);
                   /* cuando el array filtrado de la categoria termine, se almacena la accomodacion en un nuevo array (categories) */
@@ -1158,7 +1255,8 @@ export default {
                     label: seasonInfo.tourSeasonName,
                     tourId: seasonInfo.tourId,
                     idSeasons: idSeasons,
-                    status: true,
+                    status: seasonInfo.isActive,
+                    isActive: seasonInfo.isActive,
                     changeName: true,
                     priority: seasonInfo.priority,
                     applyToTourParent: seasonInfo.applyToTourParent,
@@ -1197,6 +1295,7 @@ export default {
                 label: season.name,
                 tourId: this.listTours.id,
                 status: true,
+                isActive: true,
                 changeName: true,
                 priority: index == 0 ? true : false,
                 applyToTourParent: false,
@@ -1274,7 +1373,7 @@ export default {
               console.error(error.response);
             });
         } else {
-          console.log("entre", this.seasons)
+          console.log("entre", this.seasons);
           axios
             .put(this.url + "TourCategorySeason", this.seasons)
             .then((response) => {
