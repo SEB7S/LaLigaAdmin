@@ -517,8 +517,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: i18n('notifications.success'),
-                message: i18n('notifications.hotelAddedSuccess'),
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.hotelAddedSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -529,8 +529,8 @@ export default {
             })
         } else {
           this.$notify({
-            title: i18n('notifications.success'),
-            message: i18n('notifications.providerDuplicated'),
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.providerDuplicated'),
             type: 'error',
             duration: 2000
           })

@@ -405,7 +405,7 @@
               type="textarea"
               :rows="2"
               placeholder="Please input"
-              maxlength="150"
+              maxlength="500"
               show-word-limit
             />
           </el-form-item>
@@ -809,8 +809,9 @@ export default {
         providerName: '',
         providerCategoryName: '',
         providerCategoryId: 0,
-        statusActive: true
+        statusActive: true,
       }
+      this.description= '';
       this.city_name = ''
       this.fileList = []
       console.log(this.roomTypeDefault)

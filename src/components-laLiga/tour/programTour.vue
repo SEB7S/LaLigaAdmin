@@ -233,9 +233,11 @@
                     border
                     class="space"
                     :disabled="tourDay.disabled"
-                  >
+                    :style="{ display: tourDay.hidden ? 'none': '' }"
+                 >
                     {{ tourDay.nameInstance }}
                     {{ tourDay.startDate | formatDate }}
+                    
                   </el-checkbox>
                 </div></el-col
               >
@@ -1824,6 +1826,7 @@ export default {
     caculateDate(tour) {
       let date = new Date(tour.tourDayDescriptions[0].startTime);
       this.aListTours = [];
+      let currentDate = new Date();
       console.log("temporadas", this.tour);
       for (let index = 0; index < 52; index++) {
         this.aListTours.push({
@@ -1833,8 +1836,10 @@ export default {
           disabled: false,
           seasonName: this.categoryDefault.tourSeasonName,
           seasons: this.seasonsId,
+          hidden: currentDate > date.setDate(date.getDate() + 7) ? true : false,
         });
       }
+      console.log(this.aListTours);
       this.checkTour(tour);
       this.orderList();
       this.aListToursFinal = this.aListTours;
@@ -2041,7 +2046,9 @@ export default {
       this.listTours.tourInstances.forEach((element, index) => {
         if (element.tourhijo == id) {
           axios
-            .delete(this.url + "TourInstance/" + element.id)
+            .delete(
+              this.url + "TourInstance/DeleteInstanceCascade?id=" + element.id
+            )
             .then((response) => {
               this.$notify({
                 title: "Success",
