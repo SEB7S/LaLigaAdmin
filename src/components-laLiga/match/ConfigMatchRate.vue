@@ -685,8 +685,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: i18n('notifications.success'),
-                message: i18n('notifications.changeStateSuccess'),
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.changeStateSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -717,6 +717,7 @@ export default {
       this.formMatchRate.matchName = row.matchName
       this.formMatchRate.match_price = row.matchPrice
       this.formMatchRate.stadium_id = row.stadioId
+      this.formMatchRate.available = row.available
     },
     updateData() {
       this.$refs['formMatchRate'].validate((valid) => {
@@ -736,8 +737,8 @@ export default {
             .then((response) => {
               this.dialogFormVisible = false
               this.$notify({
-                title: i18n('notifications.success'),
-                message: i18n('notifications.uptadeSuccess'),
+                title: i18n.t('notifications.success'),
+                message: i18n.t('notifications.uptadeSuccess'),
                 type: 'success',
                 duration: 2000
               })
@@ -760,8 +761,8 @@ export default {
         .delete(this.url + 'MatchRate/' + id)
         .then((response) => {
           this.$notify({
-            title: i18n('notifications.success'),
-            message: i18n('notifications.deleteSuccessfully'),
+            title: i18n.t('notifications.success'),
+            message: i18n.t('notifications.deleteSuccessfully'),
             type: 'success',
             duration: 2000
           })
@@ -775,42 +776,42 @@ export default {
     },
     confirmDelete(row) {
       this.$confirm(
-        i18n('modals.deleteItemWarning'),
-        i18n('modals.warning'),
+        i18n.t('modals.deleteItemWarning'),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: i18n('modals.confirmButton'),
-          cancelButtonText: i18n('modals.cancelButton'),
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: i18n('notifications.deleteComplete')
+            message: i18n.t('notifications.deleteComplete')
           })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
             type: 'info',
-            message: i18n('notifications.deleteCanceled')
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },
     handleDeleteAll() {
       this.$confirm(
-        i18n('modals.deleteItemWarning'),
+        i18n.t('modals.deleteItemWarning'),
         'Warning',
         {
-          confirmButtonText: i18n('modals.confirmButton'),
-          cancelButtonText: i18n('modals.cancelButton'),
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
           type: 'warning'
         }
       )
         .then(() => {
           this.$message({
             type: 'success',
-            message: i18n('notifications.deleteComplete')
+            message: i18n.t('notifications.deleteComplete')
           })
           this.matchRateList.forEach((value) => {
             console.log(value)
@@ -820,7 +821,7 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: i18n('notifications.deleteCanceled')
+            message: i18n.t('notifications.deleteCanceled')
           })
         })
     },

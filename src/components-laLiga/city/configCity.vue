@@ -554,9 +554,9 @@ export default {
           latitude: this.cities.latitude.toString(),
           longitude: this.cities.longitude.toString()
         }
-        if (this.duplicateCity) {
-          city.cityNameEspanish = this.cities.city + ', ' + this.cities.country
-        }
+/*         if (this.duplicateCity) {
+          city.cityNameEspanish = city.cityNameEnglish
+        } */
         if (valid) {
           axios
             .post(this.url + 'City', city)
