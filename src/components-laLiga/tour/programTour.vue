@@ -252,6 +252,7 @@
                     placeholder="Select"
                     style="margin: 3px"
                     @change="itemSelected(tourDay, index)"
+                    :style="{ display: tourDay.hidden ? 'none': '' }"
                   >
                     <el-option
                       v-for="item in seasons"
@@ -2057,7 +2058,9 @@ export default {
                 duration: 2000,
               });
               this.showReviewer = false;
-              this.getTourbyId(this.listTours);
+              if(index == this.listTours.tourInstances.length - 1) {
+                this.getTourbyId(this.listTours);
+              }
             })
             .catch((error) => {
               console.error(error.response);

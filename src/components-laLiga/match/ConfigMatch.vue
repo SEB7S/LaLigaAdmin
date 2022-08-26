@@ -395,35 +395,35 @@ export default {
           {
             required: true,
             message: i18n.t('forms.incompleteInput'),
-            trigger: 'blur'
+
           }
         ],
         clubHomeName: [
           {
             required: true,
             message: i18n.t('forms.incompleteInput'),
-            trigger: 'blur'
+
           }
         ],
         stadiumName: [
           {
             required: true,
             message: i18n.t('forms.incompleteInput'),
-            trigger: 'blur'
+
           }
         ],
         date: [
           {
             required: true,
             message: i18n.t('forms.incompleteInput'),
-            trigger: 'blur'
+   
           }
         ],
         tournamentName: [
           {
             required: true,
             message: i18n.t('forms.incompleteInput'),
-            trigger: 'blur'
+
           }
         ]
       },
