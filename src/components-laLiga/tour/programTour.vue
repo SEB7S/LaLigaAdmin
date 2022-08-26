@@ -748,11 +748,14 @@ export default {
     var priceValidator = (rule, value, callback) => {
       console.log(value, rule, "En input");
       var n = parseInt(value);
+     if(this.newAccommodation){
+
+     }
       if (!value) {
         callback(new Error(i18n.t("forms.incompleteInput")));
       } else if (!Number.isInteger(n)) {
         callback(new Error(i18n.t("forms.invalidFormat")));
-      } else if (n < 100) {
+      } else if (n == 0) {
         callback(new Error(i18n.t("forms.invalidPrice")));
       } else {
         callback();
@@ -1862,14 +1865,15 @@ export default {
       let currentDate = new Date();
       console.log("temporadas", this.tour);
       for (let index = 0; index < 52; index++) {
+        let day = new Date(date.setDate(date.getDate() + 7))
         this.aListTours.push({
           tourId: tour.id,
           nameInstance: index + 1 + ". " + tour.name,
-          startDate: new Date(date.setDate(date.getDate() + 7)),
+          startDate: day,
           disabled: false,
           seasonName: this.categoryDefault.tourSeasonName,
           seasons: this.seasonsId,
-          hidden: currentDate > date.setDate(date.getDate() + 7) ? true : false,
+          hidden: currentDate > day ? true : false,
         });
       }
       console.log(this.aListTours);
