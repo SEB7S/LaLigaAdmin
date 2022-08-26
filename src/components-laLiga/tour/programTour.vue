@@ -233,11 +233,10 @@
                     border
                     class="space"
                     :disabled="tourDay.disabled"
-                    :style="{ display: tourDay.hidden ? 'none': '' }"
-                 >
+                    :style="{ display: tourDay.hidden ? 'none' : '' }"
+                  >
                     {{ tourDay.nameInstance }}
                     {{ tourDay.startDate | formatDate }}
-                    
                   </el-checkbox>
                 </div></el-col
               >
@@ -252,7 +251,7 @@
                     placeholder="Select"
                     style="margin: 3px"
                     @change="itemSelected(tourDay, index)"
-                    :style="{ display: tourDay.hidden ? 'none': '' }"
+                    :style="{ display: tourDay.hidden ? 'none' : '' }"
                   >
                     <el-option
                       v-for="item in seasons"
@@ -759,7 +758,7 @@ export default {
         callback();
 
         console.log(this.newAccommodation);
-        if (this.getSeasons.length > 0) {
+        if (this.getSeasons.length > 0 && value != 0) {
           this.newAccommodation.price = value;
           this.PostNewAcc();
         }
@@ -969,10 +968,19 @@ export default {
         price: 0,
       });
       console.log(list, "item");
+      this.disableCategorySeasons(
+        this.newAccommodation.categoryId,
+        this.newAccommodation.seasonId,
+        false
+      );
     },
     /* Añadiendo una nueva acco */
     PostNewAcc() {
-      console.log(this.isEmptyObject(this.newAccommodation));
+      console.log(
+        this.isEmptyObject(this.newAccommodation),
+        this.newAccommodation,
+        this.seasons
+      );
       if (this.isEditAcc) {
         let acc = {
           priority: true,
@@ -981,6 +989,7 @@ export default {
           roomTypeId: this.newAccommodation.accommodationId,
           price: this.newAccommodation.price,
           disableCategory: true,
+          isActive: this.newAccommodation.isActive,
         };
         axios
           .post(this.url + "TourCategorySeason", acc)
@@ -993,6 +1002,11 @@ export default {
             });
             this.newAccommodation = {};
             this.isEditAcc = false;
+            this.disableCategorySeasons(
+              acc.tourCategoryId,
+              acc.tourSeasonId,
+              true
+            );
             if (!this.isNewSeason) {
               this.getSeason();
             }
@@ -1002,6 +1016,19 @@ export default {
           });
       }
     },
+    /* Deshabilitar categorias mientras se completa el precio de una acomodacion */
+    disableCategorySeasons(idCat, idSeason, status) {
+      this.seasons.map((season) => {
+        season.categories.map((cat) => {
+          if (cat.categoryId != idCat || season.seasonId != idSeason) {
+            if (cat.disableCategory != status) {
+              cat.disableCategory = status;
+            }
+          }
+        });
+      });
+    },
+
     /* Validar que un objeto este vacio */
     isEmptyObject(obj) {
       return JSON.stringify(obj) === "{}";
@@ -1021,10 +1048,14 @@ export default {
         if (item.idCatSeason) {
           this.HandleDeleteAcc(item.idCatSeason);
         }
+        this.disableCategorySeasons(
+          this.newAccommodation.categoryId,
+          this.newAccommodation.seasonId,
+          true
+        );
       }
       /*  */ console.log(list, "item", item, this.seasons);
     },
-
     HandleDeleteAcc(id) {
       axios
         .delete(this.url + "TourCategorySeason/" + id)
@@ -1035,6 +1066,7 @@ export default {
             type: "success",
             duration: 2000,
           });
+
           this.getSeason();
         })
         .catch((error) => {
@@ -2058,7 +2090,7 @@ export default {
                 duration: 2000,
               });
               this.showReviewer = false;
-              if(index == this.listTours.tourInstances.length - 1) {
+              if (index == this.listTours.tourInstances.length - 1) {
                 this.getTourbyId(this.listTours);
               }
             })
