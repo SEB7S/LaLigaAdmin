@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <el-autocomplete
+      v-loading.fullscreen.lock="fullscreenLoading"
       v-model="tour"
       popper-class="my-autocomplete"
       :fetch-suggestions="getTour"
@@ -17,7 +18,12 @@
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
       <el-tab-pane :label="$t('tour.season')" name="first">
-        <el-button v-if="tour != ''" type="primary" round @click="postSeason"
+        <el-button
+          :disabled="!disabledButton"
+          v-if="tour != ''"
+          type="primary"
+          round
+          @click="postSeason"
           >Next</el-button
         >
         <el-row v-if="tour != ''" :gutter="40" ref="seasons">
@@ -527,6 +533,7 @@
                     type="date"
                     placeholder="Pick a day"
                     @change="calculateDays"
+                    :picker-options="pickerOptions"
                   >
                   </el-date-picker>
                 </el-form-item>
@@ -748,14 +755,13 @@ export default {
     var priceValidator = (rule, value, callback) => {
       console.log(value, rule, "En input");
       var n = parseInt(value);
-     if(this.newAccommodation){
-
-     }
+      if (this.newAccommodation) {
+      }
       if (!value) {
         callback(new Error(i18n.t("forms.incompleteInput")));
       } else if (!Number.isInteger(n)) {
         callback(new Error(i18n.t("forms.invalidFormat")));
-      } else if (n == 0) {
+      } else if (n < 1) {
         callback(new Error(i18n.t("forms.invalidPrice")));
       } else {
         callback();
@@ -897,7 +903,13 @@ export default {
           },
         ],
       },
-
+      fullscreenLoading: false,
+      disabledButton: true,
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now();
+        },
+      },
       //START DATA FOR SEASON TAB ------------------------------------------
       allDefault: true,
 
@@ -979,6 +991,7 @@ export default {
     },
     /* Añadiendo una nueva acco */
     PostNewAcc() {
+      this.fullscreenLoading = true;
       console.log(
         this.isEmptyObject(this.newAccommodation),
         this.newAccommodation,
@@ -1013,20 +1026,21 @@ export default {
             if (!this.isNewSeason) {
               this.getSeason();
             }
+            this.fullscreenLoading = false;
           })
           .catch((error) => {
             console.error(error.response);
+            this.fullscreenLoading = false;
           });
       }
     },
     /* Deshabilitar categorias mientras se completa el precio de una acomodacion */
     disableCategorySeasons(idCat, idSeason, status) {
+      this.disabledButton = status;
       this.seasons.map((season) => {
         season.categories.map((cat) => {
           if (cat.categoryId != idCat || season.seasonId != idSeason) {
-    
-              cat.disableCategory = status;
-            
+            cat.disableCategory = status;
           }
         });
       });
@@ -1060,6 +1074,7 @@ export default {
       /*  */ console.log(list, "item", item, this.seasons);
     },
     HandleDeleteAcc(id) {
+      this.fullscreenLoading = true;
       axios
         .delete(this.url + "TourCategorySeason/" + id)
         .then((response) => {
@@ -1071,9 +1086,11 @@ export default {
           });
 
           this.getSeason();
+          this.fullscreenLoading = false;
         })
         .catch((error) => {
           console.error(error.response);
+          this.fullscreenLoading = false;
         });
     },
     AddSeasonsCategories() {
@@ -1356,7 +1373,7 @@ export default {
       /* this.activeName = "second";
       this.caculateDate(this.listTours); */
       var validator = true;
-
+      this.fullscreenLoading = true;
       this.$refs.seasons.$children.forEach((card) => {
         console.log(card.$children[0], "card children");
 
@@ -1417,9 +1434,11 @@ export default {
             .put(this.url + "TourCategorySeason", this.seasons)
             .then((response) => {
               this.getSeason();
+              this.fullscreenLoading = false;
             })
             .catch((error) => {
               console.error(error.response);
+              this.fullscreenLoading = false;
             });
         }
 
@@ -1553,6 +1572,7 @@ export default {
       this.dialogFormVisible = true;
     },
     postTourInstance() {
+      this.fullscreenLoading = true;
       console.log(this.checkedTours, this.aListToursFinal);
       var tour = {
         duration_in_days: this.listTours.duration_in_days,
@@ -1582,9 +1602,11 @@ export default {
           });
           this.getTourbyId(this.listTours);
           this.activeName = "second";
+          this.fullscreenLoading = false;
         })
         .catch((error) => {
           console.error(error.response);
+          this.fullscreenLoading = false;
         });
     },
     /* UPDATE */
@@ -1865,7 +1887,7 @@ export default {
       let currentDate = new Date();
       console.log("temporadas", this.tour);
       for (let index = 0; index < 52; index++) {
-        let day = new Date(date.setDate(date.getDate() + 7))
+        let day = new Date(date.setDate(date.getDate() + 7));
         this.aListTours.push({
           tourId: tour.id,
           nameInstance: index + 1 + ". " + tour.name,
@@ -1928,9 +1950,11 @@ export default {
       } else {
         tour.tourInstances.forEach((element, index) => {
           this.checkedTours.push(element.nameInstance);
-          this.aListTours.forEach((element2, index) => {
+          this.aListTours.forEach((element2, index2) => {
             if (element2.nameInstance == element.nameInstance) {
-              this.getTourCategorySeasonsTours(element, element2);
+              if (index == tour.tourInstances.length - 1) {
+                this.getTourCategorySeasonsTours(element, element2);
+              }
               console.log(
                 "Tour instance",
                 element,
