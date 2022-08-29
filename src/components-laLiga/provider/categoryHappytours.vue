@@ -147,7 +147,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :close-on-click-modal = "false"
+      :close-on-click-modal="false"
     >
       <el-form
         ref="formCategory"
@@ -179,42 +179,42 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle
-} from '@/api/article'
-import i18n from '@/lang/index.js'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
+  updateArticle,
+} from "@/api/article";
+import i18n from "@/lang/index.js";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'CategoryProvider',
+  name: "CategoryProvider",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   data() {
     return {
@@ -223,8 +223,8 @@ export default {
       total: 0,
       listLoading: true,
       defaultProps: {
-        children: 'hotels',
-        label: 'providerName'
+        children: "hotels",
+        label: "providerName",
       },
       listQuery: {
         page: 1,
@@ -232,31 +232,31 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
-      search: '',
+      dialogStatus: "",
+      search: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
@@ -264,25 +264,24 @@ export default {
         categoryName: [
           {
             required: true,
-            message: i18n.t('forms.categoryIncomplete'),
-            trigger: 'blur'
-          }
-        ]
+            message: i18n.t("forms.categoryIncomplete"),
+          },
+        ],
       },
       downloadLoading: false,
       /** FormCity  */
-      city_name: '',
-      city_nameEs: '',
+      city_name: "",
+      city_nameEs: "",
       cities: [],
       /** FormStadium */
       formCategory: {
-        categoryName: ''
+        categoryName: "",
       },
       hotelUpdate: [],
       categoryProviderList: [],
       /* EndPoint */
-      url: this.$store.getters.url
-    }
+      url: this.$store.getters.url,
+    };
   },
   /* INPUT SEARCH */
   computed: {
@@ -291,86 +290,86 @@ export default {
         return this.list.filter((item) => {
           return item.categoryName
             .toLowerCase()
-            .includes(this.search.toLowerCase())
-        })
+            .includes(this.search.toLowerCase());
+        });
       }
-    }
+    },
   },
   created() {
-    this.getCategoryHappyTour()
+    this.getCategoryHappyTour();
   },
   methods: {
     /* TABLE */
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getCategoryHappyTour()
+      this.listQuery.page = 1;
+      this.getCategoryHappyTour();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'categoryName']
-        const filterVal = ['id', 'categoryName']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "categoryName"];
+        const filterVal = ["id", "categoryName"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'CategoryHT' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "CategoryHT" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
@@ -378,228 +377,232 @@ export default {
     resetTemp() {
       /** FormStadium */
       this.formCategory = {
-        categoryName: ''
-      }
+        categoryName: "",
+      };
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     /* GET */
     getCategoryHappyTour() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'HappyTourCategories')
+        .get(this.url + "HappyTourCategories")
         .then((response) => {
-          console.log(response.data)
-          this.list = response.data
-          this.listLoading = false
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     /* POST */
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.city_name = ''
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.city_name = "";
     },
     postCategory() {
-      this.$refs['formCategory'].validate((valid) => {
+      this.$refs["formCategory"].validate((valid) => {
         var category = {
-          categoryName: this.formCategory.categoryName
-        }
+          categoryName: this.formCategory.categoryName,
+        };
         if (valid) {
           axios
-            .post(this.url + 'HappyTourCategories', category)
+            .post(this.url + "HappyTourCategories", category)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: i18n.t('notifications.success'),
-                message: i18n.t('notifications.hotelAddedSuccess'),
-                type: 'success',
-                duration: 2000
-              })
-              this.getCategoryHappyTour()
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.hotelAddedSuccess"),
+                type: "success",
+                duration: 2000,
+              });
+              this.getCategoryHappyTour();
+              this.resetForm("formCategory");
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     /* UPDATE */
     handleUpdate(row) {
-      console.log(row)
-      this.hotelUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formCategory.categoryName = row.categoryName
+      console.log(row);
+      this.hotelUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formCategory.categoryName = row.categoryName;
     },
     updateData() {
-      this.$refs['formCategory'].validate((valid) => {
+      this.$refs["formCategory"].validate((valid) => {
         if (valid) {
           var category = {
             id: this.hotelUpdate.id,
-            categoryName: this.formCategory.categoryName
-          }
+            categoryName: this.formCategory.categoryName,
+          };
           axios
-            .put(this.url + 'HappyTourCategories', category)
+            .put(this.url + "HappyTourCategories", category)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: i18n.t('notifications.success'),
-                message: i18n.t('notifications.updateSuccess'),
-                type: 'success',
-                duration: 2000
-              })
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.updateSuccess"),
+                type: "success",
+                duration: 2000,
+              });
 
-              this.getCategoryHappyTour()
+              this.getCategoryHappyTour();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.categoryProviderList = val
+      this.categoryProviderList = val;
     },
     handleDelete(row, selected) {
-      var id = selected ? row : row.id
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + 'HappyTourCategories/' + id)
+        .delete(this.url + "HappyTourCategories/" + id)
         .then((response) => {
-          console.log(response)
+          console.log(response);
           this.$notify({
-            title: i18n.t('notifications.success'),
-            message: i18n.t('notifications.deleteSuccessfully'),
-            type: 'success',
-            duration: 2000
-          })
-          this.getCategoryHappyTour()
-          this.showReviewer = false
-          this.categoryProviderList = []
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
+          this.getCategoryHappyTour();
+          this.showReviewer = false;
+          this.categoryProviderList = [];
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     confirmDelete(row) {
       this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
         }
       )
         .then(() => {
-          this.handleDelete(row, false)
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
     handleDeleteAll() {
       this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-            message: 'Delete completed'
-          })
+            type: "success",
+            message: "Delete completed",
+          });
           this.categoryProviderList.forEach((value) => {
-            console.log(value)
-            this.handleDelete(value, false)
-          })
+            console.log(value);
+            this.handleDelete(value, false);
+          });
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
     /* CITY */
     /* GET */
     getCities(queryString, cb) {
       axios
-        .get(this.url + 'City')
+        .get(this.url + "City")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     createFilter(queryString) {
       return (link) => {
         return (
           link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
-        )
-      }
+        );
+      };
     },
     handleSelect(item) {
-      console.log(item)
-      this.formCategory.city_name = item.nameEnglish
-      this.formCategory.cityId = item.id
+      console.log(item);
+      this.formCategory.city_name = item.nameEnglish;
+      this.formCategory.cityId = item.id;
     },
     handleIconClick(ev) {
-      console.log(ev)
+      console.log(ev);
     },
     /* PROVIDER */
     /* GET */
     getProviders(queryString, cb) {
       axios
-        .get(this.url + 'Provider')
+        .get(this.url + "Provider")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-          console.error(error.response)
-        })
+          this.status = "error";
+          console.error(error.response);
+        });
     },
     createFilter(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-      }
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
     },
     handleSelectProvider(item) {
-      this.formCategory.providerName = item.name
-      this.formCategory.providerId = item.id
+      this.formCategory.providerName = item.name;
+      this.formCategory.providerId = item.id;
     },
     handleClose(done) {
-      this.$confirm(i18n.t('modals.closeFormMsg'))
+      this.$confirm(i18n.t("modals.closeFormMsg"))
         .then((_) => {
-          done()
+          done();
         })
-        .catch((_) => {})
-    }
-  }
-}
+        .catch((_) => {});
+    },
+  },
+};
 </script>
 <style lang="scss">
 </style>

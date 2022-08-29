@@ -163,7 +163,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :close-on-click-modal = "false"
+      :close-on-click-modal="false"
       class="mobile"
     >
       <el-steps :active="active" align-center finish-status="success">
@@ -255,7 +255,7 @@
         </el-form>
 
         <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt="">
+          <img width="100%" :src="dialogImageUrl" alt="" />
         </el-dialog>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -270,7 +270,11 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :close-on-click-modal = "false">
+    <el-dialog
+      :visible.sync="dialogPvVisible"
+      title="Reading statistics"
+      :close-on-click-modal="false"
+    >
       <el-table
         :data="pvData"
         border
@@ -294,51 +298,51 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle
-} from '@/api/article'
-import i18n from '@/lang/index.js'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
+  updateArticle,
+} from "@/api/article";
+import i18n from "@/lang/index.js";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'ConfigStadium',
+  name: "ConfigStadium",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   data() {
     var validateNumber = (rule, value, callback) => {
       if (isNaN(value)) {
-        callback(new Error('Please input numbers'))
+        callback(new Error("Please input numbers"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     return {
       tableKey: 0,
       list: [],
@@ -350,58 +354,58 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
 
       downloadLoading: false,
       /** FormCity  */
-      city_name: '',
-      city_nameEs: '',
+      city_name: "",
+      city_nameEs: "",
       cities: [],
       /** FormStadium */
       formStadium: {
-        name: '',
-        latitude: '',
-        longitude: '',
-        cityId: '',
-        city_name: '',
+        name: "",
+        latitude: "",
+        longitude: "",
+        cityId: "",
+        city_name: "",
         categoryStadium: [],
-        options: []
+        options: [],
       },
       stadiumUpdate: [],
       /* for update form */
       categoryStadiumUpdate: [],
-      search: '',
+      search: "",
       active: 0,
       formImageStadium: {
         MediaContentType: 0,
         idStadium: 0,
-        id: null
+        id: null,
       },
       /* EndPoint */
       url: this.$store.getters.url,
@@ -409,68 +413,66 @@ export default {
         name: [
           {
             required: true,
-            message: i18n.t('forms.nameIncomplete'),
-            trigger: 'change'
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "change",
           },
           {
             min: 3,
-            message: i18n.t('forms.incompleteInputLength'),
-            trigger: 'blur'
-          }
+            message: i18n.t("forms.incompleteInputLength"),
+            trigger: "blur",
+          },
         ],
         latitude: [
           {
-            message: i18n.t('forms.latitudeIncomplete'),
-            trigger: 'blur'
+            message: i18n.t("forms.latitudeIncomplete"),
+            trigger: "blur",
           },
           {
             min: 3,
-            message: i18n.t('forms.incompleteInputLength'),
-            trigger: 'blur'
+            message: i18n.t("forms.incompleteInputLength"),
+            trigger: "blur",
           },
           {
             validator: validateNumber,
-            trigger: 'blur'
-          }
+            trigger: "blur",
+          },
         ],
         longitude: [
           {
-            message: i18n.t('forms.longitudeIncomplete'),
-            trigger: 'blur'
+            message: i18n.t("forms.longitudeIncomplete"),
+            trigger: "blur",
           },
           {
             min: 3,
-            message: i18n.t('forms.incompleteInputLength'),
-            trigger: 'blur'
+            message: i18n.t("forms.incompleteInputLength"),
+            trigger: "blur",
           },
           {
             validator: validateNumber,
-            trigger: 'blur'
-          }
+            trigger: "blur",
+          },
         ],
         city_name: [
           {
             required: true,
-            message: i18n.t('forms.cityIncomplete'),
-            trigger: 'change'
-          }
+            message: i18n.t("forms.cityIncomplete"),
+          },
         ],
         categoryStadium: [
           {
             required: true,
-            message: i18n.t('forms.categoryIncomplete'),
-            trigger: 'change'
-          }
-        ]
+            message: i18n.t("forms.categoryIncomplete"),
+          },
+        ],
       },
       /* Images */
-      dialogImageUrl: '',
+      dialogImageUrl: "",
       dialogVisible: false,
       fileList: [],
       stadiumList: [],
       /* Filter column */
-      aFilterCityStadium: []
-    }
+      aFilterCityStadium: [],
+    };
   },
   /* Input Search */
   computed: {
@@ -482,284 +484,288 @@ export default {
             item.cityName.toLowerCase().includes(this.search.toLowerCase()) ||
             item.latitude.toLowerCase().includes(this.search.toLowerCase()) ||
             item.longitude.toLowerCase().includes(this.search.toLowerCase())
-          )
-        })
+          );
+        });
       }
-    }
+    },
   },
   created() {
     /*     this.getList(); */
-    this.getStadium()
+    this.getStadium();
   },
   methods: {
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getStadium()
+      this.listQuery.page = 1;
+      this.getStadium();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     filterHandler(value, row, column) {
-      console.log(value, row, column)
-      const property = column['columnKey']
-      return row[property] === value
+      console.log(value, row, column);
+      const property = column["columnKey"];
+      return row[property] === value;
     },
 
     /* STADIUM */
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'name', 'cityName', 'longitude', 'latitude']
-        const filterVal = ['id', 'name', 'cityName', 'longitude', 'latitude']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "cityName", "longitude", "latitude"];
+        const filterVal = ["id", "name", "cityName", "longitude", "latitude"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Stadiums' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "Stadiums" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.active = 0
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.active = 0;
     },
     resetTemp() {
       (this.formStadium = {
-        name: '',
-        latitude: '',
-        longitude: '',
-        cityId: '',
-        city_name: '',
+        name: "",
+        latitude: "",
+        longitude: "",
+        cityId: "",
+        city_name: "",
         categoryStadium: [],
-        options: []
+        options: [],
       }),
-      (this.city_name = '')
-      this.fileList = []
-      this.categoryStadiumUpdate = []
-      this.getCategoryStadium()
+        (this.city_name = "");
+      this.fileList = [];
+      this.categoryStadiumUpdate = [];
+      this.getCategoryStadium();
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     /* POST */
     postStadium() {
       if (this.active == 0) {
-        this.$refs['formStadium'].validate((valid) => {
+        this.$refs["formStadium"].validate((valid) => {
           var stadium = {
             stadiumName: this.formStadium.name,
             latitude: this.formStadium.latitude,
             longitude: this.formStadium.longitude,
             cityId: this.formStadium.cityId,
-            stadiumStadiumCategories: []
-          }
+            stadiumStadiumCategories: [],
+          };
           this.formStadium.categoryStadium.forEach((element) => {
-            console.log(element)
+            console.log(element);
             stadium.stadiumStadiumCategories.push({
               stadiumId: 0,
-              stadiumCategoryId: element
-            })
-          })
+              stadiumCategoryId: element,
+            });
+          });
           if (valid) {
             axios
-              .post(this.url + 'Stadium', stadium)
+              .post(this.url + "Stadium", stadium)
               .then((response) => {
-                this.formImageStadium.idStadium = response.data.id
-                this.next()
+                this.formImageStadium.idStadium = response.data[0].id;
+                this.next();
                 this.$notify({
-                  title: i18n.t('notifications.success'),
-                  message: i18n.t('notifications.stadiumAddedSuccess'),
-                  type: 'success',
-                  duration: 2000
-                })
-                this.getStadium()
+                  title: i18n.t("notifications.success"),
+                  message: i18n.t("notifications.stadiumAddedSuccess"),
+                  type: "success",
+                  duration: 2000,
+                });
+                this.getStadium();
+                this.resetForm("formStadium")
               })
               .catch((error) => {
-                console.error(error.response)
-              })
+                console.error(error.response);
+              });
           }
-        })
+        });
       } else {
-        this.dialogFormVisible = false
+        this.dialogFormVisible = false;
       }
     },
     /* GET */
     getStadium() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'Stadium')
+        .get(this.url + "Stadium")
         .then((response) => {
-          console.log(response.data)
-          this.list = response.data
-          this.listLoading = false
-          console.log('lista:', this.stadiumList)
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
+          console.log("lista:", this.stadiumList);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     getCategoryStadium() {
       axios
-        .get(this.url + 'StadiumCategory')
+        .get(this.url + "StadiumCategory")
         .then((response) => {
-          this.formStadium.options = response.data
-          console.log(this.formStadium)
+          this.formStadium.options = response.data;
+          console.log(this.formStadium);
         })
         .catch((error) => {
-          console.error(error)
-        })
+          console.error(error);
+        });
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.stadiumList = val
+      this.stadiumList = val;
     },
     handleDelete(row, selected) {
-      var id = selected ? row : row.id
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + 'Stadium/' + id)
+        .delete(this.url + "Stadium/" + id)
         .then((response) => {
           this.$notify({
-            title: i18n.t('notifications.success'),
-            message: i18n.t('notifications.deleteSuccessfully'),
-            type: 'success',
-            duration: 2000
-          })
-          this.getStadium()
-          this.showReviewer = false
-          this.stadiumList = []
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
+          this.getStadium();
+          this.showReviewer = false;
+          this.stadiumList = [];
         })
         .catch((error) => {
-          console.error(error.response.data)
+          console.error(error.response.data);
           this.$notify({
-            title: 'Error',
-            message: i18n.t('notifications.unableDelete'),
-            type: 'error',
-            duration: 3000
-          })
-        })
+            title: "Error",
+            message: i18n.t("notifications.unableDelete"),
+            type: "error",
+            duration: 3000,
+          });
+        });
     },
     confirmDelete(row) {
       this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
         }
       )
         .then(() => {
-          this.handleDelete(row, false)
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
     handleDeleteAll() {
       this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-             message: i18n.t('notifications.deleteComplete')
-          })
+            type: "success",
+            message: i18n.t("notifications.deleteComplete"),
+          });
           this.stadiumList.forEach((value) => {
-            console.log(value)
-            this.handleDelete(value, false)
-          })
+            console.log(value);
+            this.handleDelete(value, false);
+          });
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
 
     /* UPDATE */
     handleUpdate(row) {
-      this.resetTemp()
-      this.getImageByIdStadium(row)
-      console.log(row)
-      this.active = 0
-      this.stadiumUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formStadium.name = row.name
-      this.formStadium.latitude = row.latitude
-      this.formStadium.longitude = row.longitude
-      this.formStadium.city_name = row.cityName
-      this.formStadium.cityId = row.cityId
-      this.formImageStadium.idStadium = row.id
-      this.formStadium.options = row.stadiumCategories
+      this.resetTemp();
+      this.getImageByIdStadium(row);
+      console.log(row);
+      this.active = 0;
+      this.stadiumUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formStadium.name = row.name;
+      this.formStadium.latitude = row.latitude;
+      this.formStadium.longitude = row.longitude;
+      this.formStadium.city_name = row.cityName;
+      this.formStadium.cityId = row.cityId;
+      this.formImageStadium.idStadium = row.id;
+      this.formStadium.options = row.stadiumCategories;
       row.stadiumCategories.forEach((element) => {
-        this.formStadium.categoryStadium.push(element.stadiumCategoryId)
-      })
+        this.formStadium.categoryStadium.push(element.stadiumCategoryId);
+      });
     },
     updateData() {
       if (this.active == 0) {
-        this.$refs['formStadium'].validate((valid) => {
+        this.$refs["formStadium"].validate((valid) => {
           if (valid) {
             var stadium = {
               id: this.stadiumUpdate.id,
@@ -767,135 +773,135 @@ export default {
               name: this.formStadium.name,
               latitude: this.formStadium.latitude,
               longitude: this.formStadium.longitude,
-              stadiumStadiumCategories: []
-            }
-            console.log(this.formStadium.categoryStadium)
+              stadiumStadiumCategories: [],
+            };
+            console.log(this.formStadium.categoryStadium);
             if (this.categoryStadiumUpdate.length == 0) {
               this.formStadium.categoryStadium.forEach((element) => {
                 stadium.stadiumStadiumCategories.push({
                   stadiumId: 0,
-                  stadiumCategoryId: element
-                })
-              })
+                  stadiumCategoryId: element,
+                });
+              });
             } else {
               this.categoryStadiumUpdate.forEach((element) => {
-                console.log('sss', element)
+                console.log("sss", element);
                 stadium.stadiumStadiumCategories.push({
                   stadiumId: 0,
-                  stadiumCategoryId: element
-                })
-              })
+                  stadiumCategoryId: element,
+                });
+              });
             }
 
             axios
-              .put(this.url + 'Stadium', stadium)
+              .put(this.url + "Stadium", stadium)
               .then((response) => {
-                this.next()
+                this.next();
                 this.$notify({
-                  title: i18n.t('notifications.success'),
-                  message: i18n.t('notifications.uptadeSuccess'),
-                  type: 'success',
-                  duration: 2000
-                })
+                  title: i18n.t("notifications.success"),
+                  message: i18n.t("notifications.uptadeSuccess"),
+                  type: "success",
+                  duration: 2000,
+                });
 
-                this.getStadium()
+                this.getStadium();
               })
               .catch((error) => {
-                console.error(error.response)
-              })
+                console.error(error.response);
+              });
           }
-        })
+        });
       } else if (this.active == 1) {
-        this.dialogFormVisible = false
+        this.dialogFormVisible = false;
       }
     },
     /* CITIES */
     getCities(queryString, cb) {
       axios
-        .get(this.url + 'City')
+        .get(this.url + "City")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     createFilter(queryString) {
       return (link) => {
         return (
           link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
-        )
-      }
+        );
+      };
     },
     handleSelect(item) {
-      console.log(item)
-      this.formStadium.city_name = item.nameEnglish
-      this.formStadium.cityId = item.id
+      console.log(item);
+      this.formStadium.city_name = item.nameEnglish;
+      this.formStadium.cityId = item.id;
     },
     handleIconClick(ev) {
-      console.log(ev)
+      console.log(ev);
     },
     /* CATEGORY STADIUM */
 
     /* IMAGES */
     handleRemove(file, fileList) {
-      console.log(file, fileList)
+      console.log(file, fileList);
       axios
-        .delete(this.url + 'StadiumMediaImage/DeleteStadiumMedia?id=' + file.id)
+        .delete(this.url + "StadiumMediaImage/DeleteStadiumMedia?id=" + file.id)
         .then((response) => {
           this.$notify({
-            title: i18n.t('notifications.success'),
-            message: i18n.t('notifications.deleteSuccessfully'),
-            type: 'success',
-            duration: 2000
-          })
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     handleSuccess(response, file, fileList) {
-      this.formImageStadium.id = response.id
-      console.log(this.formImageStadium.id, response)
+      this.formImageStadium.id = response.id;
+      console.log(this.formImageStadium.id, response);
     },
     handlePictureCardPreview(file) {
-      console.log(file)
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
+      console.log(file);
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
     },
     handleClose(done) {
-      this.$confirm(i18n.t('modals.closeFormMsg'))
+      this.$confirm(i18n.t("modals.closeFormMsg"))
         .then((_) => {
-          done()
+          done();
         })
-        .catch((_) => {})
+        .catch((_) => {});
     },
     getImageByIdStadium(stadium) {
       axios
         .get(
-          this.url + 'StadiumMediaImage/GetAllByStadium?idStadium=' + stadium.id
+          this.url + "StadiumMediaImage/GetAllByStadium?idStadium=" + stadium.id
         )
         .then((response) => {
-          console.log(response.data)
-          this.fileList = response.data
+          console.log(response.data);
+          this.fileList = response.data;
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     /* OTHER */
     next() {
       /* Change step in form */
-      if (this.active++ > 1) this.active = 0
-    }
-  }
-}
+      if (this.active++ > 1) this.active = 0;
+    },
+  },
+};
 </script>
 <style lang="scss">
 </style>

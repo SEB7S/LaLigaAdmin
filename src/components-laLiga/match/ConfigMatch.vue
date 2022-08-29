@@ -164,7 +164,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :close-on-click-modal = "false"
+      :close-on-click-modal="false"
     >
       <el-form
         ref="formMatch"
@@ -273,7 +273,7 @@
     <el-dialog
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
-      :close-on-click-modal = "false"
+      :close-on-click-modal="false"
     >
       <el-table
         :data="pvData"
@@ -294,49 +294,49 @@
   </div>
 </template>
 <script>
-import i18n from '@/lang/index.js'
-import { fetchList, fetchPv } from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
-import moment from 'moment'
+import i18n from "@/lang/index.js";
+import { fetchList, fetchPv } from "@/api/article";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
+import moment from "moment";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'ConfigProvider',
+  name: "ConfigProvider",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   filters: {
-    dateformat: function(value) {
+    dateformat: function (value) {
       if (value) {
-        return moment(String(value)).format('MM/DD/YYYY HH:mm')
+        return moment(String(value)).format("MM/DD/YYYY HH:mm");
       }
-    }
+    },
   },
   data() {
     return {
@@ -350,30 +350,30 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
@@ -381,63 +381,58 @@ export default {
       /** FormStadium */
       formMatch: {
         club_guest_id: 0,
-        clubGuestName: '',
+        clubGuestName: "",
         club_home_id: 0,
-        clubHomeName: '',
+        clubHomeName: "",
         stadium_id: 0,
-        stadiumName: '',
-        date: '',
-        tournamentName: '',
-        tournament_id: 0
+        stadiumName: "",
+        date: "",
+        tournamentName: "",
+        tournament_id: 0,
       },
       rules: {
         clubGuestName: [
           {
             required: true,
-            message: i18n.t('forms.incompleteInput'),
-
-          }
+            message: i18n.t("forms.incompleteInput"),
+          },
         ],
         clubHomeName: [
           {
             required: true,
-            message: i18n.t('forms.incompleteInput'),
-
-          }
+            message: i18n.t("forms.incompleteInput"),
+          },
         ],
         stadiumName: [
           {
             required: true,
-            message: i18n.t('forms.incompleteInput'),
-
-          }
+            message: i18n.t("forms.incompleteInput"),
+          },
         ],
         date: [
           {
             required: true,
-            message: i18n.t('forms.incompleteInput'),
-   
-          }
+            message: i18n.t("forms.incompleteInput"),
+          },
         ],
         tournamentName: [
           {
             required: true,
-            message: i18n.t('forms.incompleteInput'),
-
-          }
-        ]
+            message: i18n.t("forms.incompleteInput"),
+          },
+        ],
       },
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() < Date.now()
-        }
+          return time.getTime() < Date.now();
+        },
       },
       matchUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      search: '',
-      matchList: []
-    }
+      search: "",
+      matchList: [],
+    };
   },
   /* INPUR SEARCH */
   computed: {
@@ -451,193 +446,197 @@ export default {
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
             item.stadiumName.toLowerCase().includes(this.search.toLowerCase())
-          )
-        })
+          );
+        });
       }
-    }
+    },
   },
   created() {
     /*     this.getList(); */
-    this.getMatch()
+    this.getMatch();
   },
   methods: {
     /* TABLE */
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getMatch()
+      this.listQuery.page = 1;
+      this.getMatch();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'name', 'document', 'phone', 'email']
-        const filterVal = ['id', 'name', 'document', 'phone', 'email']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "document", "phone", "email"];
+        const filterVal = ["id", "name", "document", "phone", "email"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Providers' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "Providers" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleClose(done) {
-      this.$confirm(i18n.t('modals.closeFormMsg'))
+      this.$confirm(i18n.t("modals.closeFormMsg"))
         .then((_) => {
-          done()
+          done();
         })
-        .catch((_) => {})
+        .catch((_) => {});
     },
     /* MATCH */
     resetTemp() {
       this.formMatch = {
         club_guest_id: 0,
-        clubGuestName: '',
+        clubGuestName: "",
         club_home_id: 0,
-        clubHomeName: '',
+        clubHomeName: "",
         stadium_id: 0,
-        stadiumName: '',
-        date: '',
-        tournamentName: '',
-        tournament_id: 0
-      }
+        stadiumName: "",
+        date: "",
+        tournamentName: "",
+        tournament_id: 0,
+      };
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.city_name = ''
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.city_name = "";
     },
     /* GET */
     getMatch() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'Match')
+        .get(this.url + "Match")
         .then((response) => {
-          console.log(response.data)
-          this.list = response.data
-          this.listLoading = false
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     /* POST */
     postMatch() {
-      this.$refs['formMatch'].validate((valid) => {
+      this.$refs["formMatch"].validate((valid) => {
         /* Extrayendo GMT de la fecha */
-        const d = this.formMatch.date.toString()
-        const e = d.split('GMT')
-        const f = e[1].split(' ')
-        const g = parseInt(f[0])
-        console.log(g)
+        const d = this.formMatch.date.toString();
+        const e = d.split("GMT");
+        const f = e[1].split(" ");
+        const g = parseInt(f[0]);
+        console.log(g);
         var match = {
           club_home_id: this.formMatch.club_home_id,
           club_guest_id: this.formMatch.club_guest_id,
           stadium_id: this.formMatch.stadium_id,
           date: this.formMatch.date,
           tournament_id: this.formMatch.tournament_id,
-          timeZone: g
-        }
+          timeZone: g,
+        };
         if (valid) {
           axios
-            .post(this.url + 'Match', match)
+            .post(this.url + "Match", match)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: i18n.t('notifications.success'),
-                message: i18n.t('notifications.providerAddedSuccessfully'),
-                type: 'success',
-                duration: 2000
-              })
-              this.getMatch()
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.providerAddedSuccessfully"),
+                type: "success",
+                duration: 2000,
+              });
+              this.getMatch();
+              this.resetForm("formMatch")
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     /* UPDATE */
     handleUpdate(row) {
-      console.log(row)
-      this.matchUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formMatch.club_guest_id = row.club_guest_id
-      this.formMatch.clubGuestName = row.clubGuest
-      this.formMatch.club_home_id = row.club_home_id
-      this.formMatch.clubHomeName = row.clubHome
-      this.formMatch.stadium_id = row.stadium_id
-      this.formMatch.stadiumName = row.stadiumName
-      this.formMatch.tournamentName = row.tournamentName
-      this.formMatch.tournament_id = row.tournament_id
-      this.formMatch.date = new Date(row.date)
+      console.log(row);
+      this.matchUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formMatch.club_guest_id = row.club_guest_id;
+      this.formMatch.clubGuestName = row.clubGuest;
+      this.formMatch.club_home_id = row.club_home_id;
+      this.formMatch.clubHomeName = row.clubHome;
+      this.formMatch.stadium_id = row.stadium_id;
+      this.formMatch.stadiumName = row.stadiumName;
+      this.formMatch.tournamentName = row.tournamentName;
+      this.formMatch.tournament_id = row.tournament_id;
+      this.formMatch.date = new Date(row.date);
     },
     updateData() {
-      this.$refs['formMatch'].validate((valid) => {
+      this.$refs["formMatch"].validate((valid) => {
         if (valid) {
-          console.log(this.formMatch.date)
+          console.log(this.formMatch.date);
           /* Extrayendo GMT de la fecha */
-          const d = this.formMatch.date.toString()
-          const e = d.split('GMT')
-          const f = e[1].split(' ')
-          const g = parseInt(f[0])
-          console.log(g)
+          const d = this.formMatch.date.toString();
+          const e = d.split("GMT");
+          const f = e[1].split(" ");
+          const g = parseInt(f[0]);
+          console.log(g);
           var match = {
             id: this.matchUpdate.id,
             club_guest_id: this.formMatch.club_guest_id,
@@ -645,201 +644,200 @@ export default {
             stadium_id: this.formMatch.stadium_id,
             date: this.formMatch.date,
             tournament_id: this.formMatch.tournament_id,
-            timeZone: g
-          }
+            timeZone: g,
+          };
           axios
-            .put(this.url + 'Match', match)
+            .put(this.url + "Match", match)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: i18n.t('notifications.success'),
-                message: i18n.t('notifications.updateSuccess'),
-                type: 'success',
-                duration: 2000
-              })
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.updateSuccess"),
+                type: "success",
+                duration: 2000,
+              });
 
-              this.getMatch()
+              this.getMatch();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.matchList = val
+      this.matchList = val;
     },
     handleDelete(row, selected) {
-      var id = selected ? row : row.id
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + 'Match/' + id)
+        .delete(this.url + "Match/" + id)
         .then((response) => {
           this.$notify({
-            title: i18n.t('notifications.success'),
-            message: i18n.t('notifications.deleteSuccessfully'),
-            type: 'success',
-            duration: 2000
-          })
-          this.getMatch()
-          this.showReviewer = false
-          this.matchList = []
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
+          this.getMatch();
+          this.showReviewer = false;
+          this.matchList = [];
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     confirmDelete(row) {
       this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-            message: i18n.t('notifications.deleteComplete')
-          })
-          this.handleDelete(row, false)
+            type: "success",
+            message: i18n.t("notifications.deleteComplete"),
+          });
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
     handleDeleteAll() {
       this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          type: i18n.t('notifications.success'),
-          message: i18n.t('notifications.deleteComplete'),
-          type: 'warning'
+          type: i18n.t("notifications.success"),
+          message: i18n.t("notifications.deleteComplete"),
+          type: "warning",
         }
       )
         .then(() => {
           this.$message({
-            type: 'success',
-            message: i18n.t('notifications.deleteComplete')
-          })
+            type: "success",
+            message: i18n.t("notifications.deleteComplete"),
+          });
           this.matchList.forEach((value) => {
-            console.log(value)
-            this.handleDelete(value, false)
-          })
+            console.log(value);
+            this.handleDelete(value, false);
+          });
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.delteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.delteCanceled"),
+          });
+        });
     },
     /* CLUB */
     getClub(queryString, cb) {
       axios
-        .get(this.url + 'Club')
+        .get(this.url + "Club")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     createFilter(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-      }
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
     },
     handleSelectHome(item) {
-      console.log(item)
-      this.formMatch.clubHomeName = item.name
-      this.formMatch.club_home_id = item.id
-      this.formMatch.stadium_id = item.stadiumId
-      this.formMatch.stadiumName = item.stadiumName
+      console.log(item);
+      this.formMatch.clubHomeName = item.name;
+      this.formMatch.club_home_id = item.id;
+      this.formMatch.stadium_id = item.stadiumId;
+      this.formMatch.stadiumName = item.stadiumName;
     },
     handleIconClickHome(ev) {
-      console.log(ev)
+      console.log(ev);
     },
     handleSelectGuest(item) {
-      console.log(item)
-      this.formMatch.clubGuestName = item.name
-      this.formMatch.club_guest_id = item.id
+      console.log(item);
+      this.formMatch.clubGuestName = item.name;
+      this.formMatch.club_guest_id = item.id;
     },
     handleIconClickGuest(ev) {
-      console.log(ev)
+      console.log(ev);
     },
     /* STADIUM */
     getStadium(queryString, cb) {
       axios
-        .get(this.url + 'Stadium')
+        .get(this.url + "Stadium")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilterStadium(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     createFilterStadium(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-      }
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
     },
     handleSelectStadium(item) {
-      console.log(item)
-      this.formMatch.stadiumName = item.name
-      this.formMatch.stadium_id = item.id
+      console.log(item);
+      this.formMatch.stadiumName = item.name;
+      this.formMatch.stadium_id = item.id;
     },
     handleIconClickStadium(ev) {
-      console.log(ev)
+      console.log(ev);
     },
     /* TOURNAMENT */
     getTournament(queryString, cb) {
       axios
-        .get(this.url + 'Tournament')
+        .get(this.url + "Tournament")
         .then((response) => {
-          console.log(response.data)
-          var links = response.data
+          console.log(response.data);
+          var links = response.data;
           var results = queryString
             ? links.filter(this.createFilterTournament(queryString))
-            : links
-          cb(results)
+            : links;
+          cb(results);
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     createFilterTournament(queryString) {
       return (link) => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-      }
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
     },
     handleSelectTournament(item) {
-      console.log(item)
-      this.formMatch.tournamentName = item.name
-      this.formMatch.tournament_id = item.id
+      console.log(item);
+      this.formMatch.tournamentName = item.name;
+      this.formMatch.tournament_id = item.id;
     },
     handleIconClickTournament(ev) {
-      console.log(ev)
-    }
-  }
-}
+      console.log(ev);
+    },
+  },
+};
 </script>
 <style lang="scss">
-
 </style>

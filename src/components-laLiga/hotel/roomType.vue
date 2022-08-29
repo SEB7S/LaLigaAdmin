@@ -151,7 +151,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :close-on-click-modal = "false"
+      :close-on-click-modal="false"
     >
       <el-form
         ref="formRoomType"
@@ -167,11 +167,7 @@
           <el-input v-model="formRoomType.nameEspanish" />
         </el-form-item>
         <el-form-item :label="$t('hotel.max_pax')" prop="maxPax">
-          <el-input-number
-            v-model="formRoomType.maxPax"
-            :min="1"
-            :max="5"
-          />
+          <el-input-number v-model="formRoomType.maxPax" :min="1" :max="5" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -190,7 +186,7 @@
     <el-dialog
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
-      :close-on-click-modal = "false"
+      :close-on-click-modal="false"
     >
       <el-table
         :data="pvData"
@@ -215,42 +211,42 @@ import {
   fetchList,
   fetchPv,
   createArticle,
-  updateArticle
-} from '@/api/article'
-import i18n from '@/lang/index.js'
-import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import axios from 'axios'
+  updateArticle,
+} from "@/api/article";
+import i18n from "@/lang/index.js";
+import waves from "@/directive/waves"; // waves directive
+import { parseTime } from "@/utils";
+import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
+import axios from "axios";
 const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
+];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'CategoryProvider',
+  name: "CategoryProvider",
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
-    }
+      return calendarTypeKeyValue[type];
+    },
   },
   data() {
     return {
@@ -258,37 +254,37 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      search: '',
+      search: "",
       listQuery: {
         page: 1,
         limit: 10,
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: '+id'
+        sort: "+id",
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published",
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create",
       },
       dialogPvVisible: false,
       pvData: [],
@@ -296,43 +292,40 @@ export default {
         nameEnglish: [
           {
             required: true,
-            message:  i18n.t('forms.nameIncomplete'),
-            trigger: 'blur'
-          }
+            message: i18n.t("forms.nameIncomplete"),
+          },
         ],
         nameEspanish: [
           {
             required: true,
-            message:  i18n.t('forms.nameIncomplete'),
-            trigger: 'blur'
-          }
+            message: i18n.t("forms.nameIncomplete"),
+          },
         ],
         maxPax: [
           {
             required: true,
-            message:  i18n.t('forms.paxIncomplete'),
-            trigger: 'blur'
-          }
-        ]
+            message: i18n.t("forms.paxIncomplete"),
+          },
+        ],
       },
       downloadLoading: false,
       /** FormCity  */
-      city_name: '',
-      city_nameEs: '',
+      city_name: "",
+      city_nameEs: "",
       cities: [],
       /** FormStadium */
       formRoomType: {
-        nameEnglish: '',
-        nameEspanish: '',
+        nameEnglish: "",
+        nameEspanish: "",
         maxPax: 1,
-        stadiumId: '',
-        stadiumName: ''
+        stadiumId: "",
+        stadiumName: "",
       },
       hotelUpdate: [],
       roomTypeList: [],
       /* EndPoint */
-      url: this.$store.getters.url
-    }
+      url: this.$store.getters.url,
+    };
   },
   /* INPUT SEARCH */
   computed: {
@@ -344,266 +337,262 @@ export default {
               .toLowerCase()
               .includes(this.search.toLowerCase()) ||
             item.nameEspanish.toLowerCase().includes(this.search.toLowerCase())
-          )
-        })
+          );
+        });
       }
-    }
+    },
   },
   created() {
-    this.getRoomType()
+    this.getRoomType();
   },
   methods: {
     /* TABLE */
     getList() {
-      this.listLoading = true
+      this.listLoading = true;
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data.items;
+        this.total = response.data.total;
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false
-        }, 1.5 * 1000)
-      })
+          this.listLoading = false;
+        }, 1.5 * 1000);
+      });
     },
     handleFilter() {
-      this.listQuery.page = 1
-      this.getRoomType()
+      this.listQuery.page = 1;
+      this.getRoomType();
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+        message: "操作Success",
+        type: "success",
+      });
+      row.status = status;
     },
     sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
+      const { prop, order } = data;
+      if (prop === "id") {
+        this.sortByID(order);
       }
     },
     sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (order === "ascending") {
+        this.listQuery.sort = "+id";
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = "-id";
       }
-      this.handleFilter()
+      this.handleFilter();
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
+        this.pvData = response.data.pvData;
+        this.dialogPvVisible = true;
+      });
     },
     handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then((excel) => {
-        const tHeader = ['id', 'name', 'Ciudad', 'longitude', 'latitude']
-        const filterVal = ['id', 'name', 'cityId', 'longitude', 'latitude']
-        const data = this.formatJson(filterVal)
-        const date = new Date()
+      this.downloadLoading = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
+        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const data = this.formatJson(filterVal);
+        const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: 'Stadiums' + date
-        })
-        this.downloadLoading = false
-      })
+          filename: "Stadiums" + date,
+        });
+        this.downloadLoading = false;
+      });
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
+          if (j === "timestamp") {
+            return parseTime(v[j]);
           } else {
-            return v[j]
+            return v[j];
           }
         })
-      )
+      );
     },
-    getSortClass: function(key) {
+    getSortClass: function (key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleClose(done) {
-      this.$confirm(i18n.t('modals.closeFormMsg'))
+      this.$confirm(i18n.t("modals.closeFormMsg"))
         .then((_) => {
-          done()
+          done();
         })
-        .catch((_) => {})
+        .catch((_) => {});
     },
     /* ROOM TYPE */
     resetTemp() {
       this.formRoomType = {
-        nameEnglish: '',
-        nameEspanish: '',
+        nameEnglish: "",
+        nameEspanish: "",
         maxPax: 1,
-        stadiumId: '',
-        stadiumName: ''
-      }
+        stadiumId: "",
+        stadiumName: "",
+      };
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     /* GET */
     getRoomType() {
-      this.listLoading = true
+      this.listLoading = true;
       axios
-        .get(this.url + 'RoomType')
+        .get(this.url + "RoomType")
         .then((response) => {
-          console.log(response.data)
-          this.list = response.data
-          this.listLoading = false
+          console.log(response.data);
+          this.list = response.data;
+          this.listLoading = false;
         })
         .catch((error) => {
-          this.status = 'error'
-        })
+          this.status = "error";
+        });
     },
     /* POST */
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.city_name = ''
+      this.resetTemp();
+      this.dialogStatus = "create";
+      this.dialogFormVisible = true;
+      this.city_name = "";
     },
     postRoomType() {
-      this.$refs['formRoomType'].validate((valid) => {
+      this.$refs["formRoomType"].validate((valid) => {
         var roomType = {
           nameEnglish: this.formRoomType.nameEnglish,
           nameEspanish: this.formRoomType.nameEspanish,
-          maxPax: this.formRoomType.maxPax
-        }
+          maxPax: this.formRoomType.maxPax,
+        };
         if (valid) {
           axios
-            .post(this.url + 'RoomType', roomType)
+            .post(this.url + "RoomType", roomType)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: i18n.t('notifications.success'),
-                message: i18n.t('notifications.cathegoryAddedSuccess'),
-                type: 'success',
-                duration: 2000
-              })
-              this.getRoomType()
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.cathegoryAddedSuccess"),
+                type: "success",
+                duration: 2000,
+              });
+              this.getRoomType();
+              this.resetForm("formRoomType");
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     /* UPDATE */
     handleUpdate(row) {
-      console.log(row)
-      this.hotelUpdate = row
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.formRoomType.nameEnglish = row.nameEnglish
-      this.formRoomType.nameEspanish = row.nameEspanish
-      this.formRoomType.maxPax = row.maxPax
-      this.formRoomType.stadiumId = row.stadiumId
+      console.log(row);
+      this.hotelUpdate = row;
+      this.dialogStatus = "update";
+      this.dialogFormVisible = true;
+      this.formRoomType.nameEnglish = row.nameEnglish;
+      this.formRoomType.nameEspanish = row.nameEspanish;
+      this.formRoomType.maxPax = row.maxPax;
+      this.formRoomType.stadiumId = row.stadiumId;
     },
     updateData() {
-      this.$refs['formRoomType'].validate((valid) => {
+      this.$refs["formRoomType"].validate((valid) => {
         if (valid) {
           var roomType = {
             id: this.hotelUpdate.id,
             nameEnglish: this.formRoomType.nameEnglish,
             nameEspanish: this.formRoomType.nameEspanish,
-            maxPax: this.formRoomType.maxPax
-          }
+            maxPax: this.formRoomType.maxPax,
+          };
           axios
-            .put(this.url + 'RoomType', roomType)
+            .put(this.url + "RoomType", roomType)
             .then((response) => {
-              this.dialogFormVisible = false
+              this.dialogFormVisible = false;
               this.$notify({
-                title: i18n.t('notifications.success'),
-                message: i18n.t('notifications.updateSuccess'),
-                type: 'success',
-                duration: 2000
-              })
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.updateSuccess"),
+                type: "success",
+                duration: 2000,
+              });
 
-              this.getRoomType()
+              this.getRoomType();
             })
             .catch((error) => {
-              console.error(error.response)
-            })
+              console.error(error.response);
+            });
         }
-      })
+      });
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.roomTypeList = val
+      this.roomTypeList = val;
     },
     handleDelete(row, selected) {
-      var id = selected ? row : row.id
+      var id = selected ? row : row.id;
       axios
-        .delete(this.url + 'RoomType/' + id)
+        .delete(this.url + "RoomType/" + id)
         .then((response) => {
           this.$notify({
-            title: i18n.t('notifications.success'),
-            message: i18n.t('notifications.deleteSuccessfully'),
-            type: 'success',
-            duration: 2000
-          })
-          this.getRoomType()
-          this.showReviewer = false
-          this.roomTypeList = []
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
+          this.getRoomType();
+          this.showReviewer = false;
+          this.roomTypeList = [];
         })
         .catch((error) => {
-          console.error(error.response)
-        })
+          console.error(error.response);
+        });
     },
     confirmDelete(row) {
-      this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('warning'),
-        {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
-        }
-      )
+      this.$confirm(i18n.t("modals.deleteItemWarning"), i18n.t("warning"), {
+        confirmButtonText: i18n.t("modals.confirmButton"),
+        cancelButtonText: i18n.t("modals.cancelButton"),
+        type: "warning",
+      })
         .then(() => {
           this.$message({
-            type: 'success',
-            message: i18n.t('notifications.deleteComplete')
-          })
-          this.handleDelete(row, false)
+            type: "success",
+            message: i18n.t("notifications.deleteComplete"),
+          });
+          this.handleDelete(row, false);
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
     handleDeleteAll() {
-      this.$confirm(
-        i18n.t('modals.deleteItemWarning'),
-        i18n.t('warning'),
-        {
-          confirmButtonText: i18n.t('modals.confirmButton'),
-          cancelButtonText: i18n.t('modals.cancelButton'),
-          type: 'warning'
-        }
-      )
+      this.$confirm(i18n.t("modals.deleteItemWarning"), i18n.t("warning"), {
+        confirmButtonText: i18n.t("modals.confirmButton"),
+        cancelButtonText: i18n.t("modals.cancelButton"),
+        type: "warning",
+      })
         .then(() => {
           this.$message({
-            type: 'success',
-            message: i18n.t('notifications.deleteComplete')
-          })
+            type: "success",
+            message: i18n.t("notifications.deleteComplete"),
+          });
           this.roomTypeList.forEach((value) => {
-            console.log(value)
-            this.handleDelete(value, false)
-          })
+            console.log(value);
+            this.handleDelete(value, false);
+          });
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n.t('notifications.deleteCanceled')
-          })
-        })
-    }
-  }
-}
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
+    },
+  },
+};
 </script>

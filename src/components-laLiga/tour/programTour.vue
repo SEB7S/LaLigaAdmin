@@ -1024,9 +1024,9 @@ export default {
       this.seasons.map((season) => {
         season.categories.map((cat) => {
           if (cat.categoryId != idCat || season.seasonId != idSeason) {
-            if (cat.disableCategory != status) {
+    
               cat.disableCategory = status;
-            }
+            
           }
         });
       });
