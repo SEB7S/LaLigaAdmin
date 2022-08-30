@@ -1396,9 +1396,11 @@ export default {
                 duration: 2000,
               });
               this.getSeason();
+              this.fullscreenLoading = false;
             })
             .catch((error) => {
               console.error(error.response);
+              this.fullscreenLoading = false;
             });
         } else {
           axios
@@ -1762,14 +1764,15 @@ export default {
     handleCheckAllChange(val) {
       console.log(val);
       val
-        ? this.checkTour(this.listTours, this.disabledButton = true)
-        : (this.checkedTours = this.aListTours , this.disabledButton = false);
+        ? this.checkTour(this.listTours, (this.disabledButton = true))
+        : ((this.checkedTours = this.aListTours),
+          (this.disabledButton = false));
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
       this.aListToursFinal = [];
       var copyValue = value;
-      
+
       /* CONVIRTIENDO ARRAY DE STRING EN ARRAY DE OBJETS  */
       value.forEach((element, index) => {
         this.aListTours.forEach((element2, index) => {
@@ -1796,15 +1799,23 @@ export default {
       this.checkAll = checkedCount === this.aListTours.length;
       this.isIndeterminate =
         checkedCount > 0 && checkedCount < this.aListTours.length;
-      if(this.listTours.tourInstances.length == value.length){
-        this.disabledButton = false
-      } else{
-        this.disabledButton = true
+      if (this.listTours.tourInstances.length == value.length) {
+        this.disabledButton = false;
+      } else {
+        this.disabledButton = true;
       }
-        console.log(value, value.length, this.listTours.tourInstances, this.aListToursFinal)
+      console.log(
+        value,
+        value.length,
+        this.listTours.tourInstances,
+        this.aListToursFinal
+      );
     },
     handleClick(tab, event) {
       console.log(tab, event);
+      if (tab.name === "first") {
+        this.disabledButton = true;
+      }
     },
     /* ASIGAR SEASONS A TOURS */
     getTourCategorySeasonsTours(tour, listTour) {
@@ -1900,25 +1911,31 @@ export default {
           this.checkedTours.push(element.nameInstance);
           this.aListTours.forEach((element2, index2) => {
             if (element2.nameInstance == element.nameInstance) {
-              if (index == tour.tourInstances.length - 1) {
-                this.getTourCategorySeasonsTours(element, element2);
-              }
+              this.getTourCategorySeasonsTours(element, element2);
+
               element2.disabled = true;
-              console.log(index2)
-              this.countCheckedTours = index2 + 1
-              
+              console.log(index2);
+              this.countCheckedTours = index2 + 1;
             }
           });
         });
       }
-      if((this.countCheckedTours == tour.tourInstances.length) && this.activeName === 'second' ){
-        console.log("si")
-        this.disabledButton = false
-      }else {
-        this.disabledButton = true
-        
+      if (
+        this.countCheckedTours == tour.tourInstances.length &&
+        this.activeName === "second"
+      ) {
+        console.log("si");
+        this.disabledButton = false;
+      } else {
+        this.disabledButton = true;
       }
-      console.log("count",this.countCheckedTours, this.countCheckedTours == this.aListTours.length && this.activeName === 'second',  this.disabledButton );
+      console.log(
+        "count",
+        this.countCheckedTours,
+        this.countCheckedTours == this.aListTours.length &&
+          this.activeName === "second",
+        this.disabledButton
+      );
     },
     orderList() {
       var aTourChildren = [];
