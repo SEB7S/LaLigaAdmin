@@ -980,11 +980,13 @@ export default {
         chooseProvider: "",
         price: 0,
       });
-      this.disableCategorySeasons(
-        this.newAccommodation.categoryId,
-        this.newAccommodation.seasonId,
-        false
-      );
+      if (this.getSeasons.length != 0) {
+        this.disableCategorySeasons(
+          this.newAccommodation.categoryId,
+          this.newAccommodation.seasonId,
+          false
+        );
+      }
     },
     /* Añadiendo una nueva acco */
     PostNewAcc() {
@@ -1056,11 +1058,13 @@ export default {
         if (item.idCatSeason) {
           this.HandleDeleteAcc(item.idCatSeason);
         }
-        this.disableCategorySeasons(
-          this.newAccommodation.categoryId,
-          this.newAccommodation.seasonId,
-          true
-        );
+        if (this.getSeasons.length != 0) {
+          this.disableCategorySeasons(
+            this.newAccommodation.categoryId,
+            this.newAccommodation.seasonId,
+            true
+          );
+        }
       }
     },
     HandleDeleteAcc(id) {
