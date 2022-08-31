@@ -78,7 +78,9 @@
                       <el-form-item
                         style="margin: 0"
                         prop="label"
-                        :rules="formRules.name[0]"
+                        :rules="
+                          season.status ? formRules.name[0] : formRules.name2[0]
+                        "
                       >
                         <el-input
                           :readonly="season.changeName"
@@ -155,7 +157,7 @@
                   <el-form-item
                     class="card-form-item"
                     prop="price"
-                    :rules="formRules.price[0]"
+                    :rules="(season.status && category.disableCategory) ? formRules.price[0] : formRules.price2[0]"
                   >
                     <el-input v-model="acc.price"> </el-input>
                   </el-form-item>
@@ -935,6 +937,14 @@ export default {
         ],
         price: [{ validator: priceValidator, trigger: "blur" }],
         accoType: [{}],
+        name2: [
+          {
+            required: false,
+            message: i18n.t("forms.nameIncomplete"),
+            trigger: "blur",
+          },
+        ],
+        price2: [{ required: false, trigger: "blur" }],
       },
 
       //END DATA FOR SEASON TAB ------------------------------------------------
@@ -990,8 +1000,10 @@ export default {
     },
     /* Añadiendo una nueva acco */
     PostNewAcc() {
-      this.fullscreenLoading = true;
+      
       if (this.isEditAcc) {
+        console.log("entre", this.newAccommodation)
+        this.fullscreenLoading = true;
         let acc = {
           priority: true,
           tourCategoryId: this.newAccommodation.categoryId,
@@ -999,7 +1011,7 @@ export default {
           roomTypeId: this.newAccommodation.accommodationId,
           price: this.newAccommodation.price,
           disableCategory: true,
-          isActive: this.newAccommodation.isActive,
+          isActive: this.newAccommodation.status,
         };
         axios
           .post(this.url + "TourCategorySeason", acc)
@@ -1356,8 +1368,32 @@ export default {
       this.caculateDate(this.listTours); */
       var validator = true;
       this.fullscreenLoading = true;
+      /*       this.$refs.seasonForm.forEach((seasons) => {
+        if (seasons.$options.propsData.model.status) {
+          console.log(
+            "INACTIVO",
+            seasons.$options.propsData.model.status,
+            this.$refs
+          );
+          if (seasons.$vnode.tag == "vue-component-43-ElForm") {
+            seasons.validate((valid) => {
+              if (!valid) {
+                validator = false;
+              }
+            });
+          }
+          if (seasons.$vnode.tag == "vue-component-40-ElTooltip") {
+            seasons.$children[0].validate((valid) => {
+              if (!valid) {
+                validator = false;
+              }
+            });
+          }
+        }
+      }); */
       this.$refs.seasons.$children.forEach((card) => {
         card.$children[0].$children.forEach((cardItems) => {
+          /*           console.log("aquí",this.$refs) */
           if (cardItems.$vnode.tag == "vue-component-43-ElForm") {
             cardItems.validate((valid) => {
               if (!valid) {
@@ -1428,6 +1464,7 @@ export default {
           type: "error",
           duration: 2000,
         });
+        this.fullscreenLoading = false;
       }
     },
     handleSelect(item) {
