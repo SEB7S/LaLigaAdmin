@@ -65,10 +65,11 @@
                   effect="dark"
                   :content="$t('tour.clickToEdit')"
                   placement="top"
+                  :disabled="index < 3"
                 >
                   <span
                     class="card-name"
-                    :class="{ 'card-name-onfocus': season.changeName == false }"
+                    :class="[{ 'card-name-onfocus': season.changeName == false}, {'card-name-hover': index > 2}]"
                     :ref="'name' + index"
                     @keyup.enter="verifyCardName(index, $event)"
                     @focusout="verifyCardName(index, $event)"
@@ -1200,7 +1201,7 @@ export default {
         });
     },
     verifyCardName(n, event) {
-      if (this.seasons[n].label != "") {
+      if (this.seasons[n].label != "" && n > 2 ) {
         switch (event.type) {
           case "click":
             this.seasons[n].changeName = false;
@@ -2442,7 +2443,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.card-name {
+.card-name, .card-name-hover:hover{
   display: flex;
   max-width: 60%;
   box-sizing: border-box;
@@ -2450,7 +2451,7 @@ export default {
   transition: 0.2s ease;
   border: 1px solid transparent;
 }
-.card-name:hover,
+.card-name-hover:hover,
 .card-name-onfocus {
   border-color: #e6e6e6;
   -webkit-box-shadow: -1px 3px 12px 2px rgba(173, 173, 173, 0.2);
@@ -2469,6 +2470,24 @@ export default {
   border-bottom-right-radius: 0;
   border-color: transparent;
 }
+.card-name input:focus{
+  border: none;
+  border-color: transparent;
+}
+.card-name-hover input:focus, .card-name-hover input:hover{
+  border: 1px solid;
+  border-color: #455BA0;
+}
+.card-name input:hover{
+  border: none;
+  outline: none;
+  border-color: transparent;
+  cursor: default;
+}
+.card-name-hover input:hover{
+  border: 1px solid #e6e6e6;
+  cursor: text;
+}
 
 .card-name input:read-only {
   flex-basis: 0;
@@ -2484,7 +2503,7 @@ export default {
   width: 50px;
 }
 
-.card-name:hover button,
+.card-name-hover:hover button,
 .card-name-onfocus button {
   opacity: 1;
 }
