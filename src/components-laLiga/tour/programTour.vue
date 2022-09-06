@@ -69,7 +69,10 @@
                 >
                   <span
                     class="card-name"
-                    :class="[{ 'card-name-onfocus': season.changeName == false}, {'card-name-hover': index > 2}]"
+                    :class="[
+                      { 'card-name-onfocus': season.changeName == false },
+                      { 'card-name-hover': index > 2 },
+                    ]"
                     :ref="'name' + index"
                     @keyup.enter="verifyCardName(index, $event)"
                     @focusout="verifyCardName(index, $event)"
@@ -158,7 +161,11 @@
                   <el-form-item
                     class="card-form-item"
                     prop="price"
-                    :rules="(season.status && category.disableCategory) ? formRules.price[0] : formRules.price2[0]"
+                    :rules="
+                      season.status && category.disableCategory
+                        ? formRules.price[0]
+                        : formRules.price2[0]
+                    "
                   >
                     <el-input v-model="acc.price"> </el-input>
                   </el-form-item>
@@ -233,8 +240,8 @@
             v-model="checkedTours"
             @change="handlecheckedToursChange"
           >
-            <el-row :gutter="20">
-              <el-col :span="6"
+            <el-row type="flex" class="space-bet"  :gutter="20">
+              <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="6"
                 ><div class="grid-content bg-purple">
                   <el-checkbox
                     v-for="(tourDay, index) in aListTours"
@@ -250,7 +257,7 @@
                   </el-checkbox>
                 </div></el-col
               >
-              <el-col :span="6">
+              <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="6">
                 <div
                   v-for="(tourDay, index) in aListTours"
                   :label="tourDay.nameInstance"
@@ -1001,9 +1008,8 @@ export default {
     },
     /* Añadiendo una nueva acco */
     PostNewAcc() {
-      
       if (this.isEditAcc) {
-        console.log("entre", this.newAccommodation)
+        console.log("entre", this.newAccommodation);
         this.fullscreenLoading = true;
         let acc = {
           priority: true,
@@ -1201,7 +1207,7 @@ export default {
         });
     },
     verifyCardName(n, event) {
-      if (this.seasons[n].label != "" && n > 2 ) {
+      if (this.seasons[n].label != "" && n > 2) {
         switch (event.type) {
           case "click":
             this.seasons[n].changeName = false;
@@ -1333,6 +1339,7 @@ export default {
     },
     /* Cuando el Tour no tiene temporadas configuradas */
     getSeasonDefault() {
+      let firstPriority = true;
       axios
         .get(this.url + "TourSeason")
         .then((response) => {
@@ -1340,9 +1347,10 @@ export default {
 
           response.data.forEach((season, index) => {
             if (season.isdefault) {
-              if (index == 0) {
+              if (firstPriority) {
                 this.categoryDefault = season;
               }
+              console.log(index, firstPriority);
               this.seasons.push({
                 seasonId: season.id,
                 label: season.name,
@@ -1350,12 +1358,16 @@ export default {
                 status: true,
                 isActive: true,
                 changeName: true,
-                priority: index == 0 ? true : false,
+                priority: firstPriority ? firstPriority : false,
                 applyToTourParent: false,
                 categories: [],
               });
+              if (firstPriority) {
+                firstPriority = false;
+              }
             }
           });
+
           this.AddSeasonsCategories();
         })
 
@@ -1812,6 +1824,7 @@ export default {
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
+      console.log("hola",value);
       this.aListToursFinal = [];
       var copyValue = value;
 
@@ -1906,12 +1919,12 @@ export default {
       console.log(this.aListTours);
     },
     itemSelected(item, index) {
+      console.log("hola", this.aListToursFinal, item)
       let season = item.seasonName;
       item.seasons = season.idSeasons;
       item.seasonName = season.label;
       this.seasonsId = item.seasons;
-      /*       console.log("seleccionar", item, season, this.aListToursFinal, index); */
-      if (item.idTourCategorySeasonTour.length > 0) {
+      if (item.idTourCategorySeasonTour && item.idTourCategorySeasonTour.length > 0) {
         item.idTourCategorySeasonTour.forEach((id, index) => {
           this.updateTourCategorySeasonsTours(
             id,
@@ -1920,6 +1933,12 @@ export default {
           );
         });
       }
+      this.aListToursFinal.forEach(index => {
+        if(item.nameInstance == index.nameInstance){
+          index.seasonName = item.seasonName
+          index.seasons = item.seasons
+        }
+      })
     },
     updateTourCategorySeasonsTours(id, tourId, tourCategorySeasonId) {
       let tourCatSeason = {
@@ -2406,6 +2425,9 @@ export default {
   .el-dialog {
     width: 100% !important;
   }
+  .space-bet{
+    justify-content: space-between !important;
+  }
 }
 .space {
   margin: 3px;
@@ -2443,7 +2465,8 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.card-name, .card-name-hover:hover{
+.card-name,
+.card-name-hover:hover {
   display: flex;
   max-width: 60%;
   box-sizing: border-box;
@@ -2470,21 +2493,22 @@ export default {
   border-bottom-right-radius: 0;
   border-color: transparent;
 }
-.card-name input:focus{
+.card-name input:focus {
   border: none;
   border-color: transparent;
 }
-.card-name-hover input:focus, .card-name-hover input:hover{
+.card-name-hover input:focus,
+.card-name-hover input:hover {
   border: 1px solid;
-  border-color: #455BA0;
+  border-color: #455ba0;
 }
-.card-name input:hover{
+.card-name input:hover {
   border: none;
   outline: none;
   border-color: transparent;
   cursor: default;
 }
-.card-name-hover input:hover{
+.card-name-hover input:hover {
   border: 1px solid #e6e6e6;
   cursor: text;
 }
@@ -2554,7 +2578,6 @@ export default {
 .add-card {
   height: 732px;
   width: 100%;
-
   display: flex;
   justify-content: center;
   align-content: center;
