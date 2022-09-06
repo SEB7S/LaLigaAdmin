@@ -128,7 +128,8 @@ export default {
     providerHotel: 'Proveedor',
     status: 'Estado',
     image: 'Cargar Imágen',
-    description: 'Descripción',
+    descriptionEN: 'Descripción (EN)',
+    descriptionES: 'Descripción (ES)',
     max_pax: 'Max Pax',
 
   },

@@ -133,7 +133,8 @@ export default {
     providerHotel: 'Provider',
     status: 'Status',
     image: 'Choose Image',
-    description: 'Description',
+    descriptionEN: 'Description (En)',
+    descriptionES: 'Description (Es)',
     max_pax: 'Ocupation',
   },
   provider: {

@@ -399,11 +399,21 @@
               <i class="el-icon-plus" />
             </el-upload>
           </el-form-item>
-          <el-form-item :label="$t('hotel.description')">
+          <el-form-item :label="$t('hotel.descriptionEN')">
             <el-input
-              v-model="description"
+              v-model="descriptionEN"
               type="textarea"
-              :rows="2"
+              :rows="6"
+              placeholder="Please input"
+              maxlength="500"
+              show-word-limit
+            />
+          </el-form-item>
+          <el-form-item :label="$t('hotel.descriptionES')">
+            <el-input
+              v-model="descriptionES"
+              type="textarea"
+              :rows="6"
               placeholder="Please input"
               maxlength="500"
               show-word-limit
@@ -553,7 +563,9 @@ export default {
       /* EndPoint */
       url: this.$store.getters.url,
       urlImgage: this.$store.getters.urlImgage,
-      description: "",
+      descriptionES: "",
+      descriptionEN: "",
+      idDescription: 0,
       search: "",
       rules: {
         nameEnglish: [
@@ -849,6 +861,23 @@ export default {
           this.status = "error";
         });
     },
+    getDescriptions(hotel) {
+      axios
+        .get(
+          this.url +
+            "HotelTextContent/GetAllHotelTextContentByHotelId?id=" +
+            hotel.id
+        )
+        .then((response) => {
+          console.log(response.data[0].hotelDescriptionEnglish);
+          this.idDescription = response.data[0].id;
+          this.descriptionEN = response.data[0].hotelDescriptionEnglish;
+          this.descriptionES = response.data[0].hotelDescriptionSpanish;
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
     /* POST */
     handleCreate() {
       this.resetTemp();
@@ -891,16 +920,34 @@ export default {
         });
       } else if (this.active == 1) {
         this.next();
+        this.postDescription();
         this.dialogFormVisible = false;
       }
+    },
+    postDescription() {
+      let description = {
+        hotelDescriptionEnglish: this.descriptionEN,
+        hotelDescriptionSpanish: this.descriptionES,
+        hotelId: this.formImageHotel.idHotel,
+      };
+      axios
+        .post(this.url + "HotelTextContent", description)
+        .then((response) => {
+          console.log(response, response);
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
     },
     /* UPDATE */
     handleUpdate(row) {
       this.resetTemp();
       this.getImageByIdHotel(row);
+      this.getDescriptions(row);
       this.hotelUpdate = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
+
       this.formHotel.nameEnglish = row.nameEnglish;
       this.formHotel.nameSpanish = row.nameSpanish;
       this.formHotel.city_name = row.cityName;
@@ -911,6 +958,7 @@ export default {
       this.formHotel.providerCategoryName = row.providerCategoryName;
       this.formHotel.providerCategoryId = row.providerCategoryId;
       this.formImageHotel.idHotel = row.id;
+
       /*  this.getRoomTypeById() */
       console.log(this.formRoomType);
     },
@@ -950,7 +998,7 @@ export default {
               type: "success",
               duration: 2000,
             });
-
+            this.updateDescription();
             this.getHotel();
             this.next();
           })
@@ -960,6 +1008,22 @@ export default {
         console.log(this.active);
         this.dialogFormVisible = false;
       }
+    },
+    updateDescription() {
+      let description = {
+        id: this.idDescription,
+        hotelDescriptionEnglish: this.descriptionEN,
+        hotelDescriptionSpanish: this.descriptionES,
+        hotelId: this.hotelUpdate.id,
+      };
+      axios
+        .put(this.url + "HotelTextContent", description)
+        .then((response) => {})
+        .catch((error) => {
+          console.error(error.response);
+        });
+      console.log(this.active);
+      this.dialogFormVisible = false;
     },
     /* DELETE */
     handleSelectionChange(val) {
@@ -1248,3 +1312,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.el-form {
+  max-width: 100%;
+  margin: auto;
+}
+</style>
