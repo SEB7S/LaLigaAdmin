@@ -181,6 +181,7 @@
       @pagination="getList"
     />
     <el-dialog
+      :close-on-press-escape="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
@@ -310,8 +311,22 @@
                             class="el-icon-edit el-input__icon"
                           />
                           <template slot-scope="{ item }">
-                            <div v-show="item.hotels.length > 0" class="value">
-                              {{ item.nameEnglish }}
+                            <div
+                              :disabled="item.hotels.length > 0"
+                              class="value"
+                            >
+                              <span style="float: left">{{
+                                item.nameEnglish
+                              }}</span>
+                              <span
+                                style="
+                                  float: right;
+                                  color: #8492a6;
+                                  font-size: 13px;
+                                "
+                              >
+                                {{ item.hotels.length == 0 ? "Sin Hotel" : "" }}
+                              </span>
                             </div>
                           </template>
                         </el-autocomplete>
@@ -378,7 +393,10 @@
                         >
                           <i class="el-icon-plus" />
                         </el-upload>
-                        <el-dialog :visible.sync="dialogVisible">
+                        <el-dialog
+                          :close-on-press-escape="false"
+                          :visible.sync="dialogVisible"
+                        >
                           <img width="100%" :src="dialogImageUrl" alt="" />
                         </el-dialog>
                       </el-form-item>
@@ -417,6 +435,7 @@
       </div>
     </el-dialog>
     <el-dialog
+      :close-on-press-escape="false"
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
       :close-on-click-modal="false"
@@ -696,20 +715,35 @@ export default {
       axios
         .get(this.url + "Tour")
         .then((response) => {
-          console.log("sss", response.data);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 699 ~ .then ~ response",
+            response.data
+          );
           var aTours = [];
           aTours = response.data.map((item) => {
-            console.log(item.masterTourId);
+            console.log(
+              "🚀 ~ file: configTour.vue ~ line 702 ~ aTours=response.data.map ~ item",
+              item.masterTourId
+            );
             return item.masterTourId == null ? item : 1;
           });
-          console.log(aTours);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 705 ~ aTours=response.data.map ~ aTours",
+            aTours
+          );
           this.list = aTours.filter((element) => element !== 1);
-          console.log(this.list);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 708 ~ .then ~ list",
+            this.list
+          );
           this.listLoading = false;
         })
         .catch((error) => {
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 711 ~ getTour ~ error",
+            error
+          );
           this.status = "error";
-          console.log(error.response);
         });
     },
     getCatProv() {
@@ -720,19 +754,28 @@ export default {
             this.formTour.idProvider
         )
         .then((response) => {
-          console.log(response.data);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 723 ~ .then ~ response",
+            response.data
+          );
           this.formTour.options = response.data;
         })
         .catch((error) => {
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 727 ~ getCatProv ~ error",
+            error
+          );
           this.status = "error";
-          console.log(error.response);
         });
     },
     getProviders(queryString, cb) {
       axios
         .get(this.url + "Provider/GetProviderWithCategories")
         .then((response) => {
-          console.log(response.data);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 736 ~ .then ~ response",
+            response.data
+          );
           var links = response.data;
           var results = queryString
             ? links.filter(this.createFilter(queryString))
@@ -740,8 +783,11 @@ export default {
           cb(results);
         })
         .catch((error) => {
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 767 ~ getProviders ~ error",
+            error
+          );
           this.status = "error";
-          console.error(error.response);
         });
     },
     createFilter(queryString) {
@@ -755,13 +801,15 @@ export default {
       this.getCatProv();
     },
     handleIconClick(ev) {
-      console.log(ev);
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 782 ~ handleIconClick ~ ev",
+        ev
+      );
     },
     /* Función que suma o resta días a una fecha, si el parámetro
    días es negativo restará los días*/
     sumarDias(fecha, dias) {
       fecha.setDate(fecha.getDate() + dias);
-      console.log(fecha);
       return fecha;
     },
     /* POST */
@@ -793,7 +841,10 @@ export default {
         };
 
         this.formTour.hotel_category.forEach((option) => {
-          console.log(option);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 819 ~ this.formTour.hotel_category.forEach ~ option",
+            option
+          );
           var tourCategory = {
             tourId: 0,
             providerCategoryId: option,
@@ -802,7 +853,10 @@ export default {
         });
 
         this.formDayDetail.forEach((element, index) => {
-          console.log(element);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 828 ~ this.formDayDetail.forEach ~ element",
+            element
+          );
           var d = new Date(element.startDateFormat);
           var dayDescription = {
             dayNumber: index + 1,
@@ -817,7 +871,10 @@ export default {
           };
           tour.tourDayDescriptions.push(dayDescription);
         });
-        console.log(tour);
+        console.log(
+          "🚀 ~ file: configTour.vue ~ line 842 ~ this.formDayDetail.forEach ~ tour",
+          tour
+        );
         axios
           .post(this.url + "Tour", tour)
           .then((response) => {
@@ -838,14 +895,34 @@ export default {
       }
     },
     postImageTour(dayDescription) {
-      console.log(dayDescription, this.formDayDetail);
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 891 ~ postImageTour ~ dayDescription",
+        dayDescription
+      );
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 893 ~ postImageTour ~ this.formDayDetail",
+        this.formDayDetail
+      );
       this.formDayDetail.forEach((day, index) => {
-        console.log(day, dayDescription[index].id);
+        console.log(
+          "🚀 ~ file: configTour.vue ~ line 894 ~ this.formDayDetail.forEach ~ day",
+          day
+        );
         day.images.forEach((img) => {
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 919 ~ day.images.forEach ~ img",
+            img
+          );
           var formData = new FormData();
-          formData.append("UploadImage", img.file);
           formData.append("MediaContentType", 0);
           formData.append("IdTourDay", dayDescription[index].id);
+
+          if (img.id == undefined) {
+            formData.append("UploadImage", img.file);
+            formData.append("IdImage", 0);
+          } else {
+            formData.append("IdImage", img.id);
+          }
           axios
             .post(this.url + "TourDayMediaContent/SendTourDay", formData, {
               headers: {
@@ -1089,9 +1166,6 @@ export default {
     next() {
       if (this.active++ > 2) this.active = 0;
     },
-    esto(counter) {
-      console.log("counter", counter);
-    },
     /* IMAGE */
     handleRemove(file, fileList) {
       console.log(file, fileList);
@@ -1114,16 +1188,28 @@ export default {
       }
     },
     uploadFile(file) {
-      console.log(this.formDayDetail, this.arrayPosition, file);
-
       this.formDayDetail[this.arrayPosition].images.push(file);
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 1168 ~ uploadFile ~ this.formDayDetail",
+        this.formDayDetail
+      );
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 1164 ~ uploadFile ~ file",
+        file
+      );
     },
     getImageByIdDay(day) {
-      console.log(day);
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 1143 ~ getImageByIdDay ~ day",
+        day
+      );
       axios
         .get(this.url + "TourDayMediaImage/GetAllByTourDay?tourday=" + day.id)
         .then((response) => {
-          console.log(response.data);
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 1147 ~ .then ~ response",
+            response.data
+          );
           day.images = response.data;
         })
         .catch((error) => {
@@ -1175,16 +1261,23 @@ export default {
       };
     },
     handleSelectCity(item) {
-      console.log(item, this.arrayPosition + 1, this.formDayDetail.length);
-      this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
-      this.formDayDetail[this.arrayPosition].cityId = item.id;
-      if (this.arrayPosition + 1 < this.formDayDetail.length) {
-        this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
-          item.nameEnglish.split(",")[0]
-        );
+      if (item.hotels.length > 0) {
+        console.log(item, this.arrayPosition + 1, this.formDayDetail.length);
+        this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
+        this.formDayDetail[this.arrayPosition].cityId = item.id;
+        if (this.arrayPosition + 1 < this.formDayDetail.length) {
+          this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
+            item.nameEnglish.split(",")[0]
+          );
+        }
+        this.formDayDetail[this.arrayPosition].titleTourCities =
+          this.concatenateTitle(this.arrayPosition);
+      } else {
+        this.$notify.error({
+          title: "Error",
+          message: "La ciudad no tiene hoteles asignados",
+        });
       }
-      this.formDayDetail[this.arrayPosition].titleTourCities =
-        this.concatenateTitle(this.arrayPosition);
     },
     /* TOURDAY */
     calculateDays() {

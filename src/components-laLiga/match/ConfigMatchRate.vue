@@ -187,6 +187,8 @@
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
+      :close-on-press-escape="false"
+
     >
       <el-form
         ref="formMatchRate"
@@ -286,6 +288,7 @@
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
       :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <el-table
         :data="pvData"

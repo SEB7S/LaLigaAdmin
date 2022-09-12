@@ -145,6 +145,7 @@
       @pagination="getList"
     />
     <el-dialog
+    :close-on-press-escape="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"

@@ -165,6 +165,7 @@
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <el-form
         ref="formMatch"

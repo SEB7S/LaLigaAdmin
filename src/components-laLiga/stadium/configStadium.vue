@@ -161,6 +161,7 @@
       @pagination="getList"
     />
     <el-dialog
+      :close-on-press-escape="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
@@ -254,7 +255,7 @@
           </el-form-item>
         </el-form>
 
-        <el-dialog :visible.sync="dialogVisible">
+        <el-dialog :close-on-press-escape="false" :visible.sync="dialogVisible">
           <img width="100%" :src="dialogImageUrl" alt="" />
         </el-dialog>
       </div>
@@ -271,6 +272,7 @@
       </div>
     </el-dialog>
     <el-dialog
+      :close-on-press-escape="false"
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
       :close-on-click-modal="false"
@@ -629,7 +631,7 @@ export default {
                   duration: 2000,
                 });
                 this.getStadium();
-                this.resetForm("formStadium")
+                this.resetForm("formStadium");
               })
               .catch((error) => {
                 console.error(error.response);

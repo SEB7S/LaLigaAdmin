@@ -137,6 +137,7 @@
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <el-steps :active="active" align-center finish-status="success">
         <el-step title="General Data" />

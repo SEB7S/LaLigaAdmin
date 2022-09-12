@@ -125,6 +125,7 @@
       @pagination="getList"
     />
     <el-dialog
+      :close-on-press-escape="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
@@ -154,6 +155,7 @@
       </div>
     </el-dialog>
     <el-dialog
+      :close-on-press-escape="false"
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
       :close-on-click-modal="false"
@@ -427,7 +429,7 @@ export default {
               });
 
               this.getTournament();
-              this.resetForm("formTournament")
+              this.resetForm("formTournament");
               console.log(this.formImageClub.idClub);
             })
             .catch((error) => {

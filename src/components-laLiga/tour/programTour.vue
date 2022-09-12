@@ -240,7 +240,7 @@
             v-model="checkedTours"
             @change="handlecheckedToursChange"
           >
-            <el-row type="flex" class="space-bet"  :gutter="20">
+            <el-row type="flex" class="space-bet" :gutter="20">
               <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="6"
                 ><div class="grid-content bg-purple">
                   <el-checkbox
@@ -459,6 +459,7 @@
           @pagination="getList"
         />
         <el-dialog
+          :close-on-press-escape="false"
           :title="textMap[dialogStatus]"
           :visible.sync="dialogFormVisible"
           :close-on-click-modal="false"
@@ -663,7 +664,10 @@
                             >
                               <i class="el-icon-plus"></i>
                             </el-upload>
-                            <el-dialog :visible.sync="dialogVisible">
+                            <el-dialog
+                              :close-on-press-escape="false"
+                              :visible.sync="dialogVisible"
+                            >
                               <img width="100%" :src="dialogImageUrl" alt="" />
                             </el-dialog>
                           </el-form-item>
@@ -700,6 +704,7 @@
           </div>
         </el-dialog>
         <el-dialog
+          :close-on-press-escape="false"
           :visible.sync="dialogPvVisible"
           title="Reading statistics"
           :close-on-click-modal="false"
@@ -1824,7 +1829,7 @@ export default {
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
-      console.log("hola",value);
+      console.log("hola", value);
       this.aListToursFinal = [];
       var copyValue = value;
 
@@ -1919,12 +1924,15 @@ export default {
       console.log(this.aListTours);
     },
     itemSelected(item, index) {
-      console.log("hola", this.aListToursFinal, item)
+      console.log("hola", this.aListToursFinal, item);
       let season = item.seasonName;
       item.seasons = season.idSeasons;
       item.seasonName = season.label;
       this.seasonsId = item.seasons;
-      if (item.idTourCategorySeasonTour && item.idTourCategorySeasonTour.length > 0) {
+      if (
+        item.idTourCategorySeasonTour &&
+        item.idTourCategorySeasonTour.length > 0
+      ) {
         item.idTourCategorySeasonTour.forEach((id, index) => {
           this.updateTourCategorySeasonsTours(
             id,
@@ -1933,12 +1941,12 @@ export default {
           );
         });
       }
-      this.aListToursFinal.forEach(index => {
-        if(item.nameInstance == index.nameInstance){
-          index.seasonName = item.seasonName
-          index.seasons = item.seasons
+      this.aListToursFinal.forEach((index) => {
+        if (item.nameInstance == index.nameInstance) {
+          index.seasonName = item.seasonName;
+          index.seasons = item.seasons;
         }
-      })
+      });
     },
     updateTourCategorySeasonsTours(id, tourId, tourCategorySeasonId) {
       let tourCatSeason = {
@@ -2425,7 +2433,7 @@ export default {
   .el-dialog {
     width: 100% !important;
   }
-  .space-bet{
+  .space-bet {
     justify-content: space-between !important;
   }
 }
