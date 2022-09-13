@@ -185,6 +185,7 @@
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
+       v-loading.fullscreen.lock="fullscreenLoading"
     >
       <div>
         <el-steps :active="active" finish-status="success" align-center>
@@ -533,6 +534,7 @@ export default {
       },
       dialogPvVisible: false,
       pvData: [],
+      fullscreenLoading: false,
       rules: {
         name: [
           {
@@ -891,10 +893,10 @@ export default {
           .catch((error) => {
             console.error(error.response);
           });
-        this.dialogFormVisible = false;
       }
     },
     postImageTour(dayDescription) {
+      this.fullscreenLoading = true;
       console.log(
         "🚀 ~ file: configTour.vue ~ line 891 ~ postImageTour ~ dayDescription",
         dayDescription
@@ -908,7 +910,7 @@ export default {
           "🚀 ~ file: configTour.vue ~ line 894 ~ this.formDayDetail.forEach ~ day",
           day
         );
-        day.images.forEach((img) => {
+        day.images.forEach((img, index2) => {
           console.log(
             "🚀 ~ file: configTour.vue ~ line 919 ~ day.images.forEach ~ img",
             img
@@ -930,6 +932,11 @@ export default {
               },
             })
             .then((response) => {
+              console.log(index2 == day.images.length - 1);
+              if (index2 == day.images.length - 1) {
+                this.dialogFormVisible = false;
+                this.fullscreenLoading = false;
+              }
               console.log(this.formTour.options);
             })
             .catch((error) => {
@@ -1119,7 +1126,6 @@ export default {
           .catch((error) => {
             console.error(error.response);
           });
-        this.dialogFormVisible = false;
         console.log("esto", this.formDayDetail);
       }
     },
