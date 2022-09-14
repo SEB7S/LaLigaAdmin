@@ -185,7 +185,7 @@
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
-       v-loading.fullscreen.lock="fullscreenLoading"
+      v-loading.fullscreen.lock="fullscreenLoading"
     >
       <div>
         <el-steps :active="active" finish-status="success" align-center>
@@ -896,6 +896,10 @@ export default {
       }
     },
     postImageTour(dayDescription) {
+
+      dayDescription = dayDescription.sort((a,b) => a.id - b.id)
+
+
       this.fullscreenLoading = true;
       console.log(
         "🚀 ~ file: configTour.vue ~ line 891 ~ postImageTour ~ dayDescription",
@@ -1071,8 +1075,10 @@ export default {
         this.aTourCategory[index] = element.id;
       });
       this.editFormTourDayDescription.forEach((element, index) => {
+        console.log("🚀 ~ file: configTour.vue ~ line 1074 ~ this.editFormTourDayDescription.forEach ~ element", element)
         this.getImageByIdDay(element);
       });
+      console.log("🚀 ~ file: configTour.vue ~ line 1080 ~ this.editFormTourDayDescription.forEach ~ this.editFormTourDayDescription", this.editFormTourDayDescription)
       console.log(this.aTourCategory, this.formDayDetail);
       this.getCatProv();
     },
@@ -1205,18 +1211,14 @@ export default {
       );
     },
     getImageByIdDay(day) {
-      console.log(
-        "🚀 ~ file: configTour.vue ~ line 1143 ~ getImageByIdDay ~ day",
-        day
-      );
       axios
         .get(this.url + "TourDayMediaImage/GetAllByTourDay?tourday=" + day.id)
         .then((response) => {
-          console.log(
-            "🚀 ~ file: configTour.vue ~ line 1147 ~ .then ~ response",
-            response.data
-          );
           day.images = response.data;
+          console.log(
+            "🚀 ~ file: configTour.vue ~ line 1213 ~ .then ~ day",
+            day
+          );
         })
         .catch((error) => {
           this.status = "error";
