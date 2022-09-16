@@ -896,10 +896,7 @@ export default {
       }
     },
     postImageTour(dayDescription) {
-
-      dayDescription = dayDescription.sort((a,b) => a.id - b.id)
-
-
+      dayDescription = dayDescription.sort((a,b) => a.id - b.id);
       this.fullscreenLoading = true;
       console.log(
         "🚀 ~ file: configTour.vue ~ line 891 ~ postImageTour ~ dayDescription",
