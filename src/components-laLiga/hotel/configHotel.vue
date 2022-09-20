@@ -267,6 +267,7 @@
             </el-autocomplete>
           </el-form-item>
           <el-form-item :label="$t('hotel.cityHotel')" prop="city_name">
+
             <el-autocomplete
               v-model="formHotel.city_name"
               popper-class="my-autocomplete"
@@ -786,6 +787,7 @@ export default {
       return row[property] === value;
     },
     createFilters(data, filter) {
+      console.log("🚀 ~ file: configHotel.vue ~ line 790 ~ createFilters ~ data, filter", data, filter)
       filter.forEach((element) => {
         const aFilter = [];
         data.forEach((element2) => {
@@ -1100,7 +1102,7 @@ export default {
           console.log(response.data);
           var links = response.data;
           var results = queryString
-            ? links.filter(this.createFilter(queryString))
+            ? links.filter(this.createFilterCity(queryString))
             : links;
           cb(results);
         })
@@ -1115,6 +1117,11 @@ export default {
     },
     handleIconClick(ev) {
       console.log(ev);
+    },
+    createFilterCity(queryString) {
+      return (link) => {
+        return link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+      };
     },
     /* PROVIDER */
     getProviders(queryString, cb) {
