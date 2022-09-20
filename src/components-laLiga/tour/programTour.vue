@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <el-autocomplete
-      v-loading.fullscreen.lock="fullscreenLoading"
       v-model="tour"
       popper-class="my-autocomplete"
       :fetch-suggestions="getTour"
@@ -17,7 +16,11 @@
     </el-autocomplete>
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane :label="$t('tour.season')" name="first">
+      <el-tab-pane
+        :label="$t('tour.season')"
+        name="first"
+        v-loading.fullscreen.lock="fullscreenLoading"
+      >
         <el-button
           :disabled="!disabledButton"
           v-if="tour != ''"
@@ -285,6 +288,7 @@
         </div>
       </el-tab-pane>
       <el-tab-pane
+        v-loading.fullscreen.lock="fullscreenLoadingTable"
         :disabled="activeName == 'first'"
         :label="$t('tour.config')"
         name="third"
@@ -917,6 +921,7 @@ export default {
         ],
       },
       fullscreenLoading: false,
+      fullscreenLoadingTable: false,
       disabledButton: true,
       pickerOptions: {
         disabledDate(time) {
@@ -1795,6 +1800,7 @@ export default {
             return item.isMaster ? item : 1;
           });
           this.orderList();
+          this.fullscreenLoadingTable = false;
         })
 
         .catch((error) => {
@@ -1804,6 +1810,10 @@ export default {
     },
     /* Para actualizar la el tour actual */
     getTourbyId(tour) {
+      console.log(
+        "🚀 ~ file: programTour.vue ~ line 1809 ~ getTourbyId ~ tour",
+        tour
+      );
       axios
         .get(this.url + "Tour/GetTourById?id=" + tour.id)
         .then((response) => {
@@ -1983,7 +1993,6 @@ export default {
               this.getTourCategorySeasonsTours(element, element2);
 
               element2.disabled = true;
-              console.log(index2);
               this.countCheckedTours = index2 + 1;
             }
           });
@@ -2099,11 +2108,6 @@ export default {
         }
       )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          console.log(row);
           this.handleDelete(row, false);
         })
         .catch(() => {
@@ -2114,6 +2118,8 @@ export default {
         });
     },
     handleDeleteAll() {
+      this.fullscreenLoadingTable = true;
+      console.log("🚀 ~ file: programTour.vue ~ line 2116 ~ handleDeleteAll");
       this.$confirm(
         "This will permanently delete the file. Continue?",
         "Warning",
@@ -2124,13 +2130,16 @@ export default {
         }
       )
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "Delete completed",
-          });
-          this.aTourList.forEach((value) => {
+          this.aTourList.forEach((value, index) => {
             console.log("hola", value);
             this.handleDelete(value, false);
+            if (index == this.aTourList.length - 1) {
+              this.fullscreenLoadingTable = false;
+              this.$message({
+                type: "success",
+                message: "Delete completed",
+              });
+            }
           });
         })
         .catch(() => {
@@ -2142,22 +2151,21 @@ export default {
     },
     deleteTourInstance(id) {
       this.listTours.tourInstances.forEach((element, index) => {
-        if (element.tourhijo == id) {
+        if (parseInt(element.tourhijo) == id) {
+          this.fullscreenLoadingTable = true;
           axios
             .delete(
               this.url + "TourInstance/DeleteInstanceCascade?id=" + element.id
             )
             .then((response) => {
+              this.showReviewer = false;
+              this.getTourbyId(this.listTours);
               this.$notify({
                 title: "Success",
                 message: "Delete Successfully",
                 type: "success",
                 duration: 2000,
               });
-              this.showReviewer = false;
-              if (index == this.listTours.tourInstances.length - 1) {
-                this.getTourbyId(this.listTours);
-              }
             })
             .catch((error) => {
               console.error(error.response);
