@@ -1319,6 +1319,8 @@ export default {
                   if (seasonInfo.priority) {
                     this.categoryDefault = seasonInfo;
                     this.seasonsId = idSeasons;
+                    console.log("🚀 ~ file: programTour.vue ~ line 1322 ~ this.listTours.tourCategories.forEach ~ this.seasonsId", this.seasonsId)
+                    
                   }
                   this.seasons.push({
                     seasonId: seasonInfo.tourSeasonId,
@@ -1391,29 +1393,6 @@ export default {
       this.caculateDate(this.listTours); */
       var validator = true;
       this.fullscreenLoading = true;
-      /*       this.$refs.seasonForm.forEach((seasons) => {
-        if (seasons.$options.propsData.model.status) {
-          console.log(
-            "INACTIVO",
-            seasons.$options.propsData.model.status,
-            this.$refs
-          );
-          if (seasons.$vnode.tag == "vue-component-43-ElForm") {
-            seasons.validate((valid) => {
-              if (!valid) {
-                validator = false;
-              }
-            });
-          }
-          if (seasons.$vnode.tag == "vue-component-40-ElTooltip") {
-            seasons.$children[0].validate((valid) => {
-              if (!valid) {
-                validator = false;
-              }
-            });
-          }
-        }
-      }); */
       this.$refs.seasons.$children.forEach((card) => {
         card.$children[0].$children.forEach((cardItems) => {
           /*           console.log("aquí",this.$refs) */
@@ -1433,15 +1412,6 @@ export default {
           }
         });
 
-        /*console.log(card.$children[0].$children[2], "Card item tooltip")
-        card.$children[0].$children[2].forEach(child =>{
-          console.log(child, "Hijo de tooltip")
-        })
-        card.$children[0].$children[2].$children[0].validate(valid =>{
-          if(!valid){
-            validator = false
-          }
-        })*/
       });
 
       if (validator) {
@@ -1818,8 +1788,9 @@ export default {
         .get(this.url + "Tour/GetTourById?id=" + tour.id)
         .then((response) => {
           this.listTours = response.data[0];
+
           this.getTourForTable();
-          this.caculateDate(this.listTours);
+          this.getSeason()
         })
 
         .catch((error) => {

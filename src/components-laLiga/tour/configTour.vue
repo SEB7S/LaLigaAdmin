@@ -896,8 +896,7 @@ export default {
       }
     },
     postImageTour(dayDescription) {
-      dayDescription = dayDescription.sort((a,b) => a.id - b.id);
-      this.fullscreenLoading = true;
+      dayDescription = dayDescription.sort((a, b) => a.id - b.id);
       console.log(
         "🚀 ~ file: configTour.vue ~ line 891 ~ postImageTour ~ dayDescription",
         dayDescription
@@ -911,39 +910,46 @@ export default {
           "🚀 ~ file: configTour.vue ~ line 894 ~ this.formDayDetail.forEach ~ day",
           day
         );
-        day.images.forEach((img, index2) => {
-          console.log(
-            "🚀 ~ file: configTour.vue ~ line 919 ~ day.images.forEach ~ img",
-            img
-          );
-          var formData = new FormData();
-          formData.append("MediaContentType", 0);
-          formData.append("IdTourDay", dayDescription[index].id);
+        if (day.images.length > 0) {
+          day.images.forEach((img, index2) => {
+            console.log(
+              "🚀 ~ file: configTour.vue ~ line 919 ~ day.images.forEach ~ img",
+              img
+            );
+            var formData = new FormData();
+            formData.append("MediaContentType", 0);
+            formData.append("IdTourDay", dayDescription[index].id);
 
-          if (img.id == undefined) {
-            formData.append("UploadImage", img.file);
-            formData.append("IdImage", 0);
-          } else {
-            formData.append("IdImage", img.id);
-          }
-          axios
-            .post(this.url + "TourDayMediaContent/SendTourDay", formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            })
-            .then((response) => {
-              console.log(index2 == day.images.length - 1);
-              if (index2 == day.images.length - 1) {
-                this.dialogFormVisible = false;
-                this.fullscreenLoading = false;
-              }
-              console.log(this.formTour.options);
-            })
-            .catch((error) => {
-              console.error(error.response);
-            });
-        });
+            if (img.id == undefined) {
+              formData.append("UploadImage", img.file);
+              formData.append("IdImage", 0);
+            } else {
+              formData.append("IdImage", img.id);
+            }
+            this.fullscreenLoading = true;
+
+            axios
+              .post(this.url + "TourDayMediaContent/SendTourDay", formData, {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              })
+              .then((response) => {
+                console.log(index2 == day.images.length - 1);
+                if (index2 == day.images.length - 1) {
+                  this.dialogFormVisible = false;
+                  this.fullscreenLoading = false;
+                }
+                console.log(this.formTour.options);
+              })
+              .catch((error) => {
+                console.error(error.response);
+              });
+          });
+        } else {
+          this.dialogFormVisible = false;
+          this.fullscreenLoading = false;
+        }
       });
     },
     addTourCities(index) {
@@ -1072,10 +1078,16 @@ export default {
         this.aTourCategory[index] = element.id;
       });
       this.editFormTourDayDescription.forEach((element, index) => {
-        console.log("🚀 ~ file: configTour.vue ~ line 1074 ~ this.editFormTourDayDescription.forEach ~ element", element)
+        console.log(
+          "🚀 ~ file: configTour.vue ~ line 1074 ~ this.editFormTourDayDescription.forEach ~ element",
+          element
+        );
         this.getImageByIdDay(element);
       });
-      console.log("🚀 ~ file: configTour.vue ~ line 1080 ~ this.editFormTourDayDescription.forEach ~ this.editFormTourDayDescription", this.editFormTourDayDescription)
+      console.log(
+        "🚀 ~ file: configTour.vue ~ line 1080 ~ this.editFormTourDayDescription.forEach ~ this.editFormTourDayDescription",
+        this.editFormTourDayDescription
+      );
       console.log(this.aTourCategory, this.formDayDetail);
       this.getCatProv();
     },
@@ -1127,7 +1139,7 @@ export default {
             this.getTour();
           })
           .catch((error) => {
-            console.error(error.response);
+            console.error(error);
           });
         console.log("esto", this.formDayDetail);
       }
