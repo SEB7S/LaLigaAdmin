@@ -43,9 +43,17 @@
                       show-word-limit
                     ></el-input>
                   </el-form-item>
-                  <el-form-item :label="$t('config.titleDashboard')">
+                  <el-form-item :label="$t('config.titleDashboardEn')">
                     <el-input
-                      placeholder="Please input"
+                      placeholder="Inglés"
+                      v-model="formDashboard.tituloEnglish"
+                      maxlength="64"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item :label="$t('config.titleDashboardEs')">
+                    <el-input
+                      placeholder="Español"
                       v-model="formDashboard.tituloSpanish"
                       maxlength="64"
                       show-word-limit
@@ -57,6 +65,10 @@
                       show-alpha
                     ></el-color-picker>
                     <p>Resultado:</p>
+                    
+                    <h2 :style="{ color: formDashboard.color }">
+                      {{ formDashboard.tituloEnglish }}
+                    </h2>
                     <h2 :style="{ color: formDashboard.color }">
                       {{ formDashboard.tituloSpanish }}
                     </h2>
@@ -273,6 +285,7 @@ export default {
         totalCarrusel: 8,
         totalDisplay: 4,
         tituloSpanish: "",
+        tituloEnglish: "",
         color: "",
         name: "Config",
         isActive: false,
