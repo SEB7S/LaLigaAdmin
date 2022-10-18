@@ -83,9 +83,11 @@ export default {
     user: 'User',
     tournament: 'Manage Tournament',
     categoryProvider: 'Provider Category',
-    dateTours:'Program Tour'
-
+    dateTours:'Program Tour',
+    config: "Config",
+    dashboard: "DashBoard",
   },
+
   tour: {
     add: 'Add',
     export: 'Export',
@@ -124,7 +126,8 @@ export default {
     matchPrice: 'Price',
     matchName: 'Match',
     stadiumCategory: 'Stadium Category',
-    tournamentName: 'Tournament'
+    tournamentName: 'Tournament',
+    feactured:"Feactured"
   },
   hotel: {
     nameEnHotel: 'Name En',
@@ -164,6 +167,17 @@ export default {
     priority: 'Priority',
     stadiumId: 'Stadium',
     categoryStadium: 'Category'
+  },
+  config:{
+    numberMatch:"Número de partidos a destacar",
+    numberMatchTotal: "Partidos Totales para destacar",
+    statusButtonSave: "Save",
+    statusButtonUpdate: "Update",
+    titleDashboard:"Titulo de la pagina principal",
+    imageDashboard:"Imagen de la página principal",
+    color:"Color",
+    name:"Configuration name",
+    activate: "Activate Congiguration"
   },
   user: {
     nameUser: 'Username',

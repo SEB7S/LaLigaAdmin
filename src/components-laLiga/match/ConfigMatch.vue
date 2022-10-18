@@ -130,7 +130,20 @@
           <span>{{ row.date | formatDate }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column
+        :label="$t('match.feactured')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+            <el-switch
+              v-model="row.destacado"
+              active-color="#619b97"
+              inactive-color="#f5365c"
+              @change="changeStatus(row, $event)"
+            />
+        </template>
+      </el-table-column>
       <el-table-column
         :label="$t('table.actions')"
         align="center"
@@ -604,7 +617,7 @@ export default {
                 duration: 2000,
               });
               this.getMatch();
-              this.resetForm("formMatch")
+              this.resetForm("formMatch");
             })
             .catch((error) => {
               console.error(error.response);
@@ -665,6 +678,48 @@ export default {
             });
         }
       });
+    },
+    changeStatus(data, status) {
+      this.$confirm(
+        i18n.t("modals.changeStatus", {
+          mgs: status ? i18n.t("modals.activate") : i18n.t("modals.inactivate"),
+        }),
+        i18n.t("modals.warning"),
+        {
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
+        }
+      )
+        .then(() => {
+          const a = new Date(data.date)
+          const d = a.toString();
+          const e = d.split("GMT");
+          const f = e[1].split(" ");
+          const g = parseInt(f[0]);
+          var match = {
+            id: data.id,
+            club_guest_id: data.club_guest_id,
+            club_home_id: data.club_home_id,
+            stadium_id: data.stadium_id,
+            date: data.date,
+            tournament_id: data.tournament_id,
+            timeZone: g,
+            destacado: status
+          };
+          console.log("hola");
+          axios
+            .put(this.url + "Match", match)
+            .then((response) => {
+              this.getMatch();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        })
+        .catch(() => {
+          this.getMatch()
+        });
     },
     /* DELETE */
     handleSelectionChange(val) {

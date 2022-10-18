@@ -19,7 +19,7 @@ import matchRouter from './modules/routes-laliga/matchRouter'
 import stadiumRouter from './modules/routes-laliga/stadiumRouter'
 import cityRouter from './modules/routes-laliga/cityRouter'
 import tourRouter from './modules/routes-laliga/tourRouter'
-
+import configRouter from './modules/routes-laliga/configLaLigaVentaRouter'
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -144,7 +144,10 @@ export const asyncRoutes = [
   providerRouter,
   cityRouter,
   stadiumRouter,
+  configRouter,
   
+  
+
   {
     path: '/user',
     component: Layout,

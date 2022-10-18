@@ -83,7 +83,10 @@ export default {
     user: 'Usuario',
     tournament: 'Gestionar Torneo',
     categoryProvider:'Categoría Proveedor',
-    dateTours:"Programar Tour"
+    dateTours:"Programar Tour",
+    config: "Configuración",
+    dashboard: "Pagina Principal",
+    
   },
   tour: {
     add: 'Añadir',
@@ -119,7 +122,8 @@ export default {
     matchPrice: 'Precio',
     matchName: 'Partido',
     stadiumCategory: 'Categoría de estadio',
-    tournamentName: 'Nombre del Torneo'
+    tournamentName: 'Nombre del Torneo',
+    feactured:"Destacados"
   },
   hotel: {
     nameEnHotel: 'Nombre En',
@@ -176,6 +180,18 @@ export default {
     theme: 'Tema',
     size: 'Tamaño global',
     profile: 'Perfil'
+  },
+
+  config:{
+    numberMatch:"Número de partidos a destacar",
+    numberMatchTotal: "Partidos totales para destacar",
+    statusButtonSave: "Guardar",
+    statusButtonUpdate: "Actualizar",
+    titleDashboard:"Titulo de la página principal",
+    imageDashboard:"Imagen de la página principal",
+    color:"Color",
+    name:"Nombre de la configuración",
+    activate: "Activar Congiguración"
   },
   login: {
     title: 'La Liga - Administrador',
