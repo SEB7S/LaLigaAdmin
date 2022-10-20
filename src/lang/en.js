@@ -178,7 +178,12 @@ export default {
     imageDashboard:"Imagen de la página principal",
     color:"Color",
     name:"Configuration name",
-    activate: "Activate Congiguration"
+    activate: "Activate Congiguration",
+    conditionsEn: "",
+    conditionsEs: "",
+    descriptionItEn:"",
+    descriptionItEs:""
+
   },
   user: {
     nameUser: 'Username',

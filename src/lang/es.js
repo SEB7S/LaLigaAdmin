@@ -192,7 +192,11 @@ export default {
     imageDashboard:"Imagen de la página principal",
     color:"Color",
     name:"Nombre de la configuración",
-    activate: "Activar Congiguración"
+    activate: "Activar Congiguración",
+    conditionsEn: "Condiciones del tour (Ing)",
+    conditionsEs: "Condiciones del tour (Esp)",
+    descriptionItEn:"Descripción general (Ing)",
+    descriptionItEs:"Descripción general (Esp)"
   },
   login: {
     title: 'La Liga - Administrador',

@@ -10,7 +10,7 @@
                 <el-select
                   v-model="value"
                   placeholder="Select"
-                  style="float: right"
+                  style="float: right;"
                   @change="onSelect"
                 >
                   <el-option
@@ -65,7 +65,7 @@
                       show-alpha
                     ></el-color-picker>
                     <p>Resultado:</p>
-                    
+
                     <h2 :style="{ color: formDashboard.color }">
                       {{ formDashboard.tituloEnglish }}
                     </h2>
@@ -138,7 +138,7 @@
                   <i
                     class="el-icon-question"
                     slot="reference"
-                    style="float: right; padding: 3px 0"
+                    style="float: right; padding: 3px 0;"
                   ></i>
                 </el-popover>
               </div>
@@ -214,7 +214,70 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="Itinerario">Itinerario</el-tab-pane>
+      <el-tab-pane label="Itinerario">
+        <el-row type="flex">
+          <el-col :xs="24" :sm="24" :md="9" :lg="11" :xl="11">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>Gestionar Descripción</span>
+              </div>
+              <div class="text item">
+                <el-form
+                  ref="formItinerary"
+                  :rules="rules"
+                  :model="formItinerary"
+                  label-position="top"
+                >
+                  <el-form-item :label="$t('config.descriptionItEn')">
+                    <el-input
+                      type="textarea"
+                      placeholder="Please input"
+                      v-model="formItinerary.generalDescriptionEnglish"
+                      maxlength="150"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item :label="$t('config.descriptionItEs')">
+                    <el-input
+                      type="textarea"
+                      placeholder="Please input"
+                      v-model="formItinerary.generalDescriptionSpanish"
+                      maxlength="150"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item :label="$t('config.conditionsEn')">
+                    <el-input
+                      type="textarea"
+                      placeholder="Please input"
+                      v-model="formItinerary.conditionsEnglish"
+                      maxlength="150"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item :label="$t('config.conditionsEs')">
+                    <el-input
+                      type="textarea"
+                      placeholder="Please input"
+                      v-model="formItinerary.conditionsSpanish"
+                      maxlength="150"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                </el-form>
+                <el-button
+                  type="primary"
+                  size="medium"
+                  class="btn"
+                  :loading="dialogFormVisible"
+                  @click="deleteItinerary"
+                  >{{ statusButton }}</el-button
+                >
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </el-tab-pane>
       <el-tab-pane label="Distribución de habitaciones"
         >Distribución de habitaciones</el-tab-pane
       >
@@ -223,7 +286,7 @@
     <div></div>
   </div>
 </template>
-  <script>
+<script>
 import {
   fetchList,
   fetchPv,
@@ -290,6 +353,12 @@ export default {
         name: "Config",
         isActive: false,
       },
+      formItinerary: {
+        generalDescriptionSpanish: "",
+        generalDescriptionEnglish: "",
+        conditionsSpanish: "",
+        conditionsEnglish: "",
+      },
       statusButton: i18n.t("config.statusButtonSave"),
       ConfigUpdate: [],
       activeName: "first",
@@ -307,6 +376,7 @@ export default {
   created() {
     this.getConfig();
     this.getSortedMatch();
+    this.getItinerary();
   },
   computed: {
     draggingInfo() {
@@ -337,6 +407,7 @@ export default {
         this.updateData();
       }
     },
+    /* DASHBOARD */
     postConfig() {
       this.$refs["formDashboard"].validate((valid) => {
         if (valid) {
@@ -381,8 +452,7 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.formImageDashboard.IdMatchFront =
-              this.formDashboard.matchFrontId;
+            this.formImageDashboard.IdMatchFront = this.formDashboard.matchFrontId;
             console.log(this.formDashboard.matchFrontId);
             this.postImageDashboard();
             this.getConfig();
@@ -616,10 +686,58 @@ export default {
       e.draggedContext.element.order = e.draggedContext.futureIndex;
       console.log("list: ", this.list);
     },
+
+    /* FIN DASHBOARD */
+
+    /* ITINERARIO */
+    postItinerary() {
+      this.$refs["formItinerary"].validate((valid) => {
+        if (valid) {
+          this.dialogFormVisible = true;
+          axios
+            .post(this.url + "ItineraryFrontDashboard", this.formItinerary)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.cathegoryAddedSuccess"),
+                type: "success",
+                duration: 2000,
+              });
+              this.getItinerary()
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+    getItinerary() {
+      axios
+        .get(this.url + "ItineraryFrontDashboard")
+        .then((response) => {
+          console.log(response.data);
+          this.formItinerary = response.data[0]
+
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    deleteItinerary() {
+      axios
+        .delete(this.url + "ItineraryFrontDashboard/DeleteAllItineraryFrontDashboard")
+        .then((response) => {
+          this.postItinerary();
+        })
+        .catch((error) => {
+          console.error(error.response);
+        });
+    },
   },
 };
 </script>
-  <style lang="scss">
+<style lang="scss">
 .box-card {
   width: 480px; // tamañano de las cards
 }
