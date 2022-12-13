@@ -96,6 +96,7 @@ export default {
     nameTour: 'Name',
     nameProvider: 'Provider',
     durationTour: 'Duration (Days)',
+    starDate:"Start Date",
     status: 'Status',
     action: 'Actions',
     stepOneName: 'General Data',
@@ -147,7 +148,9 @@ export default {
     emailProvier: 'Email',
     statusProvier: 'Status',
     categories: 'Category - HappyTour',
-    categoryProvider: 'Category - Provider'
+    categoryProvider: 'Category - Provider',
+    amenityEsp: "Amenities (Esp)",
+    amenityEng: "Amenities (Eng)"
   },
   city: {
     nameEnCity: 'Name En',

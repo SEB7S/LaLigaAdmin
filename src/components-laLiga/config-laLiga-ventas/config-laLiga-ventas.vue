@@ -187,12 +187,6 @@
                       </li>
                       <li>
                         <el-tag
-                          ><strong>ciudad:</strong>
-                          {{ element["homeClub"].cityNameEnglish }}</el-tag
-                        >
-                      </li>
-                      <li>
-                        <el-tag
                           ><strong>estadio:</strong>
                           {{ element.stadiumName }}</el-tag
                         >
@@ -233,7 +227,7 @@
                       type="textarea"
                       placeholder="Please input"
                       v-model="formItinerary.generalDescriptionEnglish"
-                      maxlength="150"
+                      maxlength="250"
                       show-word-limit
                     ></el-input>
                   </el-form-item>
@@ -652,6 +646,21 @@ export default {
     },
     getSortedMatch() {
       axios
+        .get(this.url + "MatchFrontDashboard")
+        .then((response) => {
+          console.log(response.data);
+          if (response.data.length > 0) {
+            this.list = response.data;
+          } else {
+            this.getMatch();
+          }
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    getMatch() {
+      axios
         .get(this.url + "Match")
         .then((response) => {
           console.log(response.data);
@@ -704,7 +713,7 @@ export default {
                 type: "success",
                 duration: 2000,
               });
-              this.getItinerary()
+              this.getItinerary();
             })
             .catch((error) => {
               console.error(error.response);
@@ -717,8 +726,7 @@ export default {
         .get(this.url + "ItineraryFrontDashboard")
         .then((response) => {
           console.log(response.data);
-          this.formItinerary = response.data[0]
-
+          this.formItinerary = response.data[0];
         })
         .catch((error) => {
           this.status = "error";
@@ -726,7 +734,9 @@ export default {
     },
     deleteItinerary() {
       axios
-        .delete(this.url + "ItineraryFrontDashboard/DeleteAllItineraryFrontDashboard")
+        .delete(
+          this.url + "ItineraryFrontDashboard/DeleteAllItineraryFrontDashboard"
+        )
         .then((response) => {
           this.postItinerary();
         })

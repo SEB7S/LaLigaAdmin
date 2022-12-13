@@ -96,6 +96,7 @@ export default {
     nameTour: 'Nombre',
     nameProvider: 'Proveedor',
     durationTour: 'Duración (Días)',
+    startDate:"Fecha de inicio",
     status: 'Estado',
     stepOneName: 'Datos Generales',
     stepTwoName: 'Detalle de Días',
@@ -107,6 +108,7 @@ export default {
     priority: "Seleccionar como predeterminado",
     applyToFather: "Aplicar al tour padre",
     clickToEdit: "Presiona para editar el nombre"
+
   },
   match: {
     nameClub: 'Club',
@@ -144,7 +146,9 @@ export default {
     emailProvier: 'Correo Electrónico',
     statusProvier: 'Estado',
     categories:'Categoría - HappyTour',
-    categoryProvider: 'Categoría - Proveedor'
+    categoryProvider: 'Categoría - Proveedor',
+    amenityEsp: "Amenities (Esp)",
+    amenityEng: "Amenities (Eng)"
   },
   city: {
     nameEnCity: 'Nombre En',

@@ -577,6 +577,7 @@ export default {
       this.formClub.clubName = row.name;
       this.formClub.stadiumId = row.stadiumId;
       this.formClub.stadiumName = row.stadiumName;
+      this.formImageClub.idClub = row.id;
       this.active = 0;
     },
     updateData() {

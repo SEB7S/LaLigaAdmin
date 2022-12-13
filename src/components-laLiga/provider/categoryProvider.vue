@@ -149,7 +149,7 @@
       @pagination="getList"
     />
     <el-dialog
-    :close-on-press-escape="false"
+      :close-on-press-escape="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
@@ -197,6 +197,62 @@
             </template>
           </el-autocomplete>
         </el-form-item>
+        <el-form-item :label="$t('provider.amenityEng')">
+          <el-tag
+            :key="tag"
+            v-for="tag in amenitiesEng"
+            closable
+            :disable-transitions="false"
+            @close="handleCloseTagEng(tag)"
+          >
+            {{ tag }}
+          </el-tag>
+          <el-input
+            class="input-new-tag"
+            v-if="inputVisibleEng"
+            v-model="inputValueEng"
+            ref="saveTagInputEng"
+            size="mini"
+            @keyup.enter.native="handleInputConfirmEng"
+            @blur="handleInputConfirmEng"
+          >
+          </el-input>
+          <el-button
+            v-else
+            class="button-new-tag"
+            size="small"
+            @click="showInputEng"
+            >+ New Amenity</el-button
+          >
+        </el-form-item>
+        <el-form-item :label="$t('provider.amenityEsp')">
+          <el-tag
+            :key="tag"
+            v-for="tag in amenitiesEsp"
+            closable
+            :disable-transitions="false"
+            @close="handleCloseTagEsp(tag)"
+          >
+            {{ tag }}
+          </el-tag>
+          <el-input
+            class="input-new-tag"
+            v-if="inputVisibleEsp"
+            v-model="inputValueEsp"
+            ref="saveTagInputEsp"
+            size="mini"
+            @keyup.enter.native="handleInputConfirmEsp"
+            @blur="handleInputConfirmEsp"
+          >
+          </el-input>
+          <el-button
+            v-else
+            class="button-new-tag"
+            size="small"
+            @click="showInputEsp"
+            >+ New Amenity</el-button
+          >
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -212,7 +268,7 @@
     </el-dialog>
 
     <el-dialog
-    :close-on-press-escape="false"
+      :close-on-press-escape="false"
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
       :close-on-click-modal="false"
@@ -328,14 +384,12 @@ export default {
           {
             required: true,
             message: i18n.t("forms.providerIncomplete"),
-
           },
         ],
         HTCategoryName: [
           {
             required: true,
             message: i18n.t("forms.categoryHtIncomplete"),
-
           },
         ],
       },
@@ -355,7 +409,14 @@ export default {
       categoryUpdate: [],
       categoryProviderList: [],
       /* EndPoint */
+      /* Tags */
       url: this.$store.getters.url,
+      amenitiesEng: [],
+      inputVisibleEng: false,
+      inputValueEng: "",
+      amenitiesEsp: [],
+      inputVisibleEsp: false,
+      inputValueEsp: "",
     };
   },
   /* INPUT SEARCH */
@@ -376,8 +437,44 @@ export default {
   },
   created() {
     this.getCategory();
+    /* console.log(this.dynamicTags.join('-')) */
   },
   methods: {
+    /* TAGS */
+    handleCloseTagEng(tag) {
+      this.amenitiesEng.splice(this.amenitiesEng.indexOf(tag), 1);
+    },
+    handleCloseTagEsp(tag) {
+      this.amenitiesEsp.splice(this.amenitiesEsp.indexOf(tag), 1);
+    },
+    showInputEng() {
+      this.inputVisibleEng = true;
+      this.$nextTick((_) => {
+        this.$refs.saveTagInputEng.$refs.input.focus();
+      });
+    },
+    showInputEsp() {
+      this.inputVisibleEsp = true;
+      this.$nextTick((_) => {
+        this.$refs.saveTagInputEsp.$refs.input.focus();
+      });
+    },
+    handleInputConfirmEng() {
+      let inputValue = this.inputValueEng;
+      if (inputValue) {
+        this.amenitiesEng.push(inputValue);
+      }
+      this.inputVisibleEng = false;
+      this.inputValueEng = "";
+    },
+    handleInputConfirmEsp() {
+      let inputValue = this.inputValueEsp;
+      if (inputValue) {
+        this.amenitiesEsp.push(inputValue);
+      }
+      this.inputVisibleEsp = false;
+      this.inputValueEsp = "";
+    },
     /* TABLE */
     getList() {
       this.listLoading = true;
@@ -505,6 +602,8 @@ export default {
             providerCategoryName: this.formCategory.categoryName,
             providerId: this.formCategory.providerId,
             happyTourCategoryId: this.formCategory.HTCategoryId,
+            ammenitiesEnglish: this.amenitiesEng.join("-"),
+            ammenitiesSpanish: this.amenitiesEsp.join("-"),
           };
           duplicate = this.list.findIndex(function (element) {
             return (
@@ -553,6 +652,8 @@ export default {
       this.formCategory.providerId = row.providerId;
       this.formCategory.HTCategoryName = row.happyTourCategoryName;
       this.formCategory.HTCategoryId = row.happyTourCategoryId;
+      this.amenitiesEng = row.ammenitiesEnglish.split("-");
+      this.amenitiesEsp = row.ammenitiesSpanish.split("-");
     },
     updateData() {
       this.$refs["formCategory"].validate((valid) => {
@@ -562,6 +663,8 @@ export default {
             providerCategoryName: this.formCategory.categoryName,
             providerId: this.formCategory.providerId,
             happyTourCategoryId: this.formCategory.HTCategoryId,
+            ammenitiesEnglish: this.amenitiesEng.join("-"),
+            ammenitiesSpanish: this.amenitiesEsp.join("-"),
           };
           axios
             .put(this.url + "ProviderCategories", category)
@@ -753,5 +856,4 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-</style>
+<style lang="scss"></style>

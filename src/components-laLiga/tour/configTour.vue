@@ -119,6 +119,17 @@
         </template>
       </el-table-column>
       <el-table-column
+        :label="$t('tour.startDate')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <span>{{
+            row.tourDayDescriptions[0].date | moment("MMMM Do YYYY")
+          }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         :label="$t('tour.tourInstance')"
         min-width="100px"
         align="center"
@@ -603,6 +614,9 @@ export default {
       sCity: "",
       aTourCategory: [],
       fileUploads: [],
+      includeProviders: 0,
+      categoriesProv: "",
+      aCategoriesProv: [],
     };
   },
   /* INPUT SEARCH */
@@ -849,7 +863,7 @@ export default {
           );
           var tourCategory = {
             tourId: 0,
-            providerCategoryId: option,
+            providerCategoryId: option.id,
           };
           tour.tourCategories.push(tourCategory);
         });
@@ -1074,6 +1088,7 @@ export default {
       this.start_date = new Date(row.tourDayDescriptions[0].startTime);
       row.tourCategories.forEach((element, index) => {
         console.log(element);
+
         this.formTour.hotel_category[index] = element.providerCategoryId;
         this.aTourCategory[index] = element.id;
       });
@@ -1106,7 +1121,9 @@ export default {
           tourCategories: [],
           tourDayDescriptions: [],
         };
+
         this.formDayDetail.forEach((element, index) => {
+          var d = new Date(element.startDateFormat);
           console.log(element);
           var dayDescription = {
             id: element.id,
@@ -1114,6 +1131,7 @@ export default {
             matchable: element.matchable,
             tourCities: element.titleTourCities,
             startTime: new Date(this.start_date),
+            date: new Date(this.sumarDias(d, index)),
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
             tourId: element.tourId,
@@ -1130,7 +1148,7 @@ export default {
           };
           tour.tourCategories.push(tourCategory);
         });
-        console.log(tour);
+        console.log("este es el tour", tour);
         axios
           .put(this.url + "Tour", tour)
           .then((response) => {
@@ -1257,7 +1275,8 @@ export default {
       axios
         .get(this.url + "City")
         .then((response) => {
-          console.log(response.data);
+          console.log("CIUDADES", response.data, this.formTour.hotel_category);
+          this.containProviderInAllCities(response.data);
           var links = response.data;
           var results = queryString
             ? links.filter(this.createFilterCity(queryString))
@@ -1269,6 +1288,36 @@ export default {
           console.error(error.response);
         });
     },
+    containProviderInAllCities(
+      cities //METODO PARA REVISAR QUE EN LA CIUDAD EXISTEN HOTELES CON TODOS LOS PROVEEDORES
+    ) {
+      cities.forEach((city) => {
+        city.notIncludeProvider = [];
+        this.includeProviders = 0;
+        if (city.hotels.length > 0) {
+          this.includeProviders = 0;
+          this.formTour.hotel_category.forEach((provider) => {
+            if (
+              city.hotels.some((a) => {
+                return a.providerCategoryId == provider;
+              })
+            ) {
+              this.includeProviders++;
+              console.log("SI", provider);
+            } else {
+              console.log("NO", provider);
+              city.notIncludeProvider.push(provider);
+            }
+          });
+        }
+        city.includeProvider =
+          this.includeProviders == this.formTour.hotel_category.length
+            ? true
+            : false;
+      });
+
+      console.log("HOTELES ARREGLADOS", cities);
+    },
     createFilterCity(queryString) {
       return (link) => {
         return (
@@ -1279,16 +1328,34 @@ export default {
     },
     handleSelectCity(item) {
       if (item.hotels.length > 0) {
-        console.log(item, this.arrayPosition + 1, this.formDayDetail.length);
-        this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
-        this.formDayDetail[this.arrayPosition].cityId = item.id;
-        if (this.arrayPosition + 1 < this.formDayDetail.length) {
-          this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
-            item.nameEnglish.split(",")[0]
-          );
+        if (item.includeProvider) {
+          console.log(item, this.arrayPosition + 1, this.formDayDetail.length);
+          this.formDayDetail[this.arrayPosition].cityName = item.nameEnglish;
+          this.formDayDetail[this.arrayPosition].cityId = item.id;
+          if (this.arrayPosition + 1 < this.formDayDetail.length) {
+            this.formDayDetail[this.arrayPosition + 1].tourCities.unshift(
+              item.nameEnglish.split(",")[0]
+            );
+          }
+          this.formDayDetail[this.arrayPosition].titleTourCities =
+            this.concatenateTitle(this.arrayPosition);
+        } else {
+          console.log(item, this.formTour.options);
+          item.notIncludeProvider.forEach((id) => {
+            this.aCategoriesProv = this.formTour.options.filter((a) => {
+              return a.id == id;
+            });
+            console.log(this.aCategoriesProv)
+            this.categoriesProv += this.aCategoriesProv[0].name + " "
+          });
+
+          this.$notify.error({
+            title: "Error",
+            message: `La ciudad no tiene hoteles con estas categorías  (${this.categoriesProv})`,
+          });
+          this.categoriesProv= ""
+          console.log(this.categoriesProv);
         }
-        this.formDayDetail[this.arrayPosition].titleTourCities =
-          this.concatenateTitle(this.arrayPosition);
       } else {
         this.$notify.error({
           title: "Error",
@@ -1296,6 +1363,7 @@ export default {
         });
       }
     },
+
     /* TOURDAY */
     calculateDays() {
       console.log("entre a calcular");

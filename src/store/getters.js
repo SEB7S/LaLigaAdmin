@@ -16,4 +16,5 @@ const getters = {
   urlImgage: state => state.endpoints.urlImgage
 
 }
+console.log(getters)
 export default getters
