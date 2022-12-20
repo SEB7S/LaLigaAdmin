@@ -940,6 +940,7 @@ export default {
         })
         .catch((error) => {
           console.error(error.response);
+          console.log("error")
         });
     },
     /* UPDATE */
