@@ -863,7 +863,7 @@ export default {
           );
           var tourCategory = {
             tourId: 0,
-            providerCategoryId: option.id,
+            providerCategoryId: option,
           };
           tour.tourCategories.push(tourCategory);
         });

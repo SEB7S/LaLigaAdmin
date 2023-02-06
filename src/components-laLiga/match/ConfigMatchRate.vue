@@ -186,9 +186,7 @@
     <el-dialog
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-
+      :before-close="handleClose"
     >
       <el-form
         ref="formMatchRate"
@@ -271,6 +269,11 @@
             </template>
           </el-autocomplete>
         </el-form-item>
+        <el-form-item label="Categoy color" class="category-colors"  prop="category_color">
+          <div class="block">
+            <el-color-picker v-model="formMatchRate.categoryColor" :predefine="predefineColors"></el-color-picker>
+          </div>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -287,8 +290,7 @@
     <el-dialog
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
+      :before-close="handleClose"
     >
       <el-table
         :data="pvData"
@@ -309,49 +311,49 @@
   </div>
 </template>
 <script>
-import i18n from "@/lang/index.js";
-import { fetchList, fetchPv } from "@/api/article";
-import waves from "@/directive/waves"; // waves directive
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
-import axios from "axios";
-import moment from "moment";
+import i18n from '@/lang/index.js'
+import { fetchList, fetchPv } from '@/api/article'
+import waves from '@/directive/waves' // waves directive
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import axios from 'axios'
+import moment from 'moment'
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" },
-];
+  { key: 'CN', display_name: 'China' },
+  { key: 'US', display_name: 'USA' },
+  { key: 'JP', display_name: 'Japan' },
+  { key: 'EU', display_name: 'Eurozone' }
+]
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "ConfigProvider",
+  name: 'ConfigProvider',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
-    },
+      return calendarTypeKeyValue[type]
+    }
   },
   filters: {
-    dateformat: function (value) {
+    dateformat: function(value) {
       if (value) {
-        return moment(String(value)).format("MM/DD/YYYY hh:mm");
+        return moment(String(value)).format('MM/DD/YYYY hh:mm')
       }
-    },
+    }
   },
   data() {
     return {
@@ -365,30 +367,30 @@ export default {
         importance: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" },
+        { label: 'ID Ascending', key: '+id' },
+        { label: 'ID Descending', key: '-id' }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
@@ -396,81 +398,99 @@ export default {
 
       /** FormMatchRate */
       formMatchRate: {
-        matchId: "",
-        matchName: "",
-        start_date: "",
-        final_date: "",
+        matchId: '',
+        matchName: '',
+        start_date: '',
+        final_date: '',
         stadiumCategoryId: 1,
-        stadiumCategoryName: "",
-        paxTypeIn: "",
+        stadiumCategoryName: '',
+        paxTypeIn: '',
         match_price: 0,
         stadium_id: 0,
-        startMatch: "",
+        startMatch: '',
+        categoryColor: ''
       },
       rules: {
         matchName: [
           {
             required: true,
-            message: i18n.t("forms.incompleteInput"),
-          },
+            message: i18n.t('forms.incompleteInput'),
+            trigger: 'blur'
+          }
         ],
         start_date: [
           {
             required: true,
-            message: i18n.t("forms.incompleteInput"),
-
-          },
+            message: i18n.t('forms.incompleteInput'),
+            trigger: 'blur'
+          }
         ],
         final_date: [
           {
             required: true,
-            message: i18n.t("forms.incompleteInput"),
-
-          },
+            message: i18n.t('forms.incompleteInput'),
+            trigger: 'blur'
+          }
         ],
         stadiumCategoryName: [
           {
             required: true,
-            message: i18n.t("forms.incompleteInput"),
-          },
+            message: i18n.t('forms.incompleteInput'),
+            trigger: 'blur'
+          }
         ],
         paxTypeIn: [
           {
             required: true,
-            message: i18n.t("forms.incompleteInput"),
-
-          },
+            message: i18n.t('forms.incompleteInput'),
+            trigger: 'blur'
+          }
         ],
         match_price: [
           {
             required: true,
-            message: i18n.t("forms.incompleteInput"),
-            trigger: "blur",
-          },
+            message: i18n.t('forms.incompleteInput'),
+            trigger: 'blur'
+          }
         ],
+        category_color:[
+          {
+            required: true,
+            message: i18n.t('forms.colorCategoryEmpty'),
+            trigger: 'blur'
+          }
+        ]
       },
       matchRateUpdate: [],
       /* EndPoint */
       url: this.$store.getters.url,
-      search: "",
+      search: '',
       matchRateList: [],
       defaultDate: new Date(),
       paxTypeInOption: [
         {
           value: 1,
-          label: "Adult",
+          label: 'Adult'
         },
         {
           value: 2,
-          label: "Child",
-        },
+          label: 'Child'
+        }
       ],
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() < Date.now();
-        },
+          return time.getTime() < Date.now()
+        }
       },
-    };
+
+      predefineColors: [
+        '#9abee5',
+        '#8ab1df',
+        '#3471b6',
+        '#1d4f8a',
+        '#e73a5e',
+      ],
+    }
   },
   /* INPUT SEARCH */
   computed: {
@@ -483,146 +503,143 @@ export default {
             item.phone.toLowerCase().includes(this.search.toLowerCase()) ||
             item.email.toLowerCase().includes(this.search.toLowerCase()) */
             item
-          );
-        });
+          )
+        })
       }
-    },
+    }
   },
   created() {
     /*     this.getList(); */
-    this.getMatchRate();
+    this.getMatchRate()
   },
   methods: {
     /* TABLE */
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       fetchList(this.listQuery).then((response) => {
-        this.list = response.data.items;
-        this.total = response.data.total;
+        this.list = response.data.items
+        this.total = response.data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getMatchRate();
+      this.listQuery.page = 1
+      this.getMatchRate()
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     handleFetchPv(pv) {
       fetchPv(pv).then((response) => {
-        this.pvData = response.data.pvData;
-        this.dialogPvVisible = true;
-      });
+        this.pvData = response.data.pvData
+        this.dialogPvVisible = true
+      })
     },
     handleDownload() {
-      this.downloadLoading = true;
-      import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
-        const data = this.formatJson(filterVal);
-        const date = new Date();
+      this.downloadLoading = true
+      import('@/vendor/Export2Excel').then((excel) => {
+        const tHeader = ['id', 'name', 'document', 'phone', 'email']
+        const filterVal = ['id', 'name', 'document', 'phone', 'email']
+        const data = this.formatJson(filterVal)
+        const date = new Date()
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Providers" + date,
-        });
-        this.downloadLoading = false;
-      });
+          filename: 'Providers' + date
+        })
+        this.downloadLoading = false
+      })
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
+    getSortClass: function(key) {
       /*       const sort = this.listQuery.sort;
       return sort === `+${key}` ? "ascending" : "descending"; */
     },
     handleClose(done) {
-      this.$confirm(i18n.t("modals.closeFormMsg"))
+      this.$confirm(i18n.t('modals.closeFormMsg'))
         .then((_) => {
-          done();
+          done()
         })
-        .catch((_) => {});
+        .catch((_) => {})
     },
     /* MATCH RATE */
     resetTemp() {
       this.formMatchRate = {
-        matchId: "",
-        matchName: "",
-        start_date: "",
-        final_date: "",
+        matchId: '',
+        matchName: '',
+        start_date: '',
+        final_date: '',
         stadiumCategoryId: 1,
-        stadiumCategoryName: "",
-        paxTypeIn: "",
+        stadiumCategoryName: '',
+        paxTypeIn: '',
         match_price: 0,
-        startMatch: "",
-      };
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+        startMatch: ''
+      }
     },
     resetFormContinue() {
-      console.log(this.formMatchRate);
-      this.formMatchRate.match_price = "";
-      this.formMatchRate.stadiumCategoryId = 0;
-      this.formMatchRate.stadiumCategoryName = "";
+      console.log(this.formMatchRate)
+      this.formMatchRate.match_price = ''
+      this.formMatchRate.stadiumCategoryId = 0
+      this.formMatchRate.stadiumCategoryName = '';
 
-      (this.stadiumCategoryId = 1), (this.stadiumCategoryName = "");
+      (this.stadiumCategoryId = 1), (this.stadiumCategoryName = '')
     },
     /* GET */
     getMatchRate() {
-      this.listLoading = true;
-      console.log(this.defaultDate);
+      this.listLoading = true
+      console.log(this.defaultDate)
       axios
-        .get(this.url + "MatchRate")
+        .get(this.url + 'MatchRate')
         .then((response) => {
-          console.log(response.data);
-          this.list = response.data;
-          this.listLoading = false;
+          console.log(response.data)
+          this.list = response.data
+          this.listLoading = false
         })
         .catch((error) => {
-          this.status = "error";
-        });
+          this.status = 'error'
+        })
     },
     /* POST */
     handleCreate() {
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.city_name = "";
-      this.resetTemp();
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.city_name = ''
+      this.resetTemp()
     },
     postMatchRate() {
-      this.$refs["formMatchRate"].validate((valid) => {
+      this.$refs['formMatchRate'].validate((valid) => {
         var matchRate = {
           start_date: this.formMatchRate.start_date,
           final_date: this.formMatchRate.final_date,
@@ -630,49 +647,50 @@ export default {
           stadiumStadiumCategoryId: this.formMatchRate.stadiumCategoryId,
           matchId: this.formMatchRate.matchId,
           paxTypeIn: parseInt(this.formMatchRate.paxTypeIn),
-          match_price: this.formMatchRate.match_price,
-        };
+          match_price: this.formMatchRate.match_price
+        }
         if (valid) {
           axios
-            .post(this.url + "MatchRate", matchRate)
+            .post(this.url + 'MatchRate', matchRate)
             .then((response) => {
               setTimeout(() => {
-                this.$confirm(i18n.t("modals.addAnotherMatch"), "Info", {
-                  confirmButtonText: i18n.t("modals.confirmButton"),
-                  cancelButtonText: i18n.t("modals.cancelButton"),
-                  type: "success",
-                })
+                this.$confirm(
+                  i18n.t('modals.addAnotherMatch'),
+                  'Info',
+                  {
+                    confirmButtonText: i18n.t('modals.confirmButton'),
+                    cancelButtonText: i18n.t('modals.cancelButton'),
+                    type: 'success'
+                  }
+                )
                   .then(() => {
-                    this.resetFormContinue();
+                    this.resetFormContinue()
                   })
                   .catch(() => {
-                    this.dialogFormVisible = false;
-                  });
-                this.getMatchRate();
-                this.resetForm("formMatchRate");
-              }, 1000);
+                    this.dialogFormVisible = false
+                  })
+                this.getMatchRate()
+              }, 1000)
             })
             .catch((error) => {
-              console.error(error.response);
-            });
+              console.error(error.response)
+            })
         }
-      });
+      })
     },
     /* UPDATE */
     changeStatus(data, status) {
       this.$confirm(
-        i18n.t("modals.changeStatus", {
-          mgs: status ? i18n.t("modals.activate") : i18n.t("modals.inactivate"),
-        }),
-        i18n.t("modals.warning"),
+        i18n.t('modals.changeStatus', {mgs : status ?  i18n.t('modals.activate') : i18n.t('modals.inactivate')}),
+        i18n.t('modals.warning'),
         {
-          confirmButtonText: i18n.t("modals.confirmButton"),
-          cancelButtonText: i18n.t("modals.cancelButton"),
-          type: "warning",
+          confirmButtonText: i18n.t('modals.confirmButton'),
+          cancelButtonText: i18n.t('modals.cancelButton'),
+          type: 'warning'
         }
       )
         .then(() => {
-          console.log(data);
+          console.log(data)
           var matchRate = {
             id: data.id,
             paxTypeIn: data.paxTypeId,
@@ -681,49 +699,48 @@ export default {
             start_date: data.startDate,
             final_date: data.finalDate,
             available: data.available,
-            matchId: data.matchId,
-          };
+            matchId: data.matchId
+          }
           axios
-            .put(this.url + "MatchRate", matchRate)
+            .put(this.url + 'MatchRate', matchRate)
             .then((response) => {
-              this.dialogFormVisible = false;
+              this.dialogFormVisible = false
               this.$notify({
-                title: i18n.t("notifications.success"),
-                message: i18n.t("notifications.changeStateSuccess"),
-                type: "success",
-                duration: 2000,
-              });
+                title: i18n('notifications.success'),
+                message: i18n('notifications.changeStateSuccess'),
+                type: 'success',
+                duration: 2000
+              })
 
-              this.getMatchRate();
+              this.getMatchRate()
             })
             .catch((error) => {
-              console.error(error.response);
-            });
+              console.error(error.response)
+            })
         })
         .catch(() => {
-          this.getMatchRate();
-        });
+          this.getMatchRate()
+        })
     },
     handleUpdate(row) {
-      console.log(row);
-      this.matchRateUpdate = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.formMatchRate.matchId = row.matchId;
+      console.log(row)
+      this.matchRateUpdate = row
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.formMatchRate.matchId = row.matchId
 
       /* this.formMatchRate.matchName = row.matchName; */
-      this.formMatchRate.start_date = row.startDate;
-      this.formMatchRate.final_date = row.finalDate;
-      this.formMatchRate.stadiumCategoryId = row.stadiumCategoryId;
-      this.formMatchRate.stadiumCategoryName = row.stadioCategoryNameEnglish;
-      this.formMatchRate.paxTypeIn = row.paxTypeId;
-      this.formMatchRate.matchName = row.matchName;
-      this.formMatchRate.match_price = row.matchPrice;
-      this.formMatchRate.stadium_id = row.stadioId;
-      this.formMatchRate.available = row.available;
+      this.formMatchRate.start_date = row.startDate
+      this.formMatchRate.final_date = row.finalDate
+      this.formMatchRate.stadiumCategoryId = row.stadiumCategoryId
+      this.formMatchRate.stadiumCategoryName = row.stadioCategoryNameEnglish
+      this.formMatchRate.paxTypeIn = row.paxTypeId
+      this.formMatchRate.matchName = row.matchName
+      this.formMatchRate.match_price = row.matchPrice
+      this.formMatchRate.stadium_id = row.stadioId
     },
     updateData() {
-      this.$refs["formMatchRate"].validate((valid) => {
+      this.$refs['formMatchRate'].validate((valid) => {
         if (valid) {
           var matchRate = {
             id: this.matchRateUpdate.id,
@@ -734,95 +751,99 @@ export default {
             final_date: this.formMatchRate.final_date,
             available: this.formMatchRate.available,
             matchId: this.formMatchRate.matchId,
-          };
+          }
           axios
-            .put(this.url + "MatchRate", matchRate)
+            .put(this.url + 'MatchRate', matchRate)
             .then((response) => {
-              this.dialogFormVisible = false;
+              this.dialogFormVisible = false
               this.$notify({
-                title: i18n.t("notifications.success"),
-                message: i18n.t("notifications.uptadeSuccess"),
-                type: "success",
-                duration: 2000,
-              });
+                title: i18n('notifications.success'),
+                message: i18n('notifications.uptadeSuccess'),
+                type: 'success',
+                duration: 2000
+              })
 
-              this.getMatchRate();
+              this.getMatchRate()
             })
             .catch((error) => {
-              console.error(error.response);
-            });
+              console.error(error.response)
+            })
         }
-      });
+      })
     },
     /* DELETE */
     handleSelectionChange(val) {
-      this.matchRateList = val;
+      this.matchRateList = val
     },
     handleDelete(row, selected) {
-      var id = selected ? row : row.id;
+      var id = selected ? row : row.id
       axios
-        .delete(this.url + "MatchRate/" + id)
+        .delete(this.url + 'MatchRate/' + id)
         .then((response) => {
           this.$notify({
-            title: i18n.t("notifications.success"),
-            message: i18n.t("notifications.deleteSuccessfully"),
-            type: "success",
-            duration: 2000,
-          });
-          this.getMatchRate();
-          this.showReviewer = false;
-          this.matchRateList = [];
+            title: i18n('notifications.success'),
+            message: i18n('notifications.deleteSuccessfully'),
+            type: 'success',
+            duration: 2000
+          })
+          this.getMatchRate()
+          this.showReviewer = false
+          this.matchRateList = []
         })
         .catch((error) => {
-          console.error(error.response);
-        });
+          console.error(error.response)
+        })
     },
     confirmDelete(row) {
       this.$confirm(
-        i18n.t("modals.deleteItemWarning"),
-        i18n.t("modals.warning"),
+        i18n('modals.deleteItemWarning'),
+        i18n('modals.warning'),
         {
-          confirmButtonText: i18n.t("modals.confirmButton"),
-          cancelButtonText: i18n.t("modals.cancelButton"),
-          type: "warning",
+          confirmButtonText: i18n('modals.confirmButton'),
+          cancelButtonText: i18n('modals.cancelButton'),
+          type: 'warning'
         }
       )
         .then(() => {
           this.$message({
-            type: "success",
-            message: i18n.t("notifications.deleteComplete"),
-          });
-          this.handleDelete(row, false);
+            type: 'success',
+            message: i18n('notifications.deleteComplete')
+          })
+          this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: i18n.t("notifications.deleteCanceled"),
-          });
-        });
+            type: 'info',
+            message: i18n('notifications.deleteCanceled')
+          })
+        })
     },
     handleDeleteAll() {
-      this.$confirm(i18n.t("modals.deleteItemWarning"), "Warning", {
-        confirmButtonText: i18n.t("modals.confirmButton"),
-        cancelButtonText: i18n.t("modals.cancelButton"),
-        type: "warning",
-      })
+      this.$confirm(
+        i18n('modals.deleteItemWarning'),
+        'Warning',
+        {
+          confirmButtonText: i18n('modals.confirmButton'),
+          cancelButtonText: i18n('modals.cancelButton'),
+          type: 'warning'
+        }
+      )
         .then(() => {
           this.$message({
-            type: "success",
-            message: i18n.t("notifications.deleteComplete"),
-          });
+            type: 'success',
+            message: i18n('notifications.deleteComplete')
+          })
           this.matchRateList.forEach((value) => {
-            console.log(value);
-            this.handleDelete(value, false);
-          });
+            console.log(value)
+            this.handleDelete(value, false)
+          })
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: i18n.t("notifications.deleteCanceled"),
-          });
-        });
+            type: 'info',
+            message: i18n('notifications.deleteCanceled')
+          })
+        })
     },
 
     /* CATEGORY STADIUM */
@@ -830,68 +851,68 @@ export default {
       axios
         .get(
           this.url +
-            "Stadium/GetStadiumById?id=" +
+            'Stadium/GetStadiumById?id=' +
             this.formMatchRate.stadium_id
         )
         .then((response) => {
-          console.log(response.data);
-          var links = response.data[0].stadiumCategories;
+          var links = response.data[0].stadiumCategories
           var results = queryString
             ? links.filter(this.createFilterCatStad(queryString))
-            : links;
-          cb(results);
+            : links
+          cb(results)
+          
         })
         .catch((error) => {
-          this.status = "error";
-        });
+          this.status = 'error'
+        })
     },
     createFilterCatStad(queryString) {
       return (link) => {
         return (
           link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
           0
-        );
-      };
+        )
+      }
     },
     handleSelectCatStad(item) {
-      console.log(item);
-      this.formMatchRate.stadiumCategoryName = item.nameEnglish;
-      this.formMatchRate.stadiumCategoryId = item.id;
+      console.log(item)
+      this.formMatchRate.stadiumCategoryName = item.nameEnglish
+      this.formMatchRate.stadiumCategoryId = item.id
     },
     handleIconClickCatStad(ev) {
-      console.log(ev);
+      console.log(ev)
     },
     /* MATCH */
     getMatch(queryString, cb) {
       axios
-        .get(this.url + "Match")
+        .get(this.url + 'Match')
         .then((response) => {
-          console.log(response.data);
-          var links = response.data;
+          console.log(response.data)
+          var links = response.data
           var results = queryString
             ? links.filter(this.createFilterMatch(queryString))
-            : links;
-          cb(results);
+            : links
+          cb(results)
         })
         .catch((error) => {
-          this.status = "error";
-        });
+          this.status = 'error'
+        })
     },
     createFilterMatch(queryString) {
       return (link) => {
         return (
           link.clubs.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        );
-      };
+        )
+      }
     },
     handleSelectMatch(item) {
-      console.log(item);
-      this.formMatchRate.matchId = item.id;
-      this.formMatchRate.matchName = item.clubs;
-      this.formMatchRate.stadium_id = item.stadium_id;
-      this.formMatchRate.start_date = new Date();
-      this.formMatchRate.final_date = new Date(item.date);
-      this.formMatchRate.startMatch = new Date(item.date);
+      console.log(item)
+      this.formMatchRate.matchId = item.id
+      this.formMatchRate.matchName = item.clubs
+      this.formMatchRate.stadium_id = item.stadium_id
+      this.formMatchRate.start_date = new Date()
+      this.formMatchRate.final_date = new Date(item.date)
+      this.formMatchRate.startMatch = new Date(item.date)
       if (
         this.formMatchRate.final_date.getTime() -
           this.formMatchRate.start_date.getTime() >=
@@ -899,16 +920,16 @@ export default {
       ) {
         this.formMatchRate.final_date.setDate(
           this.formMatchRate.final_date.getDate() - 7
-        );
+        )
       } else {
-        this.formMatchRate.final_date = new Date(item.date);
+        this.formMatchRate.final_date = new Date(item.date)
       }
     },
     handleIconClickMatch(ev) {
-      console.log(ev);
-    },
+      console.log(ev)
+    }
   },
-};
+}
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 </style>
