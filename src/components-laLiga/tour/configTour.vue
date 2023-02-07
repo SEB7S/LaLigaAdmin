@@ -125,7 +125,7 @@
       >
         <template slot-scope="{ row }">
           <span>{{
-            row.tourDayDescriptions[0].date | moment("MMMM Do YYYY")
+            row.tourDayDescriptions.length > 0 ? row.tourDayDescriptions[0].date : 'dias no configurados' | moment("MMMM Do YYYY")
           }}</span>
         </template>
       </el-table-column>
