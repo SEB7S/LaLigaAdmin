@@ -453,13 +453,13 @@ export default {
             trigger: 'blur'
           }
         ],
-        category_color:[
+/*         category_color:[
           {
             required: true,
             message: i18n.t('forms.colorCategoryEmpty'),
             trigger: 'blur'
           }
-        ]
+        ] */
       },
       matchRateUpdate: [],
       /* EndPoint */
