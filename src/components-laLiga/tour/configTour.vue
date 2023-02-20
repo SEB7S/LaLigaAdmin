@@ -19,13 +19,13 @@
       <el-input
         v-model="search"
         placeholder="Search"
-        style="width: 200px"
+        style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-button
         class="filter-item"
-        style="margin-left: 10px"
+        style="margin-left: 10px;"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
@@ -56,7 +56,7 @@
       <el-checkbox
         v-model="showReviewer"
         class="filter-item"
-        style="margin-left: 15px"
+        style="margin-left: 15px;"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
@@ -69,7 +69,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%"
+      style="width: 100%;"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -125,7 +125,9 @@
       >
         <template slot-scope="{ row }">
           <span>{{
-            row.tourDayDescriptions.length > 0 ? row.tourDayDescriptions[0].date : 'dias no configurados' | moment("MMMM Do YYYY")
+            row.tourDayDescriptions.length > 0
+              ? row.tourDayDescriptions[0].date
+              : "dias no configurados" | moment("MMMM Do YYYY")
           }}</span>
         </template>
       </el-table-column>
@@ -204,7 +206,7 @@
           <el-step :title="$t('tour.stepTwoName')" icon="el-icon-date" />
         </el-steps>
       </div>
-      <div style="margin-top: 60px; padding: 25px">
+      <div style="margin-top: 60px; padding: 25px;">
         <div v-if="active == 0">
           <el-form
             ref="formTour"
@@ -235,7 +237,7 @@
                 popper-class="my-autocomplete"
                 :fetch-suggestions="getProviders"
                 placeholder="Please input"
-                style="width: 100%"
+                style="width: 100%;"
                 @select="handleSelect"
               >
                 <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -314,7 +316,7 @@
                           popper-class="my-autocomplete"
                           :fetch-suggestions="getCities"
                           placeholder="Please input"
-                          style="width: 100%"
+                          style="width: 100%;"
                           @select="handleSelectCity"
                           @focus="arrayPosition = counter"
                         >
@@ -327,7 +329,7 @@
                               :disabled="item.hotels.length > 0"
                               class="value"
                             >
-                              <span style="float: left">{{
+                              <span style="float: left;">{{
                                 item.nameEnglish
                               }}</span>
                               <span
@@ -457,7 +459,7 @@
         border
         fit
         highlight-current-row
-        style="width: 100%"
+        style="width: 100%;"
       >
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
@@ -855,7 +857,6 @@ export default {
           isMaster: true,
           tourInstances: null,
         };
-
         this.formTour.hotel_category.forEach((option) => {
           console.log(
             "🚀 ~ file: configTour.vue ~ line 819 ~ this.formTour.hotel_category.forEach ~ option",
@@ -867,7 +868,6 @@ export default {
           };
           tour.tourCategories.push(tourCategory);
         });
-
         this.formDayDetail.forEach((element, index) => {
           console.log(
             "🚀 ~ file: configTour.vue ~ line 828 ~ this.formDayDetail.forEach ~ element",
@@ -891,22 +891,29 @@ export default {
           "🚀 ~ file: configTour.vue ~ line 842 ~ this.formDayDetail.forEach ~ tour",
           tour
         );
-        axios
-          .post(this.url + "Tour", tour)
-          .then((response) => {
-            this.getTour();
-            this.$notify({
-              title: i18n.t("notifications.success"),
-              message: i18n.t("notifications.addedSuccessfully"),
-              type: "success",
-              duration: 1000,
+        if (tour.tourDayDescriptions.length > 0) {
+          axios
+            .post(this.url + "Tour", tour)
+            .then((response) => {
+              this.getTour();
+              this.$notify({
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.addedSuccessfully"),
+                type: "success",
+                duration: 1000,
+              });
+              console.log(response.data.tourDayDescriptions);
+              this.postImageTour(response.data.tourDayDescriptions);
+            })
+            .catch((error) => {
+              console.error(error.response);
             });
-            console.log(response.data.tourDayDescriptions);
-            this.postImageTour(response.data.tourDayDescriptions);
-          })
-          .catch((error) => {
-            console.error(error.response);
+        }else{
+          this.$notify.error({
+            title: "Error",
+            message: 'Debes colocar una fecha',
           });
+        }
       }
     },
     postImageTour(dayDescription) {
@@ -1337,23 +1344,24 @@ export default {
               item.nameEnglish.split(",")[0]
             );
           }
-          this.formDayDetail[this.arrayPosition].titleTourCities =
-            this.concatenateTitle(this.arrayPosition);
+          this.formDayDetail[
+            this.arrayPosition
+          ].titleTourCities = this.concatenateTitle(this.arrayPosition);
         } else {
           console.log(item, this.formTour.options);
           item.notIncludeProvider.forEach((id) => {
             this.aCategoriesProv = this.formTour.options.filter((a) => {
               return a.id == id;
             });
-            console.log(this.aCategoriesProv)
-            this.categoriesProv += this.aCategoriesProv[0].name + " "
+            console.log(this.aCategoriesProv);
+            this.categoriesProv += this.aCategoriesProv[0].name + " ";
           });
 
           this.$notify.error({
             title: "Error",
             message: `La ciudad no tiene hoteles con estas categorías  (${this.categoriesProv})`,
           });
-          this.categoriesProv= ""
+          this.categoriesProv = "";
           console.log(this.categoriesProv);
         }
       } else {
@@ -1419,19 +1427,24 @@ export default {
               dayName2: days[weekDay],
               startDate: this.addDate(index, dateFormat) + " - ",
               startDateFormat: new Date(this.start_date),
-              cityName:
-                this.editFormTourDayDescription[index]["cityNameEnglish"],
+              cityName: this.editFormTourDayDescription[index][
+                "cityNameEnglish"
+              ],
               cityId: this.editFormTourDayDescription[index]["cityId"],
-              description_english:
-                this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
-              description_spanish:
-                this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
+              description_english: this.editFormTourDayDescription[index][
+                "dayDescriptionEnglish"
+              ],
+              description_spanish: this.editFormTourDayDescription[index][
+                "dayDescriptionSpanish"
+              ],
               matchable: this.editFormTourDayDescription[index]["matchable"],
               id: this.editFormTourDayDescription[index]["id"],
-              tourCities:
-                this.editFormTourDayDescription[index]["tourCities"].split("/"),
-              titleTourCities:
-                this.editFormTourDayDescription[index]["tourCities"],
+              tourCities: this.editFormTourDayDescription[index][
+                "tourCities"
+              ].split("/"),
+              titleTourCities: this.editFormTourDayDescription[index][
+                "tourCities"
+              ],
               tourId: this.editFormTourDayDescription[index]["tourId"],
               images: this.editFormTourDayDescription[index]["images"],
             };

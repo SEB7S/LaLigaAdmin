@@ -83,7 +83,7 @@
                   >
                     <el-form :model="season" ref="seasonForm">
                       <el-form-item
-                        style="margin: 0"
+                        style="margin: 0;"
                         prop="label"
                         :rules="
                           season.status ? formRules.name[0] : formRules.name2[0]
@@ -103,7 +103,7 @@
                   </span>
                 </el-tooltip>
                 <el-switch
-                  style="float: right; vertical-align: middle; margin: 0.3rem"
+                  style="float: right; vertical-align: middle; margin: 0.3rem;"
                   :disabled="season.changeName == false"
                   v-model="season.status"
                 >
@@ -225,21 +225,21 @@
           type="primary"
           round
           @click="postTourInstance"
-          :disabled="!disabledButton"
+          :disabled="!disabledButton2"
           >Next</el-button
         >
-        <div v-if="tour != ''" style="margin: 15px 0">
+        <div v-if="tour != ''" style="margin: 15px 0;">
           <el-checkbox
-            style="margin: 15px 0"
             :indeterminate="isIndeterminate"
+            style="margin: 15px 0;"
             v-model="checkAll"
             @change="handleCheckAllChange"
             >Marcar todos</el-checkbox
           >
-          <div style="margin: 15px 0"></div>
+          <div style="margin: 15px 0;"></div>
 
           <el-checkbox-group
-            style="display: grid"
+            style="display: grid;"
             v-model="checkedTours"
             @change="handlecheckedToursChange"
           >
@@ -269,7 +269,7 @@
                   <el-select
                     v-model="tourDay.seasonName"
                     placeholder="Select season"
-                    style="margin: 3px"
+                    style="margin: 3px;"
                     @change="itemSelected(tourDay, index)"
                     :style="{ display: tourDay.hidden ? 'none' : '' }"
                   >
@@ -296,7 +296,7 @@
         <div class="filter-container">
           <el-input
             placeholder="Search"
-            style="width: 200px"
+            style="width: 200px;"
             class="filter-item"
             v-model="search"
             @keyup.enter.native="handleFilter"
@@ -308,7 +308,7 @@
             type="primary"
             icon="el-icon-download"
             @click="handleDownload"
-            style="margin-left: 10px"
+            style="margin-left: 10px;"
           >
             {{ $t("table.export") }}
           </el-button>
@@ -337,7 +337,7 @@
           <el-checkbox
             v-model="showReviewer"
             class="filter-item"
-            style="margin-left: 15px"
+            style="margin-left: 15px;"
             @change="tableKey = tableKey + 1"
           >
             {{ $t("table.select") }}
@@ -350,7 +350,7 @@
           border
           fit
           highlight-current-row
-          style="width: 100%"
+          style="width: 100%;"
           @sort-change="sortChange"
           @selection-change="handleSelectionChange"
         >
@@ -474,7 +474,7 @@
               <el-step :title="$t('tour.stepTwoName')" icon="el-icon-date" />
             </el-steps>
           </div>
-          <div style="margin-top: 60px; padding: 25px">
+          <div style="margin-top: 60px; padding: 25px;">
             <div v-if="active == 0">
               <el-form
                 ref="formTour"
@@ -505,7 +505,7 @@
                     popper-class="my-autocomplete"
                     :fetch-suggestions="getProviders"
                     placeholder="Please input"
-                    style="width: 100%"
+                    style="width: 100%;"
                     @select="handleSelectProv"
                   >
                     <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -586,7 +586,7 @@
                               popper-class="my-autocomplete"
                               :fetch-suggestions="getCities"
                               placeholder="Please input"
-                              style="width: 100%"
+                              style="width: 100%;"
                               @select="handleSelectCity"
                               @focus="arrayPosition = counter"
                             >
@@ -718,7 +718,7 @@
             border
             fit
             highlight-current-row
-            style="width: 100%"
+            style="width: 100%;"
           >
             <el-table-column prop="key" label="Channel" />
             <el-table-column prop="pv" label="Pv" />
@@ -863,9 +863,10 @@ export default {
       tour: "",
       tourSelected: null,
       aListTours: [],
+      aListToursOriginal:[],
       aListToursFinal: [],
       /* checkbox */
-      checkAll: false,
+      checkAll: true,
       checkedTours: [],
 
       isIndeterminate: true,
@@ -922,7 +923,8 @@ export default {
       },
       fullscreenLoading: false,
       fullscreenLoadingTable: false,
-      disabledButton: true,
+      disabledButton: false,
+      disabledButton2:true,
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now();
@@ -1059,6 +1061,7 @@ export default {
     },
     /* Deshabilitar categorias mientras se completa el precio de una acomodacion */
     disableCategorySeasons(idCat, idSeason, status) {
+      console.log("STATUS",status)
       this.disabledButton = status;
       this.seasons.map((season) => {
         season.categories.map((cat) => {
@@ -1319,8 +1322,10 @@ export default {
                   if (seasonInfo.priority) {
                     this.categoryDefault = seasonInfo;
                     this.seasonsId = idSeasons;
-                    console.log("🚀 ~ file: programTour.vue ~ line 1322 ~ this.listTours.tourCategories.forEach ~ this.seasonsId", this.seasonsId)
-                    
+                    console.log(
+                      "🚀 ~ file: programTour.vue ~ line 1322 ~ this.listTours.tourCategories.forEach ~ this.seasonsId",
+                      this.seasonsId
+                    );
                   }
                   this.seasons.push({
                     seasonId: seasonInfo.tourSeasonId,
@@ -1393,6 +1398,7 @@ export default {
       this.caculateDate(this.listTours); */
       var validator = true;
       this.fullscreenLoading = true;
+      this.disabledButton = true;
       this.$refs.seasons.$children.forEach((card) => {
         card.$children[0].$children.forEach((cardItems) => {
           /*           console.log("aquí",this.$refs) */
@@ -1411,7 +1417,6 @@ export default {
             });
           }
         });
-
       });
 
       if (validator) {
@@ -1790,7 +1795,7 @@ export default {
           this.listTours = response.data[0];
 
           this.getTourForTable();
-          this.getSeason()
+          this.getSeason();
         })
 
         .catch((error) => {
@@ -1802,14 +1807,26 @@ export default {
       console.log(ev);
     },
     handleCheckAllChange(val) {
-      console.log(val);
-      val
+      console.log(val, this.checkedTours, this.aListToursOriginal);
+      if(val){
+        this.disabledButton2 = true
+      }else{
+        this.disabledButton2 = false
+      }
+      this.checkedTours = val ? this.aListToursOriginal : []
+
+/*             val
         ? this.checkTour(this.listTours, (this.disabledButton = true))
         : ((this.checkedTours = this.aListTours),
-          (this.disabledButton = false));
+          (this.disabledButton = false)); */
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
+      if(value.length > 0){
+        this.disabledButton2 = true
+      }else{
+        this.disabledButton2 = false
+      }
       console.log("hola", value);
       this.aListToursFinal = [];
       var copyValue = value;
@@ -1902,6 +1919,7 @@ export default {
       this.checkTour(tour);
       this.orderList();
       this.aListToursFinal = this.aListTours;
+
       console.log(this.aListTours);
     },
     itemSelected(item, index) {
@@ -1978,6 +1996,7 @@ export default {
       } else {
         this.disabledButton = true;
       }
+      this.aListToursOriginal = this.checkedTours
       console.log(
         "count",
         this.countCheckedTours,
@@ -2235,8 +2254,9 @@ export default {
           item.nameEnglish.split(",")[0]
         );
       }
-      this.formDayDetail[this.arrayPosition].titleTourCities =
-        this.concatenateTitle(this.arrayPosition);
+      this.formDayDetail[
+        this.arrayPosition
+      ].titleTourCities = this.concatenateTitle(this.arrayPosition);
     },
     /* TOURDAY */
     calculateDays() {
@@ -2293,19 +2313,24 @@ export default {
               dayName2: days[weekDay],
               startDate: this.addDate(index, dateFormat) + " - ",
               startDateFormat: new Date(this.start_date),
-              cityName:
-                this.editFormTourDayDescription[index]["cityNameEnglish"],
+              cityName: this.editFormTourDayDescription[index][
+                "cityNameEnglish"
+              ],
               cityId: this.editFormTourDayDescription[index]["cityId"],
-              description_english:
-                this.editFormTourDayDescription[index]["dayDescriptionEnglish"],
-              description_spanish:
-                this.editFormTourDayDescription[index]["dayDescriptionSpanish"],
+              description_english: this.editFormTourDayDescription[index][
+                "dayDescriptionEnglish"
+              ],
+              description_spanish: this.editFormTourDayDescription[index][
+                "dayDescriptionSpanish"
+              ],
               matchable: this.editFormTourDayDescription[index]["matchable"],
               id: this.editFormTourDayDescription[index]["id"],
-              tourCities:
-                this.editFormTourDayDescription[index]["tourCities"].split("/"),
-              titleTourCities:
-                this.editFormTourDayDescription[index]["tourCities"],
+              tourCities: this.editFormTourDayDescription[index][
+                "tourCities"
+              ].split("/"),
+              titleTourCities: this.editFormTourDayDescription[index][
+                "tourCities"
+              ],
               tourId: this.editFormTourDayDescription[index]["tourId"],
               images: this.editFormTourDayDescription[index]["images"],
             };
