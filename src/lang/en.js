@@ -164,7 +164,7 @@ export default {
     cityStadium: 'City',
     latitudeStadium: 'Latitude',
     longitudeStadium: 'Longitude',
-    image: 'Choose Image',
+    image: 'Choose Image (max 2.)',
     nameEnglish: 'Name English',
     nameEspanish: "Name Spanish",
     priority: 'Priority',

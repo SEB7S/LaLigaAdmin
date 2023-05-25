@@ -487,6 +487,11 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.list = response.data;
+          this.list.forEach((city, index) => {
+            if(city.id == 0){
+              this.list.splice(index, 1);
+            }
+          })
           this.listLoading = false;
         })
         .catch((error) => {

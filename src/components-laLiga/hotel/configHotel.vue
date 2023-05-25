@@ -4,7 +4,7 @@
       <el-input
         v-model="search"
         placeholder="Buscar"
-        style="width: 200px"
+        style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
@@ -19,7 +19,7 @@
       </el-button>  -->
       <el-button
         class="filter-item"
-        style="margin-left: 10px"
+        style="margin-left: 10px;"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
@@ -50,7 +50,7 @@
       <el-checkbox
         v-model="showReviewer"
         class="filter-item"
-        style="margin-left: 15px"
+        style="margin-left: 15px;"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
@@ -64,7 +64,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%"
+      style="width: 100%;"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -225,7 +225,7 @@
           :rules="rules"
           label-position="top"
           label-width="120px"
-          style="margin: 30px"
+          style="margin: 30px;"
         >
           <el-form-item :label="$t('hotel.nameEnHotel')" prop="nameEnglish">
             <el-input v-model="formHotel.nameEnglish" />
@@ -239,7 +239,7 @@
               popper-class="my-autocomplete"
               :fetch-suggestions="getProviders"
               placeholder="Please input"
-              style="width: 100%"
+              style="width: 100%;"
               @select="handleSelectProvider"
             >
               <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -257,7 +257,7 @@
               popper-class="my-autocomplete"
               :fetch-suggestions="getCatProvider"
               placeholder="Please input"
-              style="width: 100%"
+              style="width: 100%;"
               @select="handleSelectCatProvider"
             >
               <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -267,13 +267,12 @@
             </el-autocomplete>
           </el-form-item>
           <el-form-item :label="$t('hotel.cityHotel')" prop="city_name">
-
             <el-autocomplete
               v-model="formHotel.city_name"
               popper-class="my-autocomplete"
               :fetch-suggestions="getCities"
               placeholder="Please input"
-              style="width: 100%"
+              style="width: 100%;"
               @select="handleSelectCity"
             >
               <i
@@ -385,7 +384,7 @@
           ref="formHotel"
           label-position="top"
           label-width="120px"
-          style="margin: 30px"
+          style="margin: 30px;"
         >
           <el-form-item :label="$t('hotel.image')">
             <el-upload
@@ -449,7 +448,7 @@
         border
         fit
         highlight-current-row
-        style="width: 100%"
+        style="width: 100%;"
       >
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
@@ -739,15 +738,27 @@ export default {
           "id",
           "nameEnglish",
           "nameSpanish",
+          "cityId",
           "cityName",
+          "happyTourCategoryId",
+          "happyTourCategoryName",
+          "providerCategoryId",
           "providerCategoryName",
+          "providerId",
+          "providerName",
         ];
         const filterVal = [
           "id",
           "nameEnglish",
           "nameSpanish",
+          "cityId",
           "cityName",
+          "happyTourCategoryId",
+          "happyTourCategoryName",
+          "providerCategoryId",
           "providerCategoryName",
+          "providerId",
+          "providerName",
         ];
         const data = this.formatJson(filterVal);
         const date = new Date();
@@ -787,7 +798,11 @@ export default {
       return row[property] === value;
     },
     createFilters(data, filter) {
-      console.log("🚀 ~ file: configHotel.vue ~ line 790 ~ createFilters ~ data, filter", data, filter)
+      console.log(
+        "🚀 ~ file: configHotel.vue ~ line 790 ~ createFilters ~ data, filter",
+        data,
+        filter
+      );
       filter.forEach((element) => {
         const aFilter = [];
         data.forEach((element2) => {
@@ -940,7 +955,7 @@ export default {
         })
         .catch((error) => {
           console.error(error.response);
-          console.log("error")
+          console.log("error");
         });
     },
     /* UPDATE */
@@ -1121,7 +1136,10 @@ export default {
     },
     createFilterCity(queryString) {
       return (link) => {
-        return link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+        return (
+          link.nameEnglish.toLowerCase().indexOf(queryString.toLowerCase()) ===
+          0
+        );
       };
     },
     /* PROVIDER */

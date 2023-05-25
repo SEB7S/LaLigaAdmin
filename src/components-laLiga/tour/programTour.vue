@@ -1,9 +1,9 @@
 <template>
-  <div class="app-container">
+  <div class="app-container" v-loading="fullscreenLoading">
     <el-autocomplete
       v-model="tour"
       popper-class="my-autocomplete"
-      :fetch-suggestions="getTour"
+      :fetch-suggestions="querySearch"
       placeholder="Tour"
       @select="handleSelect"
     >
@@ -16,11 +16,7 @@
     </el-autocomplete>
     <h3>Tours</h3>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane
-        :label="$t('tour.season')"
-        name="first"
-        v-loading.fullscreen.lock="fullscreenLoading"
-      >
+      <el-tab-pane :label="$t('tour.season')" name="first">
         <el-button
           :disabled="!disabledButton"
           v-if="tour != ''"
@@ -243,7 +239,7 @@
             v-model="checkedTours"
             @change="handlecheckedToursChange"
           >
-            <el-row type="flex" class="space-bet" :gutter="20">
+            <el-row type="flex" style="justify-content: space-around;" :span="24">
               <el-col :xs="8" :sm="6" :md="6" :lg="6" :xl="6"
                 ><div class="grid-content bg-purple">
                   <el-checkbox
@@ -863,7 +859,7 @@ export default {
       tour: "",
       tourSelected: null,
       aListTours: [],
-      aListToursOriginal:[],
+      aListToursOriginal: [],
       aListToursFinal: [],
       /* checkbox */
       checkAll: true,
@@ -924,7 +920,7 @@ export default {
       fullscreenLoading: false,
       fullscreenLoadingTable: false,
       disabledButton: false,
-      disabledButton2:true,
+      disabledButton2: true,
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now();
@@ -933,7 +929,7 @@ export default {
       countCheckedTours: 0,
       //START DATA FOR SEASON TAB ------------------------------------------
       allDefault: true,
-
+      links: [],
       seasons: [],
       name_categories: "",
       categoryDefault: "",
@@ -981,7 +977,9 @@ export default {
       }
     },
   },
-  created() {},
+  created() {
+    this.getTour();
+  },
   methods: {
     //----START METHODS FOR SEASON TAB----//
     FilterAccoList(usedAccomodatios, accoList) {
@@ -1061,7 +1059,7 @@ export default {
     },
     /* Deshabilitar categorias mientras se completa el precio de una acomodacion */
     disableCategorySeasons(idCat, idSeason, status) {
-      console.log("STATUS",status)
+      console.log("STATUS", status);
       this.disabledButton = status;
       this.seasons.map((season) => {
         season.categories.map((cat) => {
@@ -1266,6 +1264,7 @@ export default {
           this.getSeasons = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
+          console.log("PROBANDO LISTA DE TOURS", this.getSeasons);
           let aSeasons = [];
           if (this.getSeasons.length > 0) {
             /* AGRUPAR RESPONSE POR SEASON */
@@ -1275,6 +1274,7 @@ export default {
               group[tourSeasonName].push(product);
               return group;
             }, {});
+            console.log("LISTA AGRUPADA", groupByCategory);
             /* ALMACENAR SEASONS AGRUPADOS  EN ARRAY */
             for (var clave in groupByCategory) {
               // Controlando que json realmente tenga esa propiedad
@@ -1283,6 +1283,7 @@ export default {
                 aSeasons.push(groupByCategory[clave]);
               }
             }
+            console.log("LISTA ALMACENADA", aSeasons, this.listTours);
             /* RECORRIENDO SEASONS */
             let accomodations = [];
             let categories = [];
@@ -1347,6 +1348,7 @@ export default {
           } else {
             this.getSeasonDefault();
           }
+          console.log("LISTA FINAL", this.seasons);
           this.caculateDate(this.listTours);
         })
         .catch((error) => {
@@ -1619,6 +1621,7 @@ export default {
     },
     /* UPDATE */
     handleUpdate(row) {
+      console.log(row);
       this.resetTemp();
       this.editFormTourDayDescription = [];
       this.active = 0;
@@ -1659,11 +1662,13 @@ export default {
           tourDayDescriptions: [],
         };
         this.formDayDetail.forEach((element, index) => {
+          console.log("DATE", element);
           var dayDescription = {
             id: element.id,
             dayNumber: index + 1,
             matchable: element.matchable,
             tourCities: element.titleTourCities,
+            date: element.date,
             startTime: new Date(this.start_date),
             dayDescriptionEnglish: element.description_english,
             dayDescriptionSpanish: element.description_spanish,
@@ -1735,28 +1740,34 @@ export default {
     },
     /* GET */
     /* para el select */
-    getTour(queryString, cb) {
+    getTour() {
+      this.fullscreenLoading = true;
       axios
         .get(this.url + "Tour")
         .then((response) => {
           /* para que el autocomplete solo muestre los tours padres */
-          var links = response.data;
-          var aTours = [];
-          this.list = response.data;
-          aTours = response.data.map((item) => {
-            return item.isMaster ? item : 1;
-          });
-          links = aTours.filter((element) => element !== 1);
-          var results = queryString
-            ? links.filter(this.createFiltertourDay(queryString))
-            : links;
-          cb(results);
+          this.links = response.data;
+          this.fullscreenLoading = false;
         })
 
         .catch((error) => {
           this.status = "error";
           console.error(error.response);
+          this.fullscreenLoading = false;
         });
+    },
+    querySearch(queryString, cb) {
+      /* para que el autocomplete solo muestre los tours padres */
+      var aTours = [];
+      aTours = this.links.map((item) => {
+        return item.isMaster ? item : 1;
+      });
+      var links = aTours.filter((element) => element !== 1);
+      var results = queryString
+        ? links.filter(this.createFiltertourDay(queryString))
+        : links;
+      // call callback function to return suggestions
+      cb(results);
     },
     createFiltertourDay(queryString) {
       return (link) => {
@@ -1808,24 +1819,24 @@ export default {
     },
     handleCheckAllChange(val) {
       console.log(val, this.checkedTours, this.aListToursOriginal);
-      if(val){
-        this.disabledButton2 = true
-      }else{
-        this.disabledButton2 = false
+      if (val) {
+        this.disabledButton2 = true;
+      } else {
+        this.disabledButton2 = false;
       }
-      this.checkedTours = val ? this.aListToursOriginal : []
+      this.checkedTours = val ? this.aListToursOriginal : [];
 
-/*             val
+      /*             val
         ? this.checkTour(this.listTours, (this.disabledButton = true))
         : ((this.checkedTours = this.aListTours),
           (this.disabledButton = false)); */
       this.isIndeterminate = false;
     },
     handlecheckedToursChange(value) {
-      if(value.length > 0){
-        this.disabledButton2 = true
-      }else{
-        this.disabledButton2 = false
+      if (value.length > 0) {
+        this.disabledButton2 = true;
+      } else {
+        this.disabledButton2 = false;
       }
       console.log("hola", value);
       this.aListToursFinal = [];
@@ -1916,6 +1927,7 @@ export default {
           hidden: currentDate > day ? true : false,
         });
       }
+      console.log("TOUR FINAL", this.aListTours);
       this.checkTour(tour);
       this.orderList();
       this.aListToursFinal = this.aListTours;
@@ -1996,7 +2008,7 @@ export default {
       } else {
         this.disabledButton = true;
       }
-      this.aListToursOriginal = this.checkedTours
+      this.aListToursOriginal = this.checkedTours;
       console.log(
         "count",
         this.countCheckedTours,
@@ -2015,6 +2027,7 @@ export default {
         .filter((element) => element !== 1 && !element.isMaster)
         .slice()
         .sort((a, b) => {
+          console.log(a, b);
           let dateA = new Date(a.tourDayDescriptions[0].startTime);
           let dateB = new Date(b.tourDayDescriptions[0].startTime);
           return dateA - dateB;
@@ -2333,6 +2346,7 @@ export default {
               ],
               tourId: this.editFormTourDayDescription[index]["tourId"],
               images: this.editFormTourDayDescription[index]["images"],
+              date: this.editFormTourDayDescription[index]["date"],
             };
           } else {
             var day = {

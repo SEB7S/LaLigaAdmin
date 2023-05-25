@@ -395,14 +395,24 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const tHeader = [
+          "id",
+          "nameEnglish",
+          "nameEspanish",
+          "maxPax"
+        ];
+        const filterVal = [
+          "id",
+          "nameEnglish",
+          "nameEspanish",
+          "maxPax"
+        ];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Stadiums" + date,
+          filename: "Accomodations" + date,
         });
         this.downloadLoading = false;
       });

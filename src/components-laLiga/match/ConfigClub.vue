@@ -416,14 +416,14 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
+        const tHeader = ["id", "name", "stadiumId", "stadiumName"];
+        const filterVal = ["id", "name", "stadiumId", "stadiumName"];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Providers" + date,
+          filename: "Clubs" + date,
         });
         this.downloadLoading = false;
       });

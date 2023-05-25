@@ -517,14 +517,42 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "document", "phone", "email"];
-        const filterVal = ["id", "name", "document", "phone", "email"];
+        const tHeader = [
+          "id",
+          "club_home_id",
+          "clubHome",
+          "club_guest_id",
+          "clubGuest",
+          "tournament_id",
+          "tournamentName",
+          "stadium_id",
+          "stadiumName",
+          "date",
+          "cityId",
+          "cityNameEnglish",
+          "cityNameSpanish"
+        ];
+        const filterVal = [
+        "id",
+          "club_home_id",
+          "clubHome",
+          "club_guest_id",
+          "clubGuest",
+          "tournament_id",
+          "tournamentName",
+          "stadium_id",
+          "stadiumName",
+          "date",
+          "cityId",
+          "cityNameEnglish",
+          "cityNameSpanish"
+        ];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Providers" + date,
+          filename: "Matches" + date,
         });
         this.downloadLoading = false;
       });

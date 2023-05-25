@@ -4,13 +4,13 @@
       <el-input
         v-model="search"
         placeholder="Search"
-        style="width: 200px"
+        style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-button
         class="filter-item"
-        style="margin-left: 10px"
+        style="margin-left: 10px;"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
@@ -52,7 +52,7 @@
       <el-checkbox
         v-model="showReviewer"
         class="filter-item"
-        style="margin-left: 15px"
+        style="margin-left: 15px;"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
@@ -65,7 +65,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%"
+      style="width: 100%;"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -137,7 +137,7 @@
       @pagination="getList"
     />
     <el-dialog
-    :close-on-press-escape="false"
+      :close-on-press-escape="false"
       :title="textMap[dialogStatus]"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
@@ -155,6 +155,11 @@
         <el-form-item :label="$t('stadium.nameEspanish')" prop="nameEspanish">
           <el-input v-model="formCategory.nameEspanish" />
         </el-form-item>
+<!--         <el-form-item label="Categoy color" class="category-colors"  prop="category_color">
+          <div class="block">
+            <el-color-picker v-model="formCategory.categoryColor" :predefine="predefineColors"></el-color-picker>
+          </div>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -170,7 +175,7 @@
     </el-dialog>
 
     <el-dialog
-    :close-on-press-escape="false"
+      :close-on-press-escape="false"
       :visible.sync="dialogPvVisible"
       title="Reading statistics"
       :close-on-click-modal="false"
@@ -180,7 +185,7 @@
         border
         fit
         highlight-current-row
-        style="width: 100%"
+        style="width: 100%;"
       >
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
@@ -283,13 +288,28 @@ export default {
             message: i18n.t("forms.nameIncomplete"),
           },
         ],
+        category_color: [
+          {
+            required: true,
+            message: i18n.t("forms.colorCategoryEmpty"),
+            trigger: "blur",
+          },
+        ],
       },
       downloadLoading: false,
       /** FormStadium */
       formCategory: {
         nameEnglish: "",
         nameEspanish: "",
+        categoryColor: ""
       },
+      predefineColors: [
+        '#9abee5',
+        '#8ab1df',
+        '#3471b6',
+        '#1d4f8a',
+        '#e73a5e',
+      ],
 
       categoryStadiumList: [],
       /* EndPoint */
@@ -387,13 +407,13 @@ export default {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
         const tHeader = ["id", "nameEnglish", "nameEspanish"];
-        const filterVal = ["id", "name", "nameEspanish"];
+        const filterVal = ["id", "nameEnglish", "nameEspanish"];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "RoomType" + date,
+          filename: "StadiumCategory" + date,
         });
         this.downloadLoading = false;
       });
@@ -431,7 +451,7 @@ export default {
                 duration: 2000,
               });
               this.getCategory();
-              this.resetForm("formCategory")
+              this.resetForm("formCategory");
             })
             .catch((error) => {
               console.error(error.response);
@@ -569,5 +589,4 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-</style>
+<style lang="scss"></style>

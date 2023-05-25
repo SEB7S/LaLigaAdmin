@@ -19,13 +19,13 @@
       <el-input
         v-model="search"
         placeholder="Search"
-        style="width: 200px"
+        style="width: 200px;"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
       <el-button
         class="filter-item"
-        style="margin-left: 10px"
+        style="margin-left: 10px;"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
@@ -56,7 +56,7 @@
       <el-checkbox
         v-model="showReviewer"
         class="filter-item"
-        style="margin-left: 15px"
+        style="margin-left: 15px;"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
@@ -69,7 +69,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%"
+      style="width: 100%;"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -173,7 +173,7 @@
             popper-class="my-autocomplete"
             :fetch-suggestions="getHTCategory"
             placeholder="Please input"
-            style="width: 100%"
+            style="width: 100%;"
             @select="handleSelectHTCategory"
           >
             <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -188,7 +188,7 @@
             popper-class="my-autocomplete"
             :fetch-suggestions="getProviders"
             placeholder="Please input"
-            style="width: 100%"
+            style="width: 100%;"
             @select="handleSelectProvider"
           >
             <i slot="suffix" class="el-icon-edit el-input__icon" />
@@ -278,7 +278,7 @@
         border
         fit
         highlight-current-row
-        style="width: 100%"
+        style="width: 100%;"
       >
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
@@ -522,14 +522,32 @@ export default {
     handleDownload() {
       this.downloadLoading = true;
       import("@/vendor/Export2Excel").then((excel) => {
-        const tHeader = ["id", "name", "Ciudad", "longitude", "latitude"];
-        const filterVal = ["id", "name", "cityId", "longitude", "latitude"];
+        const tHeader = [
+          "id",
+          "name",
+          "happyTourCategoryId",
+          "happyTourCategoryName",
+          "providerId",
+          "providerName",
+          "ammenitiesEnglish",
+          "ammenitiesSpanish",
+        ];
+        const filterVal = [
+          "id",
+          "name",
+          "happyTourCategoryId",
+          "happyTourCategoryName",
+          "providerId",
+          "providerName",
+          "ammenitiesEnglish",
+          "ammenitiesSpanish",
+        ];
         const data = this.formatJson(filterVal);
         const date = new Date();
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: "Stadiums" + date,
+          filename: "CategoryProviders" + date,
         });
         this.downloadLoading = false;
       });

@@ -162,7 +162,7 @@ export default {
     cityStadium: 'Ciudad',
     latitudeStadium: 'Latitud',
     longitudeStadium: 'Longitud',
-    image: 'Cargar Imágen',
+    image: 'Cargar Imágen (max 2.)',
     nameEnglish: 'Nombre en Inglés',
     nameEspanish: "Nombre en Español",
     priority: 'Prioridad',
