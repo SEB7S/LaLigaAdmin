@@ -25,7 +25,7 @@
 
       </template>
 
-      <el-dropdown class="avatar-container right-menu-item hover-effect sm-display-none" trigger="click">
+<!--       <el-dropdown class="avatar-container right-menu-item hover-effect sm-display-none" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <i class="el-icon-caret-bottom" />
@@ -53,7 +53,7 @@
             <span style="display:block;">{{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>
         </el-dropdown-menu>
-      </el-dropdown>
+      </el-dropdown> -->
     </div>
   </div>
 </template>
