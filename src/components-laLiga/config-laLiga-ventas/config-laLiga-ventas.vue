@@ -10,7 +10,7 @@
                 <el-select
                   v-model="value"
                   placeholder="Select"
-                  style="float: right;"
+                  style="float: right"
                   @change="onSelect"
                 >
                   <el-option
@@ -138,7 +138,7 @@
                   <i
                     class="el-icon-question"
                     slot="reference"
-                    style="float: right; padding: 3px 0;"
+                    style="float: right; padding: 3px 0"
                   ></i>
                 </el-popover>
               </div>
@@ -213,7 +213,12 @@
           <el-col :xs="24" :sm="24" :md="9" :lg="11" :xl="11">
             <el-card class="box-card">
               <div slot="header" class="clearfix">
-                <span>Gestionar Descripción</span>
+                <h4>Gestionar Descripción</h4>
+                <p>
+                  Aquí podrás aplicar la configuracíon que corresponde a la
+                  <strong>descripción general</strong> para los tours y la
+                  <strong>información importante</strong> en el itinerario
+                </p>
               </div>
               <div class="text item">
                 <el-form
@@ -240,7 +245,7 @@
                       show-word-limit
                     ></el-input>
                   </el-form-item>
-                  <el-form-item :label="$t('config.conditionsEn')">
+                  <el-form-item :label="$t('config.conditionsPriceEn')">
                     <el-input
                       type="textarea"
                       placeholder="Please input"
@@ -249,7 +254,7 @@
                       show-word-limit
                     ></el-input>
                   </el-form-item>
-                  <el-form-item :label="$t('config.conditionsEs')">
+                  <el-form-item :label="$t('config.conditionsPriceEs')">
                     <el-input
                       type="textarea"
                       placeholder="Please input"
@@ -272,10 +277,243 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="Distribución de habitaciones"
-        >Distribución de habitaciones</el-tab-pane
-      >
-      <el-tab-pane label="Config4">Config 4</el-tab-pane>
+      <el-tab-pane label="Upgrade hotel category">
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <h4>Upgrade Categoría Hotel</h4>
+            <p></p>
+          </div>
+          <div class="text item">
+            <el-form
+              ref="formCatHotel"
+              :rules="rules"
+              :model="formCatHotel"
+              label-position="top"
+            >
+              <el-form-item :label="$t('config.descriptionCatHotelEn')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formCatHotel.descriptionEnglish"
+                  maxlength="500"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+              <el-form-item :label="$t('config.descriptionCatHotelEs')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formCatHotel.descriptionSpanish"
+                  maxlength="500"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button
+              type="primary"
+              size="medium"
+              class="btn"
+              :loading="dialogFormVisible"
+              @click="updateDescrptionsHotels(formCatHotel)"
+              >{{ statusButton }}</el-button
+            >
+            <el-form
+              ref="formIncludeHotel"
+              :rules="rules"
+              :model="formIncludeHotel"
+              label-position="top"
+            >
+              <el-form-item :label="$t('config.descriptionHotelIncludedEn')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formIncludeHotel.descriptionEnglish"
+                  maxlength="500"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+              <el-form-item :label="$t('config.descriptionHotelIncludedEs')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formIncludeHotel.descriptionSpanish"
+                  maxlength="500"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button
+              type="primary"
+              size="medium"
+              class="btn"
+              :loading="dialogFormVisible"
+              @click="updateDescrptionsHotels(formIncludeHotel)"
+              >{{ statusButton }}</el-button
+            >
+          </div>
+        </el-card>
+      </el-tab-pane>
+      <el-tab-pane label="Información personal">
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <h4>Información personal</h4>
+            <p>
+              Aquí podrás aplicar la configuracíon que corresponde a las
+              descripciones de los diferentes textos correspondientes a la
+              <strong>información personal del usuario</strong>.
+            </p>
+          </div>
+          <div class="text item">
+            <el-form
+              ref="formBedDist"
+              :rules="rules"
+              :model="formBedDist"
+              label-position="top"
+            >
+              <el-form-item :label="$t('config.bedConfigEn')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formBedDist.descriptionEnglish"
+                  maxlength="250"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+              <el-form-item :label="$t('config.bedConfigEs')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formBedDist.descriptionSpanish"
+                  maxlength="150"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button
+              type="primary"
+              size="medium"
+              class="btn"
+              :loading="dialogFormVisible"
+              @click="updateDescrptionsHotels(formBedDist)"
+              >{{ statusButton }}</el-button
+            >
+            <el-form
+              ref="formaddInfo"
+              :rules="rules"
+              :model="formaddInfo"
+              label-position="top"
+            >
+
+              <el-form-item :label="$t('config.AddInfoEn')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formaddInfo.descriptionEnglish"
+                  maxlength="150"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+              <el-form-item :label="$t('config.AdInfoEs')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formaddInfo.descriptionSpanish"
+                  maxlength="150"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button
+              type="primary"
+              size="medium"
+              class="btn"
+              :loading="dialogFormVisible"
+              @click="updateDescrptionsHotels(formaddInfo)"
+              >{{ statusButton }}</el-button
+            >
+            <el-form
+              ref="formTermCond"
+              :rules="rules"
+              :model="formTermCond"
+              label-position="top"
+            >
+              <el-form-item :label="$t('config.conditionsEn')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formTermCond.descriptionEnglish"
+                  maxlength="500"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+              <el-form-item :label="$t('config.conditionsEs')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formTermCond.descriptionSpanish"
+                  maxlength="500"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button
+              type="primary"
+              size="medium"
+              class="btn"
+              :loading="dialogFormVisible"
+              @click="updateDescrptionsHotels(formTermCond)"
+              >{{ statusButton }}</el-button
+            >
+          </div>
+        </el-card>
+      </el-tab-pane>
+      <el-tab-pane label="Página de agradecimientos">
+        <el-card class="box-card">
+          <div slot="header" class="clearfix">
+            <h4>Página de agradecimiento</h4>
+            <p>
+              Aquí podrás aplicar la configuracíon que corresponde a las
+              descripciones de los diferentes textos correspondientes a la
+              <strong>Página de agradecimientos</strong>
+            </p>
+          </div>
+          <div class="text item">
+            <el-form
+              ref="formGratitude"
+              :rules="rules"
+              :model="formGratitude"
+              label-position="top"
+            >
+              <el-form-item :label="$t('config.gratitudePageEn')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formGratitude.descriptionEnglish"
+                  maxlength="250"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+              <el-form-item :label="$t('config.gratitudePageEs')">
+                <el-input
+                  type="textarea"
+                  placeholder="Please input"
+                  v-model="formGratitude.descriptionSpanish"
+                  maxlength="150"
+                  show-word-limit
+                ></el-input>
+              </el-form-item>
+            </el-form>
+            <el-button
+              type="primary"
+              size="medium"
+              class="btn"
+              :loading="dialogFormVisible"
+              @click="updateDescrptionsHotels(formGratitude)"
+              >{{ statusButton }}</el-button
+            >
+          </div>
+        </el-card>
+      </el-tab-pane>
     </el-tabs>
     <div></div>
   </div>
@@ -338,6 +576,7 @@ export default {
       value: "Option1",
 
       /** FormConfig */
+      /* Página inicial */
       formDashboard: {
         totalCarrusel: 8,
         totalDisplay: 4,
@@ -347,22 +586,63 @@ export default {
         name: "Config",
         isActive: false,
       },
+      /* Imagen de la pantalla principal */
+      formImageDashboard: {
+        MediaContentType: 0,
+        IdMatchFront: 0,
+        id: 0,
+      },
+      /* Itinerario */
       formItinerary: {
         generalDescriptionSpanish: "",
         generalDescriptionEnglish: "",
         conditionsSpanish: "",
         conditionsEnglish: "",
       },
+      /* Upgrade Hotel */
+      formCatHotel: {
+        id: 0,
+        descriptionSpanish: "",
+        descriptionEnglish: "",
+        idType: "HotelCatDescription",
+      },
+      formIncludeHotel: {
+        id: 0,
+        descriptionSpanish: "",
+        descriptionEnglish: "",
+        idType: "HotelIncDescription",
+      },
+      /* Upgrade Ticket */
+      formBedDist: {
+        id: 0,
+        descriptionSpanish: "",
+        descriptionEnglish: "",
+        idType: "bedDist",
+      },
+      formaddInfo: {
+        id: 0,
+        descriptionSpanish: "",
+        descriptionEnglish: "",
+        idType: "addInfo",
+      },
+      formTermCond: {
+        id: 0,
+        descriptionSpanish: "",
+        descriptionEnglish: "",
+        idType: "termCond",
+      },
+      formGratitude: {
+        id: 0,
+        descriptionSpanish: "",
+        descriptionEnglish: "",
+        idType: "termCond",
+      },
       statusButton: i18n.t("config.statusButtonSave"),
       ConfigUpdate: [],
       activeName: "first",
       /* EndPoint */
       url: this.$store.getters.url,
-      formImageDashboard: {
-        MediaContentType: 0,
-        IdMatchFront: 0,
-        id: 0,
-      },
+      aDescriptions: [],
       aImageDashboard: [],
       fileList: [],
     };
@@ -371,6 +651,7 @@ export default {
     this.getConfig();
     this.getSortedMatch();
     this.getItinerary();
+    this.getDescriptionHotels();
   },
   computed: {
     draggingInfo() {
@@ -446,7 +727,8 @@ export default {
               type: "success",
               duration: 2000,
             });
-            this.formImageDashboard.IdMatchFront = this.formDashboard.matchFrontId;
+            this.formImageDashboard.IdMatchFront =
+              this.formDashboard.matchFrontId;
             console.log(this.formDashboard.matchFrontId);
             this.postImageDashboard();
             this.getConfig();
@@ -695,9 +977,7 @@ export default {
       e.draggedContext.element.order = e.draggedContext.futureIndex;
       console.log("list: ", this.list);
     },
-
     /* FIN DASHBOARD */
-
     /* ITINERARIO */
     postItinerary() {
       this.$refs["formItinerary"].validate((valid) => {
@@ -744,6 +1024,60 @@ export default {
           console.error(error.response);
         });
     },
+    /* FIN ITINERARIO */
+    /* UPGRADE HOTELS */
+    getDescriptionHotels() {
+      axios
+        .get(this.url + "GeneralDescriptions")
+        .then((response) => {
+          this.aDescriptions = response.data;
+          this.addFormDescriptions(this.formCatHotel);
+          this.addFormDescriptions( this.formIncludeHotel);
+          this.addFormDescriptions(this.formBedDist);
+          this.addFormDescriptions(this.formaddInfo);
+          this.addFormDescriptions(this.formTermCond);
+          this.addFormDescriptions(this.formGratitude);
+        })
+        .catch((error) => {
+          this.status = "error";
+        });
+    },
+    /* método para filtrar la lista de descripciones y asiganarle los parametreos a sus respectivos formularios */
+    addFormDescriptions(formAdd) {
+      this.aDescriptions.forEach((item) => {
+        if (item.idType == formAdd.idType) {
+          formAdd.descriptionEnglish = item.descriptionEnglish;
+          formAdd.descriptionSpanish = item.descriptionSpanish;
+          formAdd.id = item.id;
+        }
+      });
+    },
+    updateDescrptionsHotels(form) {
+      this.$refs["formCatHotel"].validate((valid) => {
+        if (valid) {
+          this.dialogFormVisible = true;
+          axios
+            .put(this.url + "GeneralDescriptions", form)
+            .then((response) => {
+              this.dialogFormVisible = false;
+              this.$notify({
+                title: i18n.t("notifications.success"),
+                message: i18n.t("notifications.cathegoryAddedSuccess"),
+                type: "success",
+                duration: 2000,
+              });
+              this.getDescriptionHotels();
+            })
+            .catch((error) => {
+              console.error(error.response);
+            });
+        }
+      });
+    },
+
+    /* FIN UPGRADE HOTELS */
+    /* UPGRADE TICKETS */
+    /* FIN UPGRADE TICKETS */
   },
 };
 </script>

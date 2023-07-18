@@ -87,7 +87,6 @@ export default {
     config: "Config",
     dashboard: "DashBoard",
   },
-
   tour: {
     add: 'Add',
     export: 'Export',
@@ -169,7 +168,11 @@ export default {
     nameEspanish: "Name Spanish",
     priority: 'Priority',
     stadiumId: 'Stadium',
-    categoryStadium: 'Category'
+    categoryStadium: 'Category',
+    descriptionStadiumEn:"Stadium description (En)",
+    descriptionStadiumEs:"Stadium description (Es)",
+    stadiumRecomendationEn:"Data and recomendations (En)",
+    stadiumRecomendationEs:"Data and recomendations (Es)"
   },
   config:{
     numberMatch:"Número de partidos a destacar",
@@ -182,11 +185,22 @@ export default {
     color:"Color",
     name:"Configuration name",
     activate: "Activate Congiguration",
-    conditionsEn: "",
-    conditionsEs: "",
+    conditionsPriceEn: "",
+    conditionsPriceEs: "",
     descriptionItEn:"",
-    descriptionItEs:""
-
+    descriptionItEs:"",
+    descriptionCatHotelEs:"Descripcion categoría de hotel (ES)",
+    descriptionCatHotelEn:"Descripcion categoría de hotel (EN)",
+    descriptionHotelIncludedEn:"Descripción para los 'Hoteles que incluye el tour' (EN)",
+    descriptionHotelIncludedEs:"Descripción para los 'Hoteles que incluye el tour' (ES)",
+    bedConfigEn:"Distribution of beds (En)",
+    bedConfigEs:"Distribution of beds (Es)",
+    AddInfoEn:"Additional Information (En)",
+    AdInfoEs:"Additional Information (Es)",
+    conditionsEn:"Terms and Conditions (En)",
+    conditionsEs:"Terms and Conditions (Es)",
+    gratitudePageEn:"Página de agradecimientos (En)",
+    gratitudePageEs:"Página de agradecimientos (Es)",
   },
   user: {
     nameUser: 'Username',

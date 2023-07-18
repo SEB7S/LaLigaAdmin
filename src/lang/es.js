@@ -167,7 +167,11 @@ export default {
     nameEspanish: "Nombre en Español",
     priority: 'Prioridad',
     stadiumId: 'Estadio',
-    categoryStadium: 'Categoría'
+    categoryStadium: 'Categoría',
+    descriptionStadiumEn:"Descripción del estadio (En)",
+    descriptionStadiumEs:"Descripción del estadio (Es)",
+    stadiumRecomendationEn:"Datos y recomendaciones (En)",
+    stadiumRecomendationEs:"Datos y recomendaciones (Es)"
   },
   user: {
     nameUser: 'Usuario',
@@ -185,7 +189,6 @@ export default {
     size: 'Tamaño global',
     profile: 'Perfil'
   },
-
   config:{
     numberMatch:"Número de partidos a destacar",
     numberMatchTotal: "Partidos totales para destacar",
@@ -197,10 +200,22 @@ export default {
     color:"Color",
     name:"Nombre de la configuración",
     activate: "Activar Congiguración",
-    conditionsEn: "Condiciones del tour (Ing)",
-    conditionsEs: "Condiciones del tour (Esp)",
+    conditionsPriceEn: "Condiciones del tour (Ing)",
+    conditionsPriceEs: "Condiciones del tour (Esp)",
     descriptionItEn:"Descripción general (Ing)",
-    descriptionItEs:"Descripción general (Esp)"
+    descriptionItEs:"Descripción general (Esp)",
+    descriptionCatHotelEs:"Descripcion categoría de hotel (Esp)",
+    descriptionCatHotelEn:"Descripcion categoría de hotel (Ing)",
+    descriptionHotelIncludedEn:"Descripción para los 'Hoteles que incluye el tour' (Ing)",
+    descriptionHotelIncludedEs:"Descripción para los 'Hoteles que incluye el tour' (Esp)",
+    bedConfigEn:"Configuración de camas (Ing)",
+    bedConfigEs:"Configuración de camas (Esp)",
+    AddInfoEn:"Información adcional (Ing)",
+    AdInfoEs:"Información adicional (Esp)",
+    conditionsEn:"Términos y condiciones (Ing)",
+    conditionsEs:"Términos y condiciones (Esp)",
+    gratitudePageEn:"Página de agradecimientos (Ing)",
+    gratitudePageEs:"Página de agradecimientos (Esp)",
   },
   login: {
     title: 'La Liga - Administrador',

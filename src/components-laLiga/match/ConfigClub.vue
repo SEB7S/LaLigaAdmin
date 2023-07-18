@@ -95,7 +95,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        :label="$t('match.cityClub')"
+        :label="$t('match.stadiumClub')"
         min-width="100px"
         align="center"
       >

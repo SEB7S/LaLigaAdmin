@@ -269,11 +269,11 @@
             </template>
           </el-autocomplete>
         </el-form-item>
-        <el-form-item label="Categoy color" class="category-colors"  prop="category_color">
+<!--         <el-form-item label="Categoy color" class="category-colors"  prop="category_color">
           <div class="block">
             <el-color-picker v-model="formMatchRate.categoryColor" :predefine="predefineColors"></el-color-picker>
           </div>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">

@@ -155,11 +155,12 @@
         <el-form-item :label="$t('stadium.nameEspanish')" prop="nameEspanish">
           <el-input v-model="formCategory.nameEspanish" />
         </el-form-item>
-<!--         <el-form-item label="Categoy color" class="category-colors"  prop="category_color">
+        <el-form-item label="Categoy color" class="category-colors"  prop="categoryColor">
           <div class="block">
+            <p>Código: <strong>{{ formCategory.categoryColor }}</strong></p>
             <el-color-picker v-model="formCategory.categoryColor" :predefine="predefineColors"></el-color-picker>
           </div>
-        </el-form-item> -->
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -288,10 +289,10 @@ export default {
             message: i18n.t("forms.nameIncomplete"),
           },
         ],
-        category_color: [
+        categoryColor: [
           {
             required: true,
-            message: i18n.t("forms.colorCategoryEmpty"),
+            message: i18n.t("forms.categoryColor"),
             trigger: "blur",
           },
         ],
@@ -422,6 +423,7 @@ export default {
       this.formCategory = {
         nameEnglish: "",
         nameEspanish: "",
+        categoryColor: ""
       };
     },
     resetForm(formName) {
@@ -438,6 +440,7 @@ export default {
         var category = {
           nameEnglish: this.formCategory.nameEnglish,
           nameEspanish: this.formCategory.nameEspanish,
+          categoryColor:this.formCategory.categoryColor
         };
         if (valid) {
           axios
@@ -468,6 +471,7 @@ export default {
       this.formCategory.nameEnglish = row.nameEnglish;
       this.formCategory.nameEspanish = row.nameEspanish;
       this.formCategory.priorityOrder = row.priorityOrder;
+      this.formCategory.categoryColor = row.categoryColor
     },
     updateData() {
       this.$refs["formCategory"].validate((valid) => {
@@ -476,6 +480,7 @@ export default {
             id: this.hotelUpdate.id,
             nameEnglish: this.formCategory.nameEnglish,
             nameEspanish: this.formCategory.nameEspanish,
+            categoryColor: this.formCategory.categoryColor,
             priorityOrder: this.formCategory.priorityOrder,
           };
           axios

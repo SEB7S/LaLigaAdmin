@@ -4,7 +4,7 @@
       <el-input
         v-model="search"
         placeholder="Search"
-        style="width: 200px;"
+        style="width: 200px"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       /><!--
@@ -20,7 +20,7 @@
       </el-button> -->
       <el-button
         class="filter-item"
-        style="margin-left: 10px;"
+        style="margin-left: 10px"
         type="primary"
         icon="el-icon-edit"
         @click="handleCreate"
@@ -51,7 +51,7 @@
       <el-checkbox
         v-model="showReviewer"
         class="filter-item"
-        style="margin-left: 15px;"
+        style="margin-left: 15px"
         @change="tableKey = tableKey + 1"
       >
         {{ $t("table.select") }}
@@ -64,7 +64,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%;"
+      style="width: 100%"
       @sort-change="sortChange"
       @selection-change="handleSelectionChange"
     >
@@ -178,7 +178,7 @@
           :rules="rules"
           label-position="top"
           label-width="100px"
-          style="margin: 30px;"
+          style="margin: 30px"
         >
           <el-form-item :label="$t('stadium.nameStadium')" prop="name">
             <el-input v-model="formStadium.name" />
@@ -198,7 +198,7 @@
               popper-class="my-autocomplete"
               :fetch-suggestions="getCities"
               placeholder="Please input"
-              style="width: 100%;"
+              style="width: 100%"
               @select="handleSelect"
             >
               <i
@@ -220,7 +220,7 @@
               multiple
               filterable
               placeholder="Select"
-              style="width: 100%;"
+              style="width: 100%"
             >
               <el-option
                 v-for="item in formStadium.options"
@@ -230,6 +230,18 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item :label="$t('stadium.descriptionStadiumEn')" prop="desc">
+            <el-input type="textarea" v-model="formStadium.descriptionStadiumEn"></el-input>
+          </el-form-item>
+          <el-form-item :label="$t('stadium.descriptionStadiumEs')" prop="desc">
+            <el-input type="textarea" v-model="formStadium.descriptionStadiumEs"></el-input>
+          </el-form-item>
+          <el-form-item :label="$t('stadium.stadiumRecomendationEn')" prop="desc">
+            <el-input type="textarea" v-model="formStadium.stadiumRecomendationEn"></el-input>
+          </el-form-item>
+          <el-form-item :label="$t('stadium.stadiumRecomendationEs')" prop="desc">
+            <el-input type="textarea" v-model="formStadium.stadiumRecomendationEs"></el-input>
+          </el-form-item>
         </el-form>
       </div>
       <div v-if="active == 1">
@@ -237,7 +249,7 @@
           ref="formHotel"
           label-position="top"
           label-width="120px"
-          style="margin: 30px;"
+          style="margin: 30px"
         >
           <el-form-item :label="$t('stadium.image')">
             <el-upload
@@ -283,7 +295,7 @@
         border
         fit
         highlight-current-row
-        style="width: 100%;"
+        style="width: 100%"
       >
         <el-table-column prop="key" label="Channel" />
         <el-table-column prop="pv" label="Pv" />
@@ -397,6 +409,10 @@ export default {
         longitude: "",
         cityId: "",
         city_name: "",
+        descriptionStadiumEn:"",
+        descriptionStadiumEs:"",
+        stadiumRecomendationEn:"",
+        stadiumRecomendationEs:"",
         categoryStadium: [],
         options: [],
       },
@@ -462,6 +478,30 @@ export default {
           },
         ],
         categoryStadium: [
+          {
+            required: true,
+            message: i18n.t("forms.categoryIncomplete"),
+          },
+        ],
+        descriptionStadiumEn: [
+          {
+            required: true,
+            message: i18n.t("forms.categoryIncomplete"),
+          },
+        ],
+        descriptionStadiumEs: [
+          {
+            required: true,
+            message: i18n.t("forms.categoryIncomplete"),
+          },
+        ],
+        stadiumRecomendationEn: [
+          {
+            required: true,
+            message: i18n.t("forms.categoryIncomplete"),
+          },
+        ],
+        stadiumRecomendationEs: [
           {
             required: true,
             message: i18n.t("forms.categoryIncomplete"),
@@ -652,10 +692,10 @@ export default {
           console.log(response.data);
           this.list = response.data;
           this.list.forEach((stadium, index) => {
-            if(stadium.id == 0){
+            if (stadium.id == 0) {
               this.list.splice(index, 1);
             }
-          })
+          });
           this.listLoading = false;
           console.log("lista:", this.stadiumList);
         })
