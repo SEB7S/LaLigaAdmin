@@ -231,16 +231,34 @@
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('stadium.descriptionStadiumEn')" prop="desc">
-            <el-input type="textarea" v-model="formStadium.descriptionStadiumEn"></el-input>
+            <el-input
+              type="textarea"
+              v-model="formStadium.descriptionStadiumEn"
+            ></el-input>
           </el-form-item>
           <el-form-item :label="$t('stadium.descriptionStadiumEs')" prop="desc">
-            <el-input type="textarea" v-model="formStadium.descriptionStadiumEs"></el-input>
+            <el-input
+              type="textarea"
+              v-model="formStadium.descriptionStadiumEs"
+            ></el-input>
           </el-form-item>
-          <el-form-item :label="$t('stadium.stadiumRecomendationEn')" prop="desc">
-            <el-input type="textarea" v-model="formStadium.stadiumRecomendationEn"></el-input>
+          <el-form-item
+            :label="$t('stadium.stadiumRecomendationEn')"
+            prop="desc"
+          >
+            <el-input
+              type="textarea"
+              v-model="formStadium.stadiumRecomendationEn"
+            ></el-input>
           </el-form-item>
-          <el-form-item :label="$t('stadium.stadiumRecomendationEs')" prop="desc">
-            <el-input type="textarea" v-model="formStadium.stadiumRecomendationEs"></el-input>
+          <el-form-item
+            :label="$t('stadium.stadiumRecomendationEs')"
+            prop="desc"
+          >
+            <el-input
+              type="textarea"
+              v-model="formStadium.stadiumRecomendationEs"
+            ></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -253,7 +271,7 @@
         >
           <el-form-item :label="$t('stadium.image')">
             <el-upload
-              limit="2"
+              :limit="limitImg"
               :action="url + 'StadiumMediaContent/SendStadiumImage'"
               list-type="picture-card"
               :on-preview="handlePictureCardPreview"
@@ -363,6 +381,7 @@ export default {
       list: [],
       total: 0,
       listLoading: true,
+      limitImg:2,
       listQuery: {
         page: 1,
         limit: 10,
@@ -409,10 +428,10 @@ export default {
         longitude: "",
         cityId: "",
         city_name: "",
-        descriptionStadiumEn:"",
-        descriptionStadiumEs:"",
-        stadiumRecomendationEn:"",
-        stadiumRecomendationEs:"",
+        descriptionStadiumEn: "",
+        descriptionStadiumEs: "",
+        stadiumRecomendationEn: "",
+        stadiumRecomendationEs: "",
         categoryStadium: [],
         options: [],
       },
@@ -632,6 +651,10 @@ export default {
         city_name: "",
         categoryStadium: [],
         options: [],
+        descriptionStadiumEn: "",
+        descriptionStadiumEs: "",
+        stadiumRecomendationEn: "",
+        stadiumRecomendationEs: "",
       }),
         (this.city_name = "");
       this.fileList = [];
@@ -650,6 +673,10 @@ export default {
             latitude: this.formStadium.latitude,
             longitude: this.formStadium.longitude,
             cityId: this.formStadium.cityId,
+            descriptionStadiumEnglish: this.formStadium.descriptionStadiumEn,
+            descriptionStadiumSpanish: this.formStadium.descriptionStadiumEs,
+            dataRecommendationsSpanish: this.formStadium.stadiumRecomendationEs,
+            dataRecommendationsEnglish: this.formStadium.stadiumRecomendationEn,
             stadiumStadiumCategories: [],
           };
           this.formStadium.categoryStadium.forEach((element) => {
@@ -790,7 +817,6 @@ export default {
           });
         });
     },
-
     /* UPDATE */
     handleUpdate(row) {
       this.resetTemp();
@@ -804,7 +830,13 @@ export default {
       this.formStadium.latitude = row.latitude;
       this.formStadium.longitude = row.longitude;
       this.formStadium.city_name = row.cityName;
-      this.formStadium.cityId = row.cityId;
+      (this.formStadium.descriptionStadiumEn = row.descriptionStadiumEnglish),
+        (this.formStadium.descriptionStadiumEs = row.descriptionStadiumSpanish),
+        (this.formStadium.stadiumRecomendationEs =
+          row.dataRecommendationsSpanish),
+        (this.formStadium.stadiumRecomendationEn =
+          row.dataRecommendationsEnglish),
+        (this.formStadium.cityId = row.cityId);
       this.formImageStadium.idStadium = row.id;
       this.formStadium.options = row.stadiumCategories;
       row.stadiumCategories.forEach((element) => {
@@ -821,13 +853,17 @@ export default {
               name: this.formStadium.name,
               latitude: this.formStadium.latitude,
               longitude: this.formStadium.longitude,
+              descriptionStadiumEnglish: this.formStadium.descriptionStadiumEn,
+              descriptionStadiumSpanish: this.formStadium.descriptionStadiumEs,
+              dataRecommendationsSpanish:this.formStadium.stadiumRecomendationEs,
+              dataRecommendationsEnglish:this.formStadium.stadiumRecomendationEn,
               stadiumStadiumCategories: [],
             };
             console.log(this.formStadium.categoryStadium);
             if (this.categoryStadiumUpdate.length == 0) {
               this.formStadium.categoryStadium.forEach((element) => {
                 stadium.stadiumStadiumCategories.push({
-                  stadiumId: 0,
+                  stadiumId: this.stadiumUpdate.id,
                   stadiumCategoryId: element,
                 });
               });
@@ -835,7 +871,7 @@ export default {
               this.categoryStadiumUpdate.forEach((element) => {
                 console.log("sss", element);
                 stadium.stadiumStadiumCategories.push({
-                  stadiumId: 0,
+                  stadiumId: this.stadiumUpdate.id,
                   stadiumCategoryId: element,
                 });
               });
@@ -856,11 +892,18 @@ export default {
               })
               .catch((error) => {
                 console.error(error.response);
+                this.$notify({
+                  title: i18n.t("notifications.error"),
+                  message: error.response.data,
+                  type: "error",
+                  duration: 4000,
+                });
               });
           }
         });
       } else if (this.active == 1) {
         this.dialogFormVisible = false;
+
       }
     },
     /* CITIES */

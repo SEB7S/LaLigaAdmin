@@ -800,16 +800,17 @@ export default {
       this.matchRateList = val
     },
     handleDelete(row, selected) {
+      console.log(row,selected)
       var id = selected ? row : row.id
       axios
         .delete(this.url + 'MatchRate/' + id)
         .then((response) => {
           this.$notify({
-            title: i18n('notifications.success'),
-            message: i18n('notifications.deleteSuccessfully'),
-            type: 'success',
-            duration: 2000
-          })
+            title: i18n.t("notifications.success"),
+            message: i18n.t("notifications.deleteSuccessfully"),
+            type: "success",
+            duration: 2000,
+          });
           this.getMatchRate()
           this.showReviewer = false
           this.matchRateList = []
@@ -819,28 +820,25 @@ export default {
         })
     },
     confirmDelete(row) {
+      console.log(row)
       this.$confirm(
-        i18n('modals.deleteItemWarning'),
-        i18n('modals.warning'),
+        i18n.t("modals.deleteItemWarning"),
+        i18n.t("modals.warning"),
         {
-          confirmButtonText: i18n('modals.confirmButton'),
-          cancelButtonText: i18n('modals.cancelButton'),
-          type: 'warning'
+          confirmButtonText: i18n.t("modals.confirmButton"),
+          cancelButtonText: i18n.t("modals.cancelButton"),
+          type: "warning",
         }
       )
         .then(() => {
-          this.$message({
-            type: 'success',
-            message: i18n('notifications.deleteComplete')
-          })
           this.handleDelete(row, false)
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: i18n('notifications.deleteCanceled')
-          })
-        })
+            type: "info",
+            message: i18n.t("notifications.deleteCanceled"),
+          });
+        });
     },
     handleDeleteAll() {
       this.$confirm(

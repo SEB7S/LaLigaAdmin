@@ -635,7 +635,7 @@ export default {
         id: 0,
         descriptionSpanish: "",
         descriptionEnglish: "",
-        idType: "termCond",
+        idType: "gratitude",
       },
       statusButton: i18n.t("config.statusButtonSave"),
       ConfigUpdate: [],
