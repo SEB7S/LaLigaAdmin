@@ -105,7 +105,16 @@
           <span>{{ row.nameEspanish }}</span>
         </template>
       </el-table-column>
+      <el-table-column
+        :label="$t('stadium.categoryColor')"
+        min-width="100px"
+        align="center"
+      >
+        <template slot-scope="{ row }">
+          <el-button :style="{ 'background-color': row.categoryColor, 'color': '#ffffff' }">{{ row.nameEnglish }}</el-button>
 
+        </template>
+      </el-table-column>
       <el-table-column
         :label="$t('table.actions')"
         align="center"

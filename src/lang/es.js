@@ -168,6 +168,7 @@ export default {
     priority: 'Prioridad',
     stadiumId: 'Estadio',
     categoryStadium: 'Categoría',
+    categoryColor:"Color de la categoría",
     descriptionStadiumEn:"Descripción del estadio (En)",
     descriptionStadiumEs:"Descripción del estadio (Es)",
     stadiumRecomendationEn:"Datos y recomendaciones (En)",

@@ -15,7 +15,7 @@
         <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect  sm-display-none" />
         </el-tooltip>
-        <el-tooltip content="Users" effect="dark" placement="bottom" class="">
+        <el-tooltip v-permission="['admin']" content="Users" effect="dark" placement="bottom" class="">
           <router-link to="/user" style="height: 50px">
            <svg-icon icon-class="peoples" class="right-menu-item" style="font-size:34px !important" />
           </router-link>
@@ -67,8 +67,9 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import Search from '@/components/HeaderSearch'
-
+import permission from '@/directive/permission/index.js'
 export default {
+  directives: { permission },
   components: {
     Breadcrumb,
     Hamburger,

@@ -74,7 +74,7 @@
           {{ $t("login.logIn") }}
         </el-button>
 
-        <div style="position: relative">
+<!--         <div style="position: relative">
           <div class="tips">
             <span>{{ $t("login.username") }} : admin</span>
             <span>{{ $t("login.password") }} : {{ $t("login.any") }}</span>
@@ -93,83 +93,80 @@
           >
             {{ $t("login.thirdparty") }}
           </el-button>
-        </div>
+        </div> -->
       </div>
     </el-form>
 
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
+<!--     <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
       {{ $t("login.thirdpartyTips") }}
       <br />
       <br />
       <br />
       <social-sign />
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
-import { validUsername } from "@/utils/validate";
-import LangSelect from "@/components/LangSelect";
-import SocialSign from "./components/SocialSignin";
-import axios from "axios";
+import { validUsername } from '@/utils/validate'
+import LangSelect from '@/components/LangSelect'
+import SocialSign from './components/SocialSignin'
+
 export default {
-  name: "Login",
+  name: 'Login',
   components: { LangSelect, SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error("Please enter the correct user name"));
+        callback(new Error('Please enter the correct user name'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 4) {
-        callback(new Error("The password can not be less than 6 digits"));
+      if (value.length < 6) {
+        callback(new Error('The password can not be less than 6 digits'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     return {
       loginForm: {
-        username: "admin@happytours.com",
-        password: "admin",
+        username: 'admin',
+        password: '111111'
       },
       loginRules: {
-        username: [{ required: true, trigger: "blur" }],
-        password: [
-          { required: true, trigger: "blur", validator: validatePassword },
-        ],
+        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
-      passwordType: "password",
+      passwordType: 'password',
       capsTooltip: false,
       loading: false,
       showDialog: false,
       redirect: undefined,
-      otherQuery: {},
-      url: this.$store.getters.url,
-    };
+      otherQuery: {}
+    }
   },
   watch: {
     $route: {
-      handler: function (route) {
-        const query = route.query;
+      handler: function(route) {
+        const query = route.query
         if (query) {
-          this.redirect = query.redirect;
-          this.otherQuery = this.getOtherQuery(query);
+          this.redirect = query.redirect
+          this.otherQuery = this.getOtherQuery(query)
         }
       },
-      immediate: true,
-    },
+      immediate: true
+    }
   },
   created() {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === "") {
-      this.$refs.username.focus();
-    } else if (this.loginForm.password === "") {
-      this.$refs.password.focus();
+    if (this.loginForm.username === '') {
+      this.$refs.username.focus()
+    } else if (this.loginForm.password === '') {
+      this.$refs.password.focus()
     }
   },
   destroyed() {
@@ -177,81 +174,45 @@ export default {
   },
   methods: {
     checkCapslock(e) {
-      const { key } = e;
-      this.capsTooltip = key && key.length === 1 && key >= "A" && key <= "Z";
+      const { key } = e
+      this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
     },
     showPwd() {
-      if (this.passwordType === "password") {
-        this.passwordType = "";
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
       } else {
-        this.passwordType = "password";
+        this.passwordType = 'password'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus();
-      });
+        this.$refs.password.focus()
+      })
     },
     handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
-        var login = {
-          email: this.loginForm.username,
-          password: this.loginForm.password,
-        };
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
-          axios
-            .post(this.url + "Accounts/Login", login)
-            .then((response) => {
-              
-              this.$router.push({
-                path: "/manageTour",
-                query: this.otherQuery,
-              });
-              this.loading = false;
-              console.log("Logueado con exito", this.redirect , this.otherQuery);
-            })
-            .catch((error) => {
-              this.loading = false;
-              console.error(error.response);
-            });
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-      this.$refs.loginForm.validate((valid) => {
-        if (valid) {
-          var login = {
-            username: 'admin',
-            password: 'password'
-          }
-          this.loading = true;
-          this.$store
-            .dispatch("user/login", login)
+          this.loading = true
+          this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({
-                path: this.redirect || "/",
-                query: this.otherQuery,
-              });
-              this.loading = false;
-              console.log("Logueado con exito2", this.redirect , this.otherQuery);
+              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
+              this.loading = false
             })
             .catch(() => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     getOtherQuery(query) {
       return Object.keys(query).reduce((acc, cur) => {
-        if (cur !== "redirect") {
-          acc[cur] = query[cur];
+        if (cur !== 'redirect') {
+          acc[cur] = query[cur]
         }
-        return acc;
-      }, {});
-    },
+        return acc
+      }, {})
+    }
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {
     //     const code = getQueryObject(e.newValue)
@@ -270,8 +231,8 @@ export default {
     //     }
     //   }
     // }
-  },
-};
+  }
+}
 </script>
 
 <style lang="scss">

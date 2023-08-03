@@ -1019,7 +1019,7 @@ export default {
     /* Añadiendo una nueva acco */
     PostNewAcc() {
       if (this.isEditAcc) {
-        console.log("entre", this.newAccommodation);
+/*         console.log("entre", this.newAccommodation); */
         this.fullscreenLoading = true;
         let acc = {
           priority: true,
@@ -1059,7 +1059,7 @@ export default {
     },
     /* Deshabilitar categorias mientras se completa el precio de una acomodacion */
     disableCategorySeasons(idCat, idSeason, status) {
-      console.log("STATUS", status);
+      /* console.log("STATUS", status); */
       this.disabledButton = status;
       this.seasons.map((season) => {
         season.categories.map((cat) => {
@@ -1069,7 +1069,6 @@ export default {
         });
       });
     },
-
     /* Validar que un objeto este vacio */
     isEmptyObject(obj) {
       return JSON.stringify(obj) === "{}";
@@ -1264,7 +1263,7 @@ export default {
           this.getSeasons = response.data.filter(
             (element) => element.tourId == this.listTours.id
           );
-          console.log("PROBANDO LISTA DE TOURS", this.getSeasons);
+          /* console.log("PROBANDO LISTA DE TOURS", this.getSeasons); */
           let aSeasons = [];
           if (this.getSeasons.length > 0) {
             /* AGRUPAR RESPONSE POR SEASON */
@@ -1274,7 +1273,7 @@ export default {
               group[tourSeasonName].push(product);
               return group;
             }, {});
-            console.log("LISTA AGRUPADA", groupByCategory);
+          /*   console.log("LISTA AGRUPADA", groupByCategory); */
             /* ALMACENAR SEASONS AGRUPADOS  EN ARRAY */
             for (var clave in groupByCategory) {
               // Controlando que json realmente tenga esa propiedad
@@ -1283,7 +1282,7 @@ export default {
                 aSeasons.push(groupByCategory[clave]);
               }
             }
-            console.log("LISTA ALMACENADA", aSeasons, this.listTours);
+            /* console.log("LISTA ALMACENADA", aSeasons, this.listTours); */
             /* RECORRIENDO SEASONS */
             let accomodations = [];
             let categories = [];
@@ -1323,10 +1322,10 @@ export default {
                   if (seasonInfo.priority) {
                     this.categoryDefault = seasonInfo;
                     this.seasonsId = idSeasons;
-                    console.log(
+                    /* console.log(
                       "🚀 ~ file: programTour.vue ~ line 1322 ~ this.listTours.tourCategories.forEach ~ this.seasonsId",
                       this.seasonsId
-                    );
+                    ); */
                   }
                   this.seasons.push({
                     seasonId: seasonInfo.tourSeasonId,
@@ -1348,7 +1347,7 @@ export default {
           } else {
             this.getSeasonDefault();
           }
-          console.log("LISTA FINAL", this.seasons);
+          /* console.log("LISTA FINAL", this.seasons); */
           this.caculateDate(this.listTours);
         })
         .catch((error) => {
@@ -1369,7 +1368,7 @@ export default {
               if (firstPriority) {
                 this.categoryDefault = season;
               }
-              console.log(index, firstPriority);
+              /* console.log(index, firstPriority); */
               this.seasons.push({
                 seasonId: season.id,
                 label: season.name,
@@ -1480,6 +1479,7 @@ export default {
         .map((u) => u.providerCategoryName)
         .join(", ");
       this.getSeason();
+      this.getTourForTable();
     },
     //----END METHODS FOR SEASON TAB----//
 
@@ -1621,7 +1621,7 @@ export default {
     },
     /* UPDATE */
     handleUpdate(row) {
-      console.log(row);
+      /* console.log(row); */
       this.resetTemp();
       this.editFormTourDayDescription = [];
       this.active = 0;
@@ -1662,7 +1662,7 @@ export default {
           tourDayDescriptions: [],
         };
         this.formDayDetail.forEach((element, index) => {
-          console.log("DATE", element);
+         /*  console.log("DATE", element); */
           var dayDescription = {
             id: element.id,
             dayNumber: index + 1,
@@ -1779,6 +1779,7 @@ export default {
       axios
         .get(this.url + "Tour")
         .then((response) => {
+          /* console.log("TOUR", response.data) */
           /* para que el autocomplete solo muestre los tours padres */
           var aTours = [];
           this.list = response.data;
@@ -1796,10 +1797,10 @@ export default {
     },
     /* Para actualizar la el tour actual */
     getTourbyId(tour) {
-      console.log(
+      /* console.log(
         "🚀 ~ file: programTour.vue ~ line 1809 ~ getTourbyId ~ tour",
         tour
-      );
+      ); */
       axios
         .get(this.url + "Tour/GetTourById?id=" + tour.id)
         .then((response) => {
@@ -1815,10 +1816,10 @@ export default {
         });
     },
     handleIconClick(ev) {
-      console.log(ev);
+   /*    console.log(ev); */
     },
     handleCheckAllChange(val) {
-      console.log(val, this.checkedTours, this.aListToursOriginal);
+      /* console.log(val, this.checkedTours, this.aListToursOriginal); */
       if (val) {
         this.disabledButton2 = true;
       } else {
@@ -1838,13 +1839,14 @@ export default {
       } else {
         this.disabledButton2 = false;
       }
-      console.log("hola", value);
+      /* console.log("hola", value); */
       this.aListToursFinal = [];
       var copyValue = value;
 
       /* CONVIRTIENDO ARRAY DE STRING EN ARRAY DE OBJETS  */
       value.forEach((element, index) => {
         this.aListTours.forEach((element2, index) => {
+          /* console.log("PROBANDO TOURINTANCE",element, element2 ) */
           if (element === element2.nameInstance) {
             this.aListToursFinal.push({
               tourId: element2.tourId,
@@ -1873,15 +1875,15 @@ export default {
       } else {
         this.disabledButton = true;
       }
-      console.log(
+      /* console.log(
         value,
         value.length,
         this.listTours.tourInstances,
         this.aListToursFinal
-      );
+      ); */
     },
     handleClick(tab, event) {
-      console.log(tab, event);
+     /*  console.log(tab, event); */
       if (tab.name === "first") {
         this.disabledButton = true;
       }
@@ -1927,15 +1929,15 @@ export default {
           hidden: currentDate > day ? true : false,
         });
       }
-      console.log("TOUR FINAL", this.aListTours);
+      /* console.log("TOUR FINAL", this.aListTours); */
       this.checkTour(tour);
       this.orderList();
       this.aListToursFinal = this.aListTours;
 
-      console.log(this.aListTours);
+     /*  console.log(this.aListTours); */
     },
     itemSelected(item, index) {
-      console.log("hola", this.aListToursFinal, item);
+    /*   console.log("Item seleccionado", this.aListToursFinal, item); */
       let season = item.seasonName;
       item.seasons = season.idSeasons;
       item.seasonName = season.label;
@@ -1980,6 +1982,7 @@ export default {
         });
     },
     checkTour(tour) {
+
       this.countCheckedTours = 0;
       this.checkedTours = [];
       if (tour.tourInstances.length == 0) {
@@ -2003,21 +2006,15 @@ export default {
         this.countCheckedTours == tour.tourInstances.length &&
         this.activeName === "second"
       ) {
-        console.log("si");
-        this.disabledButton = false;
+        console.log("si");        this.disabledButton = false;
       } else {
         this.disabledButton = true;
       }
       this.aListToursOriginal = this.checkedTours;
-      console.log(
-        "count",
-        this.countCheckedTours,
-        this.countCheckedTours == this.aListTours.length &&
-          this.activeName === "second",
-        this.disabledButton
-      );
+     /*  console.log(tour, this.aListTours, this.checkedTours) */
     },
     orderList() {
+      /* console.log("TOURS LIST", this.listTours, this.list) */
       var aTourChildren = [];
       aTourChildren = this.list.map((item) => {
         return item.masterTourId === this.listTours.id ? item : 1;

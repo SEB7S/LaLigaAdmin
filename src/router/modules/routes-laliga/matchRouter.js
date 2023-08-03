@@ -9,7 +9,8 @@ const matchRouter = {
   name: 'ComponentDemo',
   meta: {
     title: 'match',
-    icon: 'component'
+    icon: 'component',
+    roles: ['editor'],
   },
   children: [
     {

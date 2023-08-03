@@ -1,193 +1,8 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <!--       <el-input
-        placeholder="Nombre En"
-        style="width: 200px"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-button
-        v-waves
-        class="filter-item"
-        type="primary"
-        icon="el-icon-search"
-        @click="handleFilter"
-      >
-        Search
-      </el-button> -->
-      <!--COMMENT-->
-      <!-- COMMENT2 -->
-      <el-button
-        class="filter-item"
-        style="margin-left: 10px"
-        type="primary"
-        icon="el-icon-edit"
-        @click="handleCreate"
-      >
-        {{ $t("table.add") }}
-      </el-button>
-      <el-button
-        v-waves
-        :loading="downloadLoading"
-        class="filter-item"
-        type="primary"
-        icon="el-icon-download"
-        @click="handleDownload"
-      >
-        {{ $t("table.export") }}
-      </el-button>
-      <el-checkbox
-        v-model="showReviewer"
-        class="filter-item"
-        style="margin-left: 15px"
-        @change="tableKey = tableKey + 1"
-      >
-        reviewer
-      </el-checkbox>
-    </div>
-
-    <el-table
-      :key="tableKey"
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%"
-      @sort-change="sortChange"
-    >
-      <el-table-column
-        label="ID"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="80"
-        :class-name="getSortClass('id')"
-      >
-        <template slot-scope="{ row }">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('user.nameUser')" min-width="100px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.name }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('user.cityUser')" min-width="100px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.cityName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('user.latitudeUser')" min-width="100px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.latitude }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('user.longitudeUser')" min-width="100px" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.longitude }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('table.actions')"
-        align="center"
-        width="230"
-        class-name="small-padding fixed-width"
-      >
-        <template slot-scope="{ row }">
-          <el-button 
-          type="primary" 
-          size="mini" 
-          icon="el-icon-edit" 
-          @click="handleUpdate(row)"
-          />
-          
-          <el-button
-            v-if="row.status != 'deleted'"
-            size="mini"
-            type="danger"
-            icon="el-icon-delete"
-            @click="confirmDelete(row)"
-          />
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
-      @pagination="getList"
-    />
-
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal = "false">
-      <el-form
-        ref="dataForm"
-        :rules="rules"
-        :model="temp"
-        label-position="top"
-      >
-        <el-form-item :label="$t('user.nameUser')">
-          <el-input v-model="formStadium.name" />
-        </el-form-item>
-        <el-form-item :label="$t('user.latitudeUser')">
-          <el-input v-model="formStadium.latitude" />
-        </el-form-item>
-        <el-form-item :label="$t('user.longitudeUser')" >
-          <el-input v-model="formStadium.longitude" />
-        </el-form-item>
-        <el-form-item :label="$t('user.cityUser')">
-          <el-autocomplete
-            v-model="formStadium.city_name"
-            popper-class="my-autocomplete"
-            :fetch-suggestions="getCities"
-            placeholder="Please input"
-            style="width: 100%"
-            @select="handleSelect"
-          >
-            <i
-              slot="suffix"
-              class="el-icon-edit el-input__icon"
-              @click="handleIconClick"
-            />
-            <template slot-scope="{ item }">
-              <div class="value">{{ item.nameEnglish }}</div>
-            </template>
-          </el-autocomplete>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false"> 
-          {{ $t("table.cancel") }}
-        </el-button>
-        <el-button
-          type="primary"
-          @click="dialogStatus === 'create' ? postStadium() : updateData()"
-        >
-          {{ $t("table.confirm") }}
-        </el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics" :close-on-click-modal = "false">
-      <el-table
-        :data="pvData"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%"
-      >
-        <el-table-column prop="key" label="Channel" />
-        <el-table-column prop="pv" label="Pv" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">
-          Confirm
-        </el-button>
-      </span>
-    </el-dialog>
+    <h2 v-permission="['admin']" >ESTOY AQUI ADMIN</h2>
+    <h2 v-permission="['editor']" >ESTOY AQUI EDITOR</h2>
+    <h2 v-permission="['admin', 'editor']" >ESTOY AQUI AMBOS</h2>
   </div>
 </template>
 <script>
@@ -202,6 +17,7 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import axios from 'axios'
+import permission from '@/directive/permission/index.js'
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
   { key: 'US', display_name: 'USA' },
@@ -218,7 +34,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 export default {
   name: 'ConfigUser',
   components: { Pagination },
-  directives: { waves },
+  directives: { waves, permission },
   filters: {
     statusFilter(status) {
       const statusMap = {

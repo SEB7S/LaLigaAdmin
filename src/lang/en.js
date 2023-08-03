@@ -168,11 +168,13 @@ export default {
     nameEspanish: "Name Spanish",
     priority: 'Priority',
     stadiumId: 'Stadium',
+    categoryColor:"Category Color",
     categoryStadium: 'Category',
     descriptionStadiumEn:"Stadium description (En)",
     descriptionStadiumEs:"Stadium description (Es)",
     stadiumRecomendationEn:"Data and recomendations (En)",
     stadiumRecomendationEs:"Data and recomendations (Es)"
+
   },
   config:{
     numberMatch:"Número de partidos a destacar",
